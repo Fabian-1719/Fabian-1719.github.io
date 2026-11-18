@@ -52,6 +52,10 @@
     cloud:    ["#ffffff", "#ffe2c4", "#eaa4ac", "#2c3664"],
     cloudMid: ["#e6f0fa", "#f8d0b2", "#d68e9e", "#283262"],
     cloudSh:  ["#c4d6ea", "#e0a890", "#a8687e", "#1d2548"],
+    lakeHi:   ["#7cc6f0", "#e2b48e", "#c27a86", "#25386a"],
+    lake:     ["#3d8fd4", "#5a82ae", "#4c4f88", "#16234a"],
+    lakeDeep: ["#2a6aae", "#3e5c88", "#353768", "#0d1634"],
+    wetSand:  ["#c4a068", "#cb9456", "#86686e", "#2c262c"],
     // cycle groups (4 water, 4 falls, 3 fire)
     water0: ["#3e90d6", "#4f80b0", "#4b508a", "#152046"],
     water1: ["#58a9e6", "#7b9ac0", "#6b5b9a", "#1d2b58"],
@@ -72,6 +76,96 @@
     ["#f1d8b6", "#c0e2f7", "#f6c48a", "#f08a5d", "#1e2856"],
     ["#ffe0aa", "#e4f3fb", "#ffd9a0", "#ffb36b", "#2a3462"]
   ];
+
+  /* The sword in its pedestal: a pixel sprite supplied by the site owner, 38×76. */
+  const SWORD_ROWS = [
+    "..................ab..................",
+    "..................ab..................",
+    ".................abbc.................",
+    "................babbbc................",
+    ".................baab.................",
+    "..................db..................",
+    "..................bd..................",
+    "..................db..................",
+    "..................bb..................",
+    "..................bd..................",
+    "..................db..................",
+    "..................bd..................",
+    "..................bb..................",
+    "..................db..................",
+    "..................bd..................",
+    "..................db..................",
+    ".................bbbc.................",
+    "...............abbbbbbc...............",
+    ".............c..abbbbc..b.............",
+    "............bac..aabc..bbc............",
+    "............abaccbbbccbbcb............",
+    "...........aabbbbefefbbbcbb...........",
+    "..........babaaabbefbbcbbcbc..........",
+    ".........babaa.aabbbbcc.bbcbc.........",
+    "........baa.....aabbcc.....bbc........",
+    ".................aggb.................",
+    ".................aggb.................",
+    ".................fggf.................",
+    ".................hggi.................",
+    "................hggggi................",
+    "...............hggggggi...............",
+    "...............gghihigg...............",
+    "...............hgghiggi...............",
+    "................hggggi................",
+    "................hggggi................",
+    "................hggggi................",
+    "................hggggi................",
+    "................hggggi................",
+    "................hggggi................",
+    "................hggggi................",
+    "................hggggi................",
+    "................hggggi................",
+    "................hggggi................",
+    "................hggggi................",
+    "................hggggi................",
+    "................hggggi................",
+    "................hggggi................",
+    "................hggggi................",
+    "................hggggi................",
+    "................hggggi................",
+    "................hggggi................",
+    "................hggggi................",
+    "................hggggi................",
+    "................hggggi................",
+    "................hggggi................",
+    "................hggggi................",
+    "................hggggi................",
+    "................hggggi................",
+    "..........jkkkkkhggggilllkkl..........",
+    ".........jkkkkkkhggggillkkkkl.........",
+    "........jkkkkkkkhggggilkkkkkkl........",
+    ".......jkkkkkkkkkkkkkkkkkkkkkkl.......",
+    "......jkkkkkkkkkkkkkkkkkkkkkkkkl......",
+    ".....jjjjjjjjjjjjjjjjjjjjjjjjjjkl.....",
+    ".....kkkkkkkkkkkkkkkkkkkkkkkkkkkl.....",
+    "....jkkkkkkkkkkkkkjjkkkkkkkkkkkkkl....",
+    "....jkkkkkkkkkkkkjkklkkkkkkkkkkkkl....",
+    "...jkkkkkkkkkkkkjkkkklkkkkkkkkkkkkl...",
+    "...jkkkkkkkkkkkjkkkkkklkkkkkkkkkkkl...",
+    "..jkkkkkkkkkkkjkjjjjjjklkkkkkkkkkkkl..",
+    "..jkkkkkkkkkkjkklkkkkkjklkkkkkkkkkkl..",
+    ".jkkkkkkkkkkjkkkklkkkjkkklkkkkkkkkkkl.",
+    ".jkkkkkkkkkjkkkkkklkjkkkkklkkkkkkkkkl.",
+    "jkkkkkkkkkjjjjjjjjjjjjjjjjjlkkkkkkkkkl",
+    "jkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkl",
+    "jkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkl"
+  ];
+  const SWORD_COLORS: Record<string, string> = { a: "#4c4c84", b: "#3f3f74", c: "#2f2f5d", d: "#37946e", e: "#fbf236", f: "#8f974a", g: "#9badb7", h: "#cbdbfc", i: "#8599a5", j: "#847e87", k: "#696a6a", l: "#595652" };
+  // each sprite colour gets day/golden/dusk/night keys, tinted like the rest of the world
+  const tint = (h: string, to: string, k: number, dark: number) => {
+    const a = [1, 3, 5].map((i) => parseInt(h.slice(i, i + 2), 16)), b = [1, 3, 5].map((i) => parseInt(to.slice(i, i + 2), 16));
+    return "#" + a.map((v, i) => Math.round((v + (b[i] - v) * k) * dark).toString(16).padStart(2, "0")).join("");
+  };
+  for (const [k, h] of Object.entries(SWORD_COLORS)) {
+    const glow = k === "e"; // the gem in the guard keeps a little light at night
+    ROLES["sw_" + k] = [h, tint(h, "#ffb070", 0.14, 1), tint(h, "#6a4a7a", 0.3, 0.86), glow ? tint(h, "#ffd060", 0.2, 0.8) : tint(h, "#1a2246", 0.52, 0.7)];
+  }
 
   const names = Object.keys(ROLES);
   const R: Record<string, number> = {}; names.forEach((n, i) => { R[n] = i + 1; }); // 0 = transparent
@@ -150,12 +244,20 @@
   /* Main layer: one continuous walk. Key places (logical x):
      tower 205 · cliff 250 · waterfall 250-258 · lake 262-430 · forest 430-640 ·
      sword 545 · river + bridge 640-720 · village 720-900 · hill + camp 900-1200 */
+  const WATER = 158; // lake and river surface
+  const smooth01 = (t: number) => { const c = clamp(t); return c * c * (3 - 2 * c); };
+  const forestG = (x: number) => Math.round(150 + Math.sin(x * 0.02) * 3 + noise(x * 0.1) * 2);
+  const villageG = (x: number) => Math.round(148 + noise(x * 0.06) * 2);
   const ground = (x: number): number => {
-    if (x < 250) return Math.round(112 + noise(x * 0.08) * 3);
-    if (x < 430) return 164;
-    if (x < 640) return Math.round(150 + Math.sin(x * 0.02) * 3 + noise(x * 0.1) * 2);
-    if (x < 720) return 160;
-    if (x < 900) return Math.round(148 + noise(x * 0.06) * 2);
+    if (x < 246) return Math.round(112 + noise(x * 0.08) * 3);
+    if (x < 258) return 174; // plunge pool at the foot of the falls
+    if (x < 424) return Math.round(WATER + 20 - 12 * smooth01((x - 330) / 94) + noise(x * 0.2) * 2); // lake bed: deep by the falls, shelving to the beach
+    if (x < 448) return Math.round(WATER + 8 + (forestG(448) - WATER - 8) * smooth01((x - 424) / 24)); // pebble beach
+    if (x < 636) return forestG(x);
+    if (x < 658) return Math.round(forestG(636) + (WATER + 4 - forestG(636)) * smooth01((x - 636) / 22)); // west bank
+    if (x < 702) return Math.round(WATER + 4 + Math.sin(Math.PI * (x - 658) / 44) * 6 + noise(x * 0.3)); // river bed
+    if (x < 726) return Math.round(WATER + 4 + (villageG(726) - WATER - 4) * smooth01((x - 702) / 24)); // east bank
+    if (x < 900) return villageG(x);
     return Math.round(148 - 30 * Math.sin(Math.PI * clamp((x - 900) / 330)) + noise(x * 0.08) * 2);
   };
   const G = new Int16Array(WW);
@@ -169,7 +271,9 @@
       const d = y - t;
       let c;
       const strata = noise(y * 0.35 + noise(x * 0.04) * 3);
-      if (d === 0) c = R.grassHi;
+      const shore = t >= WATER - 3 && !plateau;
+      if (shore && d < 4) c = t >= WATER ? (hash(x * 1.7 + y) > 0.7 ? R.rock : dith(x, y, 0.5) ? R.pathDk : R.wetSand) : (d === 0 ? R.wetSand : dith(x, y, 0.4) ? R.pathDk : R.wetSand);
+      else if (d === 0) c = R.grassHi;
       else if (d < 3 + (noise(x * 0.4) > 0.6 ? 1 : 0)) c = dith(x, y, 0.25) ? R.grassHi : R.grass;
       else if (d < 5 && dith(x, y, 0.5)) c = R.grass;
       else if (plateau && d > 5) {
@@ -181,7 +285,7 @@
     }
   }
   for (let i = 0; i < 300; i++) { // buried stones: varied size, lit top, dark base
-    const x = Math.floor(rnd() * WW); if (x > 255 && x < 432) continue;
+    const x = Math.floor(rnd() * WW); if (G[x] >= WATER - 2 || (x > 240 && x < 264)) continue;
     const y = G[x] + 6 + Math.floor(rnd() * rnd() * 40), w = 1 + Math.floor(rnd() * rnd() * 5);
     const lit = rnd() > 0.4 ? R.rockHi : R.rock;
     for (let k = 0; k < w; k++) {
@@ -194,47 +298,70 @@
     for (let k = 0; k < 6 + rnd() * 8; k++) { put(main, x, y, R.trunkDk); x += rnd() > 0.5 ? 1 : 0; y += 1; }
   }
   for (let x = 0; x < WW; x++) { // grass tufts break the top line
-    if (x > 255 && x < 432) continue;
+    if (G[x] >= WATER - 3 || (x > 240 && x < 264)) continue;
     const h = hash(x * 3.7);
     if (h > 0.7) put(main, x, G[x] - 1, h > 0.9 ? R.grassHi : R.grass);
     if (h > 0.94) put(main, x, G[x] - 2, R.grassHi);
   }
-  // Cliff face below the tower plateau
-  for (let x = 236; x < 262; x++) {
-    const edge = 250 + Math.round(noise(x) * 2);
-    for (let y = 112; y < 168; y++) {
-      if (x < edge - (y - 112) * 0.08) continue;
-      if (x > edge + 4 + (y - 112) * 0.2) continue;
-      const n = noise(x * 0.5 + y * 0.31);
-      put(main, x, y, n > 0.62 ? R.rockHi : n > 0.32 ? R.rock : R.rockDk);
+  // Cliff face below the tower plateau: stepped ledges, darker toward the falls
+  for (let x = 232; x < 262; x++) {
+    for (let y = 112; y < WATER + 2; y++) {
+      const edge = 246 + Math.round(noise(y * 0.18) * 3) - Math.round((y - 112) * 0.06);
+      if (x < edge) continue;
+      if (x > 257 + Math.round((y - 112) / (WATER - 112) * 3)) continue; // the face ends where the falls end
+      const n = noise(x * 0.5 + y * 0.31), ledge = (y + Math.round(noise(x * 0.2) * 3)) % 9 === 0;
+      put(main, x, y, ledge ? R.rockHi : n > 0.55 ? R.rock : R.rockDk);
     }
   }
-  // Lake with cycling ripples and a foam lip
-  for (let x = 258; x < 432; x++) {
-    for (let y = 158; y < LH; y++) {
-      if (x < 262 && y < 160) continue;
-      const band = ((x >> 2) + (y * 3) + ((y & 1) ? 2 : 0)) & 3;
-      let c = R.water0 + band;
-      if (y === 158 && hash(x) > 0.55) c = R.foam;
-      if (y > 175 && dith(x, y, (y - 175) / 25)) c = R.water3;
-      put(main, x, y, c);
+  // Water body: colour by depth, a bright skin at the surface, the bed showing through at the edges
+  function water(x0: number, x1: number, flow: boolean) {
+    for (let x = x0; x < x1; x++) {
+      const bed = G[x];
+      if (bed <= WATER) continue;
+      for (let y = WATER; y < Math.min(bed, LH); y++) {
+        const d = y - WATER, toBed = bed - y;
+        let c = d < 2 ? R.lakeHi : d < 6 ? (dith(x, y, (d - 2) / 4) ? R.lake : R.lakeHi) : dith(x, y, (d - 6) / 10) ? R.lakeDeep : R.lake;
+        if (toBed <= 2 && dith(x, y, 0.5)) c = toBed === 1 ? R.wetSand : R.lakeHi; // shallows
+        put(main, x, y, c);
+      }
+      // glints: short dashes in cycle colours, horizontal for the lake, stretched for the current
+      for (let row = 1; row < Math.min(bed - WATER, 14); row += 2 + (row >> 2)) {
+        const seg = Math.floor((x + row * 5) / (flow ? 7 : 5));
+        if (hash(seg * 13.1 + row * 7.7) > (flow ? 0.45 : 0.62)) put(main, x, WATER + row, R.water0 + (((x >> (flow ? 0 : 1)) + row) & 3));
+      }
+      if (hash(x * 2.3) > 0.55) put(main, x, WATER, R.water2);
     }
   }
-  // Waterfall over the cliff edge (cycles downward)
-  for (let y = 108; y < 160; y++) {
-    for (let x = 249; x < 258; x++) {
-      const k = ((y >> 1) + ((x & 1) ? 2 : 0) + (x === 249 || x === 257 ? 1 : 0)) & 3;
-      put(main, x, y, R.fall0 + k);
+  water(240, 450, false);
+  water(636, 728, true);
+  // Stream across the plateau feeding the falls
+  for (let x = 220; x < 247; x++) {
+    const w = 2 + ((x - 220) >> 3);
+    for (let k = 0; k < w; k++) put(main, x, G[x] + k, k === 0 ? R.water2 : R.water0 + ((x + k) & 3));
+    put(main, x, G[x] + w, R.rockDk);
+  }
+  // Waterfall: widens as it drops, lit streaks, dark edges, curling lip and splash
+  for (let y = 112; y < WATER + 1; y++) {
+    const t = (y - 112) / (WATER - 112);
+    const l = 245 - Math.round(t * 2), r = 255 + Math.round(t * 4);
+    for (let x = l; x <= r; x++) {
+      const edge = x === l || x === r;
+      const streak = (x - l) % 4 === 1;
+      let k = ((y >> 1) - x * 3) & 3;
+      if (edge) k = 3; else if (streak) k = 2;
+      if (edge && dith(x, y, 0.5)) continue; // ragged, see-through edge
+      put(main, x, y, R.fall0 + ((k + (y >> 1)) & 3));
     }
   }
-  for (let i = 0; i < 40; i++) put(main, 246 + Math.floor(rnd() * 16), 155 + Math.floor(rnd() * 6), rnd() > 0.4 ? R.foam : R.fall2);
-  // River under the bridge
-  for (let x = 652; x < 708; x++) for (let y = 156; y < LH; y++) {
-    if (y < 158 && (x < 655 || x > 704)) continue;
-    put(main, x, y, R.water0 + (((x >> 1) + y * 2) & 3));
+  for (let x = 244; x < 256; x++) put(main, x, 111, R.foam); // lip
+  for (let i = 0; i < 90; i++) { // splash: a mound of spray where the water lands
+    const a = rnd() * Math.PI, rr = rnd() * 10;
+    const x = Math.round(250 + Math.cos(a) * rr * 1.4), y = Math.round(WATER - Math.sin(a) * rr * 0.7);
+    put(main, x, y, rnd() > 0.5 ? R.foam : R.fall0 + Math.floor(rnd() * 4));
   }
+  for (let x = 236; x < 270; x++) if (hash(x * 4.1) > 0.35) put(main, x, WATER + 1 + (Math.abs(x - 252) > 10 ? 1 : 0), R.foam); // foam ring
   // Paths through the village and up the hill
-  for (let x = 720; x < 1150; x++) {
+  for (let x = 730; x < 1150; x++) {
     const t = G[x];
     for (let d = 1; d < 4; d++) {
       const edgeFade = d === 3 ? dith(x, t + d, 0.5) : true;
@@ -345,11 +472,34 @@
     put(main, x0, base - 15, R.woodDk);
   }
   function bridge() {
-    for (let x = 646; x < 714; x++) {
-      const sag = Math.round(Math.sin(Math.PI * (x - 646) / 68) * 2);
-      put(main, x, 150 + sag, R.wood); put(main, x, 151 + sag, R.woodDk);
-      if ((x - 646) % 7 === 0) for (let y = 143; y < 151; y++) put(main, x, y + sag, R.woodDk);
-      put(main, x, 144 + sag, R.wood);
+    const x0 = 634, x1 = 730;
+    const yAt = (x: number) => Math.round(147 - Math.sin(Math.PI * (x - x0) / (x1 - x0)) * 3); // gentle arch
+    // stone abutments where the deck meets each bank
+    for (const [ax, dir] of [[x0, 1], [x1, -1]] as const) {
+      for (let i = 0; i < 6; i++) for (let y = yAt(ax) + 2; y < G[ax + dir * i] + 3; y++) put(main, ax + dir * i, y, (y + i) % 3 ? R.stone : R.stoneDk);
+    }
+    // piers into the river with cross bracing
+    const piers = [664, 696];
+    for (const px of piers) for (let y = yAt(px) + 2; y < G[px] + 1; y++) { put(main, px, y, R.wood); put(main, px + 1, y, R.woodDk); }
+    for (let i = 0; i <= piers[1] - piers[0]; i++) {
+      const xa = piers[0] + i, span = piers[1] - piers[0];
+      const ya = yAt(xa) + 3 + Math.round((i / span) * 8), yb = yAt(xa) + 11 - Math.round((i / span) * 8);
+      put(main, xa, ya, R.woodDk); put(main, xa, yb, R.woodDk);
+    }
+    // deck: planks with seams and a dark underside, shadow on the water below
+    for (let x = x0; x <= x1; x++) {
+      const y = yAt(x), seam = (x - x0) % 3 === 0;
+      put(main, x, y, seam ? R.woodDk : R.wood);
+      put(main, x, y + 1, seam ? R.woodDk : (x & 1 ? R.wood : R.woodDk));
+      put(main, x, y + 2, R.trunkDk);
+      if (G[x] > WATER) { put(main, x, WATER + 1, R.lakeDeep); put(main, x, WATER + 2, R.lakeDeep); }
+    }
+    // railing: posts every 8 px, top and middle rails
+    for (let x = x0 + 2; x <= x1 - 2; x++) {
+      const y = yAt(x);
+      if ((x - x0 - 2) % 8 === 0) for (let k = 1; k <= 7; k++) put(main, x, y - k, k === 7 ? R.wood : R.woodDk);
+      put(main, x, y - 7, R.wood);
+      put(main, x, y - 4, R.woodDk);
     }
   }
   function tentAndFire(tx: number, fx: number) {
@@ -379,24 +529,11 @@
     for (const [sx, sy] of [[-5, 0], [5, 0], [-4, 1], [4, 1]]) put(main, fx + sx, fb + sy, R.rock);
   }
   function sword(x0: number) {
-    const base = G[x0];
-    const S = [
-      "....g....",
-      "...hhh...",
-      "....h....",
-      "..hhhhh..",
-      "....b....",
-      "....b....",
-      "....b....",
-      "....b....",
-      "....b....",
-      "...sbs...",
-      "..sSSSs..",
-      ".sSSSSSs.",
-      "sSSSSSSSs"
-    ];
-    const map: Record<string, number> = { g: R.gem, h: R.hilt, b: R.blade, s: R.rockHi, S: R.rock };
-    S.forEach((row, i) => [...row].forEach((ch, j) => { if (map[ch]) put(main, x0 - 4 + j, base - S.length + i + 1, map[ch]); }));
+    const w = SWORD_ROWS[0].length, h = SWORD_ROWS.length;
+    const base = G[x0] + 2; // pedestal sits a little into the clearing
+    SWORD_ROWS.forEach((row, i) => [...row].forEach((ch, j) => {
+      if (ch !== ".") put(main, x0 - (w >> 1) + j, base - h + 1 + i, R["sw_" + ch]);
+    }));
   }
   function flowers(x0: number, x1: number, n: number) {
     for (let i = 0; i < n; i++) {
@@ -411,13 +548,13 @@
   tower(196);
   flowers(10, 240, 40);
   const forest = [];
-  for (let x = 436; x < 636; x += 9 + Math.floor(rnd() * 8)) { if (x > 528 && x < 562) continue; forest.push(x); }
+  for (let x = 436; x < 636; x += 9 + Math.floor(rnd() * 8)) { if (x > 514 && x < 578) continue; forest.push(x); }
   forest.forEach((x, i) => {
     if (i % 3 === 1) pine(x, G[x] + 1, 20 + Math.floor(rnd() * 10));
     else broadleaf(x, G[x] + 1, 6 + Math.floor(rnd() * 6), 7 + Math.floor(rnd() * 4));
   });
   sword(545);
-  flowers(528, 562, 14);
+  flowers(516, 576, 18);
   bridge();
   house(732, "wood"); house(784, "stone"); house(842, "wood");
   lampPost(770); lampPost(828); lampPost(880);
