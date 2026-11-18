@@ -26,26 +26,26 @@
     "focus.arch.d": "Arquitectura hexagonal, comunicación por eventos y microservicios, aplicados en proyectos reales de equipo y no solo en diagramas.",
     "projects.title": "El sendero hasta ahora",
     "projects.intro": "Cinco proyectos, del más reciente al más antiguo. Los de equipo lo dicen; cada cifra sale del código.",
-    "p.rev.who": "Proyecto de equipo · 3 personas · Azure",
+    "p.rev.who": "Proyecto de equipo\u00a0· 3 personas\u00a0· Azure",
     "p.rev.desc": "Una plataforma de revisión de código entre compañeros para proyectos grupales de la universidad. Se conecta al repositorio de cada equipo, exige que cada cambio lo revise un compañero antes de fusionarse, mide el aporte real de cada estudiante y le prepara retroalimentación al profesor.",
     "p.rev.f1": "3 microservicios detrás de Azure API Management",
     "p.rev.f2": "Spring Boot con arquitectura hexagonal",
     "p.rev.f3": "Notificaciones en tiempo real con Azure Web PubSub",
-    "p.gc.who": "Proyecto individual · 2 repositorios",
+    "p.gc.who": "Proyecto de equipo\u00a0· 2 personas\u00a0· 2 repositorios",
     "p.gc.desc": "Una consola de juegos multijugador donde juegas contra una IA escrita en Prolog. Las partidas corren en tiempo real por WebSockets y cada jugada se envía a una plataforma de analítica aparte: un servicio en Go valida los eventos y uno en Scala los convierte en estadísticas y patrones de los jugadores.",
     "p.gc.f1": "Minimax con poda alfa-beta en Prolog",
     "p.gc.f2": "Flujo de eventos: TypeScript → Go → Scala",
     "p.gc.f3": "Imágenes Docker y CI con GitHub Actions",
-    "p.cp.who": "Proyecto de equipo · 4 personas · quien más aportó",
+    "p.cp.who": "Proyecto de equipo\u00a0· 4 personas\u00a0· quien más aportó",
     "p.cp.desc": "Una plataforma web para una pastelería que combina una tienda en línea y una academia de repostería con cursos y matrículas. Un monorepo con una app web en React y una API REST documentada con Swagger.",
     "p.cp.f1": "Tienda, carrito y matrícula de cursos en una sola app",
     "p.cp.f2": "API en Express sobre Firebase, probada con Vitest",
-    "p.nx.who": "Proyecto de equipo · web scraping",
+    "p.nx.who": "Proyecto de equipo\u00a0· web scraping",
     "p.nx.desc": "Un rastreador de precios de videojuegos. Extrae datos de tiendas digitales y de consolas, reúne fechas de lanzamiento, géneros y portadas, y lo sirve todo con una API REST que se actualiza sola cada 24 horas.",
     "p.nx.f1": "Más de 20 tiendas",
     "p.nx.f2": "80 workers concurrentes: procesos, hilos y E/S asíncrona",
     "p.nx.f3": "Sincronización con Firebase y respaldo local en JSON",
-    "p.si.who": "Proyecto individual · Python",
+    "p.si.who": "Proyecto individual\u00a0· Python",
     "p.si.desc": "Un shooter arcade al estilo del clásico, hecho con Pygame: power-ups, nave misteriosa, perfiles de jugador, historial de partidas y un top 5 que se guarda entre sesiones.",
     live: "Sitio en vivo",
     code: "Código",
@@ -120,13 +120,20 @@
   const colors = ["#f59e0b", "#38bdf8", "#f472b6", "#2563eb"];
   for (let i = 0; i < 9; i++) {
     const x = 60 + rand() * 1320, y = 300 + rand() * 100, col = colors[Math.floor(rand() * colors.length)];
-    const g = el("g", {});
-    g.style.setProperty("--d", (5 + rand() * 4).toFixed(2) + "s");
-    g.style.setProperty("--dl", (-rand() * 8).toFixed(2) + "s");
-    g.style.setProperty("--dx", ((rand() > 0.5 ? 1 : -1) * (10 + rand() * 16)).toFixed(0) + "px");
-    g.appendChild(el("ellipse", { cx: x - 3.4, cy: y, rx: 3.8, ry: 4.2, fill: col }));
-    g.appendChild(el("ellipse", { cx: x + 3.4, cy: y, rx: 3.8, ry: 4.2, fill: col }));
-    g.appendChild(el("rect", { x: x - 0.7, y: y - 3.5, width: 1.4, height: 7, fill: "#3b2a1a" }));
+    const g = el("g", { transform: `translate(${x.toFixed(1)} ${y.toFixed(1)})` });
+    const flight = el("g", { class: "bfly" });
+    flight.style.setProperty("--d", (5 + rand() * 4).toFixed(2) + "s");
+    flight.style.setProperty("--dl", (-rand() * 8).toFixed(2) + "s");
+    flight.style.setProperty("--dx", ((rand() > 0.5 ? 1 : -1) * (10 + rand() * 16)).toFixed(0) + "px");
+    const wings = el("g", { class: "bfly__wings" });
+    // upper wings larger and swept, lower wings small: reads as a butterfly, not a dot pair
+    wings.appendChild(el("path", { d: "M0 0 C-3 -9 -11 -10 -11 -4 C-11 0 -5 1 0 0Z", fill: col }));
+    wings.appendChild(el("path", { d: "M0 0 C3 -9 11 -10 11 -4 C11 0 5 1 0 0Z", fill: col }));
+    wings.appendChild(el("path", { d: "M0 0 C-2 5 -7 7 -8 4 C-8 1 -4 0 0 0Z", fill: col, opacity: ".85" }));
+    wings.appendChild(el("path", { d: "M0 0 C2 5 7 7 8 4 C8 1 4 0 0 0Z", fill: col, opacity: ".85" }));
+    flight.appendChild(wings);
+    flight.appendChild(el("rect", { x: -0.8, y: -5, width: 1.6, height: 9, rx: 0.8, fill: "#3b2a1a" }));
+    g.appendChild(flight);
     bflies.appendChild(g);
   }
 
@@ -142,8 +149,8 @@
       return [r.left - box.left + r.width / 2, r.top - box.top + r.height / 2];
     });
     if (!pts.length) return;
-    let d = `M ${pts[0][0]} ${-80}`;
-    let prev = [pts[0][0], -80];
+    let d = `M ${pts[0][0]} ${pts[0][1] - 40}`;
+    let prev = [pts[0][0], pts[0][1] - 40];
     // Walk straight down under each marker, and only swing sideways in the gap
     // just above the next camp so the trail never crosses a project's text.
     for (const p of pts) {
@@ -180,25 +187,34 @@
 
   function progressAt(elm) {
     const max = document.documentElement.scrollHeight - innerHeight;
-    return max > 0 ? clamp((elm.offsetTop - innerHeight * 0.5) / max) : 0;
+    const top = elm.getBoundingClientRect().top + scrollY;
+    return max > 0 ? clamp((top - innerHeight * 0.5) / max) : 0;
   }
   let marks = {};
+  let small = innerWidth < 860;
+  const hillPath = $("#hill");
+  const hillEdge = $("#hillEdge");
   // On narrow screens, frame the landscapes on the volcano instead of the empty middle
   const nightLand = $(".land--night");
   const dayLand = $(".land--day");
   function fitLand() {
     const small = innerWidth < 700;
     nightLand.setAttribute("viewBox", small ? "700 0 740 560" : "0 0 1440 560");
-    dayLand.setAttribute("viewBox", small ? "260 0 1000 420" : "0 0 1440 420");
+    dayLand.setAttribute("viewBox", small ? "830 0 400 420" : "0 0 1440 420");
   }
   function measure() {
     fitLand();
     marks = {
-      dawnStart: progressAt(sections.projects) - 0.12,
-      dawnFull: progressAt(sections.projects) + 0.02,
-      dayStart: progressAt(sections.stack) - 0.16,
-      dayFull: progressAt(sections.stack) - 0.02
+      // Dawn breaks as the trail begins and the day arrives while you walk it
+      dawnStart: progressAt(sections.projects) - 0.09,
+      dawnFull: progressAt(sections.projects) + 0.04,
+      dayStart: progressAt($("#ciudad-pastel")) ,
+      dayFull: progressAt(sections.stack) - 0.03,
+      hillStart: progressAt(sections.projects) - 0.04,
+      hillEnd: progressAt(sections.stack) - 0.02
     };
+    small = innerWidth < 860;
+    sections.projects.style.backgroundColor = "";
     drawTrail();
   }
 
@@ -214,13 +230,26 @@
     day.style.opacity = dayO.toFixed(3);
     night.style.opacity = (1 - dayO).toFixed(3);
 
+    // Moon starts clear of the name (above "Arce") and sets to the right
     const m = clamp(p / Math.max(marks.dawnFull, 0.01));
-    moon.style.transform = `translate(${lerp(vw * 0.12, vw * 0.7, m)}px, ${lerp(vh * 0.1, vh * 0.55, m * m)}px)`;
+    const moonX0 = small ? vw * 0.6 : vw * 0.5, moonX1 = small ? vw * 0.75 : vw * 0.86;
+    moon.style.transform = `translate(${lerp(moonX0, moonX1, m)}px, ${lerp(vh * 0.07, vh * 0.55, m * m)}px)`;
     moon.style.opacity = (1 - smooth(marks.dawnStart, marks.dawnFull, p)).toFixed(3);
 
+    // Sun climbs in the strip of sky right of the hillside, then settles high for noon
     const s = clamp((p - marks.dawnStart) / Math.max(1 - marks.dawnStart, 0.01));
-    sun.style.transform = `translate(${lerp(vw * 0.06, vw * 0.62, s)}px, ${lerp(vh * 0.62, vh * 0.06, 1 - (1 - s) * (1 - s))}px)`;
+    const sunW = sun.getBoundingClientRect().width || 150;
+    const sx = small ? lerp(vw - sunW - 8, vw - sunW - 12, s) : lerp(vw * 0.86, vw * 0.6, s * s);
+    const sy = small ? lerp(vh * 0.5, 54, 1 - (1 - s) * (1 - s)) : lerp(vh * 0.78, vh * 0.05, 1 - (1 - s) * (1 - s));
+    sun.style.transform = `translate(${sx.toFixed(1)}px, ${sy.toFixed(1)}px)`;
     sun.style.opacity = smooth(marks.dawnStart, marks.dawnFull, p).toFixed(3);
+
+    // The hillside warms from pre-dawn blue-green to lit morning green as you walk it
+    const h = smooth(marks.hillStart, marks.hillEnd, p);
+    const hill = `rgb(${Math.round(lerp(14, 31, h))} ${Math.round(lerp(42, 84, h))} ${Math.round(lerp(38, 52, h))})`;
+    hillPath.style.fill = hill;
+    hillEdge.style.opacity = (0.25 + 0.6 * smooth(marks.dawnStart, marks.dawnFull, p)).toFixed(3);
+    if (small) sections.projects.style.backgroundColor = hill;
 
     // Parallax on the night landscape while the hero is on screen
     if (!reduceMotion && scrollY < hero.offsetHeight) {
@@ -241,8 +270,8 @@
 
     // Tone of the fixed UI follows the ground under it
     const y = scrollY + 40;
-    const inJungle = y >= sections.projects.offsetTop - 60 && y < sections.stack.offsetTop + 60;
-    const inDay = y >= sections.stack.offsetTop + 60;
+    const inJungle = y >= sections.projects.offsetTop - 60 && y < sections.stack.offsetTop - 30;
+    const inDay = y >= sections.stack.offsetTop - 30;
     const tone = inDay ? "day" : inJungle ? "jungle" : "night";
     if (topbar.dataset.tone !== tone) topbar.dataset.tone = tone;
     if (scrollY > 20) topbar.setAttribute("data-scrolled", ""); else topbar.removeAttribute("data-scrolled");
@@ -256,10 +285,8 @@
   if (document.fonts && document.fonts.ready) document.fonts.ready.then(() => { measure(); update(); });
 
   /* ---------------- Reveal on enter (opt-in; content visible without JS) ---------------- */
-  const revealTargets = [
-    ".about__title", ".about__body > *", ".projects__title", ".projects__intro",
-    ".camp", ".stack__title", ".stack__group", ".contact__title", ".contact__lede", ".contact__links"
-  ];
+  // Only the camps arrive; the sky is the page's one authored motion
+  const revealTargets = [".camp"];
   if ("IntersectionObserver" in window) {
     const groups = new Map();
     revealTargets.forEach((sel) => $$(sel).forEach((n) => {

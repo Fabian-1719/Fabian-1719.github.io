@@ -33,9 +33,9 @@
     </div>
     <div class="sky__layer sky__layer--dawn"></div>
     <div class="sky__layer sky__layer--day">
-      <div class="cloud cloud--a"></div>
-      <div class="cloud cloud--b"></div>
-      <div class="cloud cloud--c"></div>
+      <svg class="cloud cloud--a" viewBox="0 0 116 48"><path d="M14 44 C3 44 3 31 14 31 C12 19 27 14 34 22 C38 9 62 6 69 20 C77 12 95 16 93 29 C107 28 113 44 100 44 Z"/></svg>
+      <svg class="cloud cloud--b" viewBox="0 0 116 48"><path d="M14 44 C3 44 3 31 14 31 C12 19 27 14 34 22 C38 9 62 6 69 20 C77 12 95 16 93 29 C107 28 113 44 100 44 Z"/></svg>
+      <svg class="cloud cloud--c" viewBox="0 0 116 48"><path d="M14 44 C3 44 3 31 14 31 C12 19 27 14 34 22 C38 9 62 6 69 20 C77 12 95 16 93 29 C107 28 113 44 100 44 Z"/></svg>
       <svg class="kite" viewBox="0 0 50 110">
         <path d="M25 4 L4 42 L46 42Z" fill="#f5c542" stroke="#b7862a" stroke-width="1"/>
         <path d="M14.5 23 L35.5 23 L25 42Z" fill="#a9dbf3" stroke="#b7862a" stroke-width="1"/>
@@ -93,14 +93,15 @@
           <radialGradient id="lava" cx="1032" cy="250" r="120" gradientUnits="userSpaceOnUse">
             <stop offset="0" stop-color="#ff7a3d" stop-opacity=".5"/><stop offset="1" stop-color="#ff7a3d" stop-opacity="0"/>
           </radialGradient>
+          <filter id="plumeBlur" x="-60%" y="-60%" width="220%" height="220%"><feGaussianBlur stdDeviation="6"/></filter>
         </defs>
         <g class="land__far" data-depth=".18">
           <path d="M0 330 L90 300 L190 318 L300 268 L400 296 L520 250 L640 290 L760 262 L880 300 L980 282 L1100 306 L1220 268 L1330 292 L1440 276 V560 H0Z" fill="#1a2444"/>
         </g>
         <g class="land__volcano" data-depth=".1">
           <ellipse cx="1032" cy="250" rx="120" ry="70" fill="url(#lava)"/>
-          <g class="smoke" transform="translate(1030 196)"><circle r="12"/><circle r="10"/><circle r="13"/></g>
-          <path d="M800 400 Q950 300 1012 204 L1028 196 L1046 204 Q1110 300 1290 400Z" fill="#121a33"/>
+          <g class="plume plume--night" filter="url(#plumeBlur)"><path class="plume__a" d="M1020 200 C1012 172 1030 150 1042 128 C1056 102 1084 92 1104 72 C1124 52 1152 46 1176 38 C1156 62 1132 76 1116 98 C1098 124 1070 142 1054 166 C1046 180 1042 192 1038 200 Z" fill="#a9b4cc"/><path class="plume__b" d="M1020 200 C1012 172 1030 150 1042 128 C1056 102 1084 92 1104 72 C1124 52 1152 46 1176 38 C1156 62 1132 76 1116 98 C1098 124 1070 142 1054 166 C1046 180 1042 192 1038 200 Z" fill="#a9b4cc"/></g>
+          <path d="M790 450 Q950 300 1012 204 L1028 196 L1046 204 Q1110 300 1300 450Z" fill="#121a33"/>
           <path d="M1012 204 L1028 196 L1046 204 L1038 211 L1020 211Z" fill="#ff8a4c" opacity=".85"/>
         </g>
         <g class="land__mid" data-depth=".06">
@@ -141,14 +142,13 @@
     </section>
 
     <!-- 05:30 dawn: the trail -->
-    <div class="dawn" aria-hidden="true">
-      <svg viewBox="0 0 1440 220" preserveAspectRatio="none" class="dawn__ridge">
-        <path d="M0 150 Q160 90 330 120 Q520 60 720 100 Q900 50 1080 96 Q1260 60 1440 90 V220 H0Z" fill="#17402d"/>
-        <path d="M0 150 Q160 90 330 120 Q520 60 720 100 Q900 50 1080 96 Q1260 60 1440 90" stroke="#ffb27a" stroke-width="2" fill="none" opacity=".55"/>
-      </svg>
-    </div>
+    <div class="dawn" aria-hidden="true"></div>
 
     <section class="projects" id="projects" aria-labelledby="projects-title">
+      <svg class="projects__land" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">
+        <path id="hill" d="M0 3.2 C8 1.2 18 2.6 28 1.6 C40 0.4 50 2.2 60 1.2 C67 0.6 73 1.6 78 3.2 C84 6 79 14 82 22 C85 32 78 42 81 52 C84 62 77 71 80 80 C82 87 79 92 74 95.5 C66 99 52 100 40 100 L0 100 Z" fill="#123a28"/>
+        <path id="hillEdge" d="M0 3.2 C8 1.2 18 2.6 28 1.6 C40 0.4 50 2.2 60 1.2 C67 0.6 73 1.6 78 3.2 C84 6 79 14 82 22 C85 32 78 42 81 52 C84 62 77 71 80 80 C82 87 79 92 74 95.5 C66 99 52 100 40 100" fill="none" stroke="#ffb27a" stroke-width="2" vector-effect="non-scaling-stroke"/>
+      </svg>
       <div class="wrap">
         <h2 class="projects__title" id="projects-title" data-i18n="projects.title">The trail so far</h2>
         <p class="projects__intro" data-i18n="projects.intro">Five projects, from the most recent. Team projects say so; every figure comes from the code.</p>
@@ -162,7 +162,7 @@
           <svg class="camp__mark" viewBox="0 0 40 40" aria-hidden="true"><path d="M6 32 20 8l14 24Z"/><path d="M20 8v24M15 32l5-8 5 8"/></svg>
           <div class="camp__head">
             <h3>RevisaTEC</h3>
-            <p class="camp__who" data-i18n="p.rev.who">Team project · 3 people · Azure</p>
+            <p class="camp__who" data-i18n="p.rev.who">Team project&nbsp;· 3 people&nbsp;· Azure</p>
           </div>
           <p class="camp__desc" data-i18n="p.rev.desc">A peer code-review platform for university team projects. It connects to each team's repository, requires every change to be reviewed by a teammate before it merges, measures each student's real contribution and drafts feedback for the professor.</p>
           <ul class="camp__facts">
@@ -181,7 +181,7 @@
           <svg class="camp__mark" viewBox="0 0 40 40" aria-hidden="true"><path d="M6 32 20 8l14 24Z"/><path d="M20 8v24M15 32l5-8 5 8"/></svg>
           <div class="camp__head">
             <h3>GameConsole <span class="amp">+</span> GameStats</h3>
-            <p class="camp__who" data-i18n="p.gc.who">Solo project · 2 repos</p>
+            <p class="camp__who" data-i18n="p.gc.who">Team project&nbsp;· 2 people&nbsp;· 2 repos</p>
           </div>
           <p class="camp__desc" data-i18n="p.gc.desc">A multiplayer game console where you play against an AI written in Prolog. Matches run in real time over WebSockets, and every move is streamed to a separate analytics platform: a Go service validates the events and a Scala service turns them into player stats and patterns.</p>
           <ul class="camp__facts">
@@ -200,7 +200,7 @@
           <svg class="camp__mark" viewBox="0 0 40 40" aria-hidden="true"><path d="M6 32 20 8l14 24Z"/><path d="M20 8v24M15 32l5-8 5 8"/></svg>
           <div class="camp__head">
             <h3>Ciudad Pastel</h3>
-            <p class="camp__who" data-i18n="p.cp.who">Team project · 4 people · top contributor</p>
+            <p class="camp__who" data-i18n="p.cp.who">Team project&nbsp;· 4 people&nbsp;· top contributor</p>
           </div>
           <p class="camp__desc" data-i18n="p.cp.desc">A web platform for a pastry business that combines an online store and a baking academy with courses and enrollments. A monorepo with a React web app and a REST API documented with Swagger.</p>
           <ul class="camp__facts">
@@ -217,7 +217,7 @@
           <svg class="camp__mark" viewBox="0 0 40 40" aria-hidden="true"><path d="M6 32 20 8l14 24Z"/><path d="M20 8v24M15 32l5-8 5 8"/></svg>
           <div class="camp__head">
             <h3>NEXUS ARCA</h3>
-            <p class="camp__who" data-i18n="p.nx.who">Team project · web scraping</p>
+            <p class="camp__who" data-i18n="p.nx.who">Team project&nbsp;· web scraping</p>
           </div>
           <p class="camp__desc" data-i18n="p.nx.desc">A video game price tracker. It scrapes digital and console stores, collects release dates, genres and covers, and serves everything through a REST API that refreshes itself every 24 hours.</p>
           <ul class="camp__facts">
@@ -236,7 +236,7 @@
           <svg class="camp__mark" viewBox="0 0 40 40" aria-hidden="true"><path d="M6 32 20 8l14 24Z"/><path d="M20 8v24M15 32l5-8 5 8"/></svg>
           <div class="camp__head">
             <h3>Space Invaders</h3>
-            <p class="camp__who" data-i18n="p.si.who">Solo project · Python</p>
+            <p class="camp__who" data-i18n="p.si.who">Solo project&nbsp;· Python</p>
           </div>
           <p class="camp__desc" data-i18n="p.si.desc">An arcade shooter in the style of the classic, built with Pygame: power-ups, a mystery ship, player profiles, match history and a top-5 leaderboard saved between sessions.</p>
           <p class="camp__stack">Python · Pygame</p>
@@ -250,9 +250,6 @@
 
     <!-- 09:00 morning -->
     <section class="stack" id="stack" aria-labelledby="stack-title">
-      <svg class="stack__ridge" viewBox="0 0 1440 120" preserveAspectRatio="none" aria-hidden="true">
-        <path d="M0 0 H1440 V40 Q1260 110 1080 70 Q900 120 720 76 Q520 116 330 72 Q160 104 0 60Z" fill="#0f3322"/>
-      </svg>
       <div class="wrap">
         <h2 class="stack__title" id="stack-title" data-i18n="stack.title">What I build with</h2>
         <div class="stack__groups">
@@ -299,10 +296,11 @@
             <stop offset="0" stop-color="#6b6f63"/><stop offset=".35" stop-color="#4f7a57"/><stop offset="1" stop-color="#3f6e4b"/>
           </linearGradient>
           <radialGradient id="swordGlow"><stop offset="0" stop-color="#7dd3fc" stop-opacity=".6"/><stop offset="1" stop-color="#7dd3fc" stop-opacity="0"/></radialGradient>
+          <filter id="plumeBlurDay" x="-60%" y="-60%" width="220%" height="220%"><feGaussianBlur stdDeviation="6"/></filter>
         </defs>
         <path d="M0 220 L90 196 L190 210 L300 170 L400 192 L520 156 L640 186 L760 164 L880 194 L980 178 L1100 198 L1220 168 L1330 188 L1440 176 V420 H0Z" fill="#8fb8cc"/>
-        <g class="smoke smoke--day" transform="translate(1030 104)"><circle r="12"/><circle r="10"/><circle r="13"/></g>
-        <path d="M800 300 Q950 200 1012 112 L1028 104 L1046 112 Q1110 200 1290 300Z" fill="url(#volcDay)"/>
+        <g class="plume plume--day" filter="url(#plumeBlurDay)" transform="translate(1028 104) scale(.75) translate(-1028 -196)"><path class="plume__a" d="M1020 200 C1012 172 1030 150 1042 128 C1056 102 1084 92 1104 72 C1124 52 1152 46 1176 38 C1156 62 1132 76 1116 98 C1098 124 1070 142 1054 166 C1046 180 1042 192 1038 200 Z" fill="#ffffff"/><path class="plume__b" d="M1020 200 C1012 172 1030 150 1042 128 C1056 102 1084 92 1104 72 C1124 52 1152 46 1176 38 C1156 62 1132 76 1116 98 C1098 124 1070 142 1054 166 C1046 180 1042 192 1038 200 Z" fill="#ffffff"/></g>
+        <path d="M790 350 Q950 200 1012 112 L1028 104 L1046 112 Q1110 200 1300 350Z" fill="url(#volcDay)"/>
         <path d="M0 300 Q150 256 300 286 T600 280 T900 296 T1200 278 T1440 288 V420 H0Z" fill="#4c9a5f"/>
         <g class="sword" transform="translate(372 0)">
           <ellipse cx="0" cy="262" rx="30" ry="26" fill="url(#swordGlow)" class="sword__glow"/>

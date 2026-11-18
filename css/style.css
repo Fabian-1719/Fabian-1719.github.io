@@ -34,7 +34,7 @@
   /* day */
   --day-0: #5fb4e6;
   --day-1: #a9dbf3;
-  --day-2: #fbe3bf;
+  --day-2: #dff1fb;
   --ink-day: #0d2536;
   --ink-day-soft: #1b3d55;
   /* signal: only on things you can click */
@@ -103,7 +103,7 @@ p { margin: 0; text-wrap: pretty; }
 .sky { position: fixed; inset: 0; z-index: -1; pointer-events: none; overflow: hidden; }
 .sky__layer { position: absolute; inset: 0; will-change: opacity; }
 .sky__layer--night { background: linear-gradient(var(--night-0), var(--night-1) 55%, var(--night-2)); }
-.sky__layer--dawn { background: linear-gradient(#1b1f4a, #6b3f6e 40%, #e57a4f 78%, #ffc58a); opacity: 0; }
+.sky__layer--dawn { background: linear-gradient(#2a2350, #a2546a 22%, #ef8650 48%, #ffc58a 74%, #ffe3b0); opacity: 0; }
 .sky__layer--day { background: linear-gradient(var(--day-0), var(--day-1) 62%, var(--day-2)); opacity: 0; }
 
 .stars { position: absolute; inset: 0; width: 100%; height: 75%; }
@@ -116,13 +116,10 @@ p { margin: 0; text-wrap: pretty; }
 .moon, .sun { position: absolute; left: 0; top: 0; width: clamp(110px, 12vw, 180px); will-change: transform, opacity; }
 .sun { opacity: 0; }
 
-.cloud { position: absolute; height: 34px; border-radius: 40px; background: #fff; opacity: .9; animation: drift linear infinite; }
-.cloud::before, .cloud::after { content: ""; position: absolute; background: #fff; border-radius: 50%; }
-.cloud::before { width: 56px; height: 56px; left: 18px; top: -28px; }
-.cloud::after { width: 42px; height: 42px; left: 62px; top: -18px; }
-.cloud--a { width: 130px; top: 16vh; animation-duration: 90s; animation-delay: -20s; }
-.cloud--b { width: 100px; top: 30vh; animation-duration: 120s; animation-delay: -70s; opacity: .75; transform: scale(.8); }
-.cloud--c { width: 150px; top: 8vh; animation-duration: 105s; animation-delay: -45s; opacity: .85; }
+.cloud { position: absolute; left: 0; fill: #fff; opacity: .6; animation: drift linear infinite; }
+.cloud--a { width: 150px; top: 12vh; animation-duration: 95s; animation-delay: -20s; }
+.cloud--b { width: 110px; top: 24vh; animation-duration: 125s; animation-delay: -70s; opacity: .45; }
+.cloud--c { width: 180px; top: 6vh; animation-duration: 110s; animation-delay: -45s; opacity: .5; }
 @keyframes drift { from { transform: translateX(-200px); } to { transform: translateX(110vw); } }
 
 .kite { position: absolute; right: 10vw; top: 9vh; width: clamp(40px, 4vw, 56px); transform-origin: 50% 38%; animation: sway 5s ease-in-out infinite; }
@@ -196,15 +193,15 @@ html[lang="es"] .lang__opt[data-lang="es"] { background: var(--bar-fg); color: v
 
 .land { position: absolute; left: 0; right: 0; bottom: -1px; width: 100%; display: block; }
 .land--night { height: min(62vh, 560px); z-index: 1; }
+@media (max-width: 720px) { .land--night { height: 40vh; } }
 .land g[data-depth] { will-change: transform; }
 
-.smoke circle { fill: #9aa6c2; opacity: 0; transform-box: fill-box; transform-origin: center; animation: smoke 9s ease-out infinite; }
-.smoke circle:nth-child(2) { animation-delay: 3s; }
-.smoke circle:nth-child(3) { animation-delay: 6s; }
-.smoke--day circle { fill: #fff; }
-@keyframes smoke { 0% { opacity: 0; transform: translate(0, 0) scale(.6); } 15% { opacity: .38; } 100% { opacity: 0; transform: translate(90px, -90px) scale(2.4); } }
-.smoke--day circle { animation-name: smokeDay; }
-@keyframes smokeDay { 0% { opacity: 0; transform: translate(0, 0) scale(.6); } 15% { opacity: .85; } 100% { opacity: 0; transform: translate(90px, -90px) scale(2.6); } }
+.plume path { transform-box: fill-box; transform-origin: 10% 100%; animation: plume 11s ease-in-out infinite; }
+.plume .plume__a { opacity: .32; }
+.plume .plume__b { opacity: .2; animation-duration: 15s; animation-delay: -6s; }
+.plume--day .plume__a { opacity: .7; }
+.plume--day .plume__b { opacity: .45; }
+@keyframes plume { 0%, 100% { transform: skewX(-4deg) scale(.96); } 50% { transform: skewX(6deg) scale(1.04) translateX(6px); } }
 
 .fireflies circle { fill: var(--firefly); filter: drop-shadow(0 0 4px #bef264); opacity: 0; animation: firefly var(--d, 6s) ease-in-out infinite; animation-delay: var(--dl, 0s); }
 @keyframes firefly { 0%, 100% { opacity: 0; transform: translate(0, 0); } 30%, 70% { opacity: .95; } 50% { transform: translate(var(--dx, 10px), -14px); } }
@@ -223,11 +220,18 @@ html[lang="es"] .lang__opt[data-lang="es"] { background: var(--bar-fg); color: v
 @media (max-width: 860px) { .about__grid { grid-template-columns: 1fr; gap: var(--space-4); } }
 
 /* ---------- Dawn band ---------- */
-.dawn { height: clamp(220px, 38vh, 420px); position: relative; background: linear-gradient(var(--basalt), transparent 38%); }
-.dawn__ridge { position: absolute; left: 0; bottom: -1px; width: 100%; height: 60%; display: block; }
+.dawn { height: clamp(140px, 22vh, 260px); background: linear-gradient(var(--basalt), transparent 70%); }
 
 /* ---------- Projects (the trail, on jungle ground) ---------- */
-.projects { background: linear-gradient(var(--jungle-1), var(--jungle-0) 30%, var(--jungle-0)); color: var(--ink-jungle); padding: var(--space-3) 0 var(--space-6); }
+.projects { position: relative; color: var(--ink-jungle); padding: clamp(5rem, 9vh, 7rem) 0 14rem; isolation: isolate; }
+.projects > .wrap, .projects > .trail { position: relative; z-index: 1; }
+.projects__land { position: absolute; inset: 0; width: 100%; height: 100%; z-index: 0; display: block; overflow: visible; }
+#hill { transition: none; }
+#hillEdge { opacity: .3; }
+@media (max-width: 859px) {
+  .projects { background: #123a28; padding-bottom: var(--space-6); }
+  .projects__land { display: none; }
+}
 .projects__title { font-size: clamp(2.2rem, 1.4rem + 3vw, 3.8rem); }
 .projects__intro { margin-top: var(--space-2); color: var(--ink-jungle-soft); max-width: 54ch; }
 
@@ -236,8 +240,8 @@ html[lang="es"] .lang__opt[data-lang="es"] { background: var(--bar-fg); color: v
 .trail__path { position: absolute; left: 0; top: 0; width: 100%; height: 100%; overflow: visible; pointer-events: none; }
 .trail__path path { fill: none; stroke: #e9d7a8; stroke-width: 2; stroke-dasharray: 2 10; stroke-linecap: round; opacity: .55; }
 
-.camp { position: relative; display: grid; grid-template-columns: 64px minmax(0, 1fr); column-gap: var(--space-3); max-width: 760px; }
-.camp:nth-child(odd) { margin-left: clamp(0px, 14vw, 300px); }
+.camp { position: relative; display: grid; grid-template-columns: 64px minmax(0, 1fr); column-gap: var(--space-3); max-width: 700px; }
+.camp:nth-child(odd) { margin-left: clamp(0px, 12vw, 220px); }
 .camp > *:not(.camp__mark) { grid-column: 2; }
 .camp__mark { grid-row: 1 / span 6; width: 48px; height: 48px; padding: 8px; border-radius: 50%; background: var(--jungle-0); border: 2px solid #e9d7a8; box-shadow: 0 8px 20px -6px rgb(0 0 0 / .5); fill: #2a6b40; stroke: #e9d7a8; stroke-width: 1.6; stroke-linejoin: round; position: relative; z-index: 1; }
 .camp__head h3 { font-size: clamp(1.7rem, 1.3rem + 1.6vw, 2.5rem); }
@@ -261,8 +265,7 @@ html[lang="es"] .lang__opt[data-lang="es"] { background: var(--bar-fg); color: v
 .stack, .contact { background: linear-gradient(var(--day-0), var(--day-1)); }
 .contact { background: linear-gradient(var(--day-1), var(--day-2)); }
 .js-sky .stack, .js-sky .contact { background: transparent; }
-.stack { position: relative; color: var(--ink-day); padding: calc(var(--space-6) + 40px) 0 var(--space-5); }
-.stack__ridge { position: absolute; left: 0; top: -1px; width: 100%; height: 120px; display: block; }
+.stack { position: relative; color: var(--ink-day); padding: var(--space-5) 0 var(--space-5); }
 .stack__title { font-size: clamp(2.2rem, 1.4rem + 3vw, 3.8rem); }
 .stack__groups { margin-top: var(--space-4); display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--space-4); }
 .stack__group { padding-top: var(--space-2); border-top: 2px solid var(--ink-day); }
@@ -276,10 +279,10 @@ html[lang="es"] .lang__opt[data-lang="es"] { background: var(--bar-fg); color: v
 .contact__title { font-size: clamp(3.4rem, 1.6rem + 8vw, 6rem); font-weight: 800; letter-spacing: -.04em; }
 .contact__lede { margin-top: var(--space-2); font-size: clamp(1.1rem, 1rem + .5vw, 1.35rem); max-width: 38ch; color: var(--ink-day-soft); }
 .contact__links { margin-top: var(--space-4); display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-3) var(--space-4); }
-.land--day { height: min(52vh, 420px); }
+.land--day { height: min(52vh, 420px); overflow: visible; }
 .sword__glow { animation: breathe 4s ease-in-out infinite; }
-#butterflies g { animation: flutter var(--d, 7s) ease-in-out infinite; animation-delay: var(--dl, 0s); }
-#butterflies ellipse { transform-box: fill-box; transform-origin: center; animation: flap .3s ease-in-out infinite alternate; }
+#butterflies .bfly { animation: flutter var(--d, 7s) ease-in-out infinite; animation-delay: var(--dl, 0s); }
+#butterflies .bfly__wings { transform-box: fill-box; transform-origin: center; animation: flap .28s ease-in-out infinite alternate; }
 @keyframes flutter { 0%, 100% { transform: translate(0, 0); } 50% { transform: translate(var(--dx, 14px), -16px); } }
 @keyframes flap { to { transform: scaleX(.3); } }
 
@@ -312,17 +315,24 @@ html[lang="es"] .lang__opt[data-lang="es"] { background: var(--bar-fg); color: v
 @keyframes wing { to { transform: scaleY(.35); } }
 
 /* ---------- Reveal (content is visible by default; JS opts in) ---------- */
-.js-reveal [data-reveal] { opacity: 0; transform: translateY(14px); filter: blur(4px); transition: opacity 600ms var(--ease-out), transform 600ms var(--ease-out), filter 600ms var(--ease-out); transition-delay: var(--rd, 0ms); }
-.js-reveal [data-reveal][data-in] { opacity: 1; transform: none; filter: none; }
+.js-reveal [data-reveal] { opacity: 0; transform: translateY(16px); transition: opacity 600ms var(--ease-out), transform 600ms var(--ease-out); }
+.js-reveal [data-reveal][data-in] { opacity: 1; transform: none; }
 
 /* ---------- Reduced motion ---------- */
 @media (prefers-reduced-motion: reduce) {
-  .stars circle, .constellation, .cloud, .kite, .smoke circle, .sword__glow, .fairy__wing, #butterflies g, #butterflies ellipse { animation: none; }
+  .stars circle, .constellation, .cloud, .kite, .plume path, .sword__glow, .fairy__wing, #butterflies .bfly, #butterflies .bfly__wings { animation: none; }
   .fireflies circle { animation: none; opacity: .8; }
-  .smoke circle { opacity: 0; }
   .cloud { transform: translateX(20vw); }
   .cloud--b { transform: translateX(60vw); }
   .cloud--c { transform: translateX(80vw); }
   .fairy { display: none; }
-  .js-reveal [data-reveal] { transform: none; filter: none; transition: opacity 300ms ease; }
+  .js-reveal [data-reveal] { transform: none; transition: opacity 300ms ease; }
+}
+
+/* ---------- Phones: sky ornaments stay out of the copy ---------- */
+@media (max-width: 720px) {
+  .cloud, .kite { display: none; }
+  .sun { width: 84px; }
+  .moon { width: 96px; }
+  .constellation { top: 76px; right: 18px; width: 38px; }
 }
