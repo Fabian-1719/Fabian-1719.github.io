@@ -20,21 +20,21 @@ A personal showcase for Fabian Aragón Arce, Computer Engineering student at Ins
 
 ## Positioning
 
-A student who works end to end, from x86 assembly to cloud microservices, with team projects that are real distributed systems. The identity is personal: a Costa Rica landscape (Arenal-style volcano, palms, fireflies/butterflies, day and night) with small, quiet Zelda-inspired easter eggs (sword in a pedestal, three-triangle constellation/kite, a small blue fairy). It must stay consistent with his GitHub profile README, which already uses this landscape.
+A student who works end to end, from x86 assembly to cloud microservices, with team projects that are real distributed systems. The visual identity is open (redesign requested 2026-11-18): it no longer has to follow the Costa Rica landscape of his GitHub banner. Subtle Zelda-inspired easter eggs stay.
 
 ## Capabilities and Constraints
 
 - Bilingual: English and Spanish with a language switch.
-- Day/night: the identity exists in both a day and a night version.
 - Hosted on GitHub Pages at https://fabian-1719.github.io (repo Fabian-1719/Fabian-1719.github.io).
 - Some projects live in private repos (Ciudad Pastel) and must be shown without a code link.
 
 ## Brand Commitments
 
 - Name: Fabian Aragón Arce. Handle: Fabian-1719.
-- Tagline used elsewhere: "Pura vida · Welcome to my GitHub", "<computer engineering student />".
-- Existing assets: night and day landscape banners (Fabian-1719/Fabian-1719 repo, assets/banner.svg and assets/banner-day.svg), drawn originally; no game art is reproduced.
-- Easter eggs must stay subtle allusions, never copied game assets, logos or characters.
+- Keep: subtle Zelda-inspired easter eggs (allusions only, never copied game assets, logos, characters or music); EN/ES language switch.
+- Background art must be detailed illustration made in code (texture, light, depth), not flat primitive polygons and not stock photography (user decision 2026-11-18).
+- The first build (Night to Day landscape mirroring the GitHub banner) was rejected as too tied to the banner and too polygonal; treat it as an anti-reference.
+- A time or light transition across the page is welcome (user suggested day to night, or another transition that fits better).
 
 ## Evidence on Hand
 

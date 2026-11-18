@@ -1,5 +1,5 @@
 /* Fabian Aragón Arce · portfolio
-   Scroll is time: the sky goes from midnight to noon as you read. */
+   Scroll drives the pixel world: the camera walks it and the day runs out. */
 (() => {
   "use strict";
 
@@ -7,6 +7,7 @@
   const finePointer = matchMedia("(hover: hover) and (pointer: fine)").matches;
   const $ = (s, r = document) => r.querySelector(s);
   const $$ = (s, r = document) => [...r.querySelectorAll(s)];
+  const clamp = (v, a = 0, b = 1) => Math.min(b, Math.max(a, v));
 
   /* ---------------- i18n ---------------- */
   const ES = {
@@ -55,278 +56,104 @@
     "stack.fw": "Frameworks",
     "stack.tools": "Nube y herramientas",
     "contact.lede": "¿Quieres hablar de un proyecto, una clase o una idea? Escríbeme.",
-    "footer.made": "HTML, CSS y JavaScript escritos a mano. Sin frameworks ni plantillas."
+    "footer.made": "Cada pixel del mundo está dibujado en código. Sin frameworks ni imágenes."
   };
   const CLOCK = {
-    en: ["midnight", "late night", "dawn", "morning", "noon"],
-    es: ["medianoche", "madrugada", "amanecer", "mañana", "mediodía"]
+    en: ["morning", "afternoon", "sunset", "dusk", "night"],
+    es: ["mañana", "tarde", "atardecer", "anochecer", "noche"]
   };
 
   const nodes = $$("[data-i18n]");
   const EN = {};
   nodes.forEach((n) => { EN[n.dataset.i18n] = n.innerHTML; });
-
   const store = {
     get(k) { try { return localStorage.getItem(k); } catch { return null; } },
-    set(k, v) { try { localStorage.setItem(k, v); } catch { /* storage blocked: language still works for this visit */ } }
+    set(k, v) { try { localStorage.setItem(k, v); } catch { /* storage blocked: the switch still works for this visit */ } }
   };
-
   let lang = store.get("lang") || ((navigator.language || "en").toLowerCase().startsWith("es") ? "es" : "en");
   const langBtn = $("#lang");
-
   function applyLang(next) {
     lang = next;
     document.documentElement.lang = lang;
     const dict = lang === "es" ? ES : EN;
     nodes.forEach((n) => { const v = dict[n.dataset.i18n]; if (v != null) n.innerHTML = v; });
     langBtn.setAttribute("aria-label", lang === "es" ? "Switch to English" : "Cambiar a español");
-    document.title = lang === "es"
-      ? "Fabian Aragón Arce · Estudiante de Ingeniería en Computación"
-      : "Fabian Aragón Arce · Computer Engineering student";
-    lastClockKey = "";
+    document.title = lang === "es" ? "Fabian Aragón Arce · Estudiante de Ingeniería en Computación" : "Fabian Aragón Arce · Computer Engineering student";
+    lastClock = "";
     update();
   }
-  langBtn.addEventListener("click", () => {
-    const next = lang === "en" ? "es" : "en";
-    store.set("lang", next);
-    applyLang(next);
-  });
+  langBtn.addEventListener("click", () => { const n = lang === "en" ? "es" : "en"; store.set("lang", n); applyLang(n); });
 
-  /* ---------------- Generated sky details ---------------- */
-  let seed = 1719;
-  const rand = () => ((seed = (seed * 16807) % 2147483647) - 1) / 2147483646;
-  const SVGNS = "http://www.w3.org/2000/svg";
-  const el = (tag, attrs) => { const e = document.createElementNS(SVGNS, tag); for (const k in attrs) e.setAttribute(k, attrs[k]); return e; };
-
-  const stars = $("#stars");
-  stars.setAttribute("viewBox", "0 0 1000 600");
-  for (let i = 0; i < 120; i++) {
-    const c = el("circle", { cx: (rand() * 1000).toFixed(1), cy: (rand() * 600).toFixed(1), r: [0.7, 0.9, 1, 1.2, 1.5][Math.floor(rand() * 5)] });
-    c.style.setProperty("--d", (2.2 + rand() * 3).toFixed(2) + "s");
-    c.style.setProperty("--dl", (-rand() * 5).toFixed(2) + "s");
-    stars.appendChild(c);
-  }
-
-  const flies = $("#fireflies");
-  for (let i = 0; i < 22; i++) {
-    const c = el("circle", { cx: (40 + rand() * 1360).toFixed(1), cy: (380 + rand() * 160).toFixed(1), r: "2.2" });
-    c.style.setProperty("--d", (4 + rand() * 4).toFixed(2) + "s");
-    c.style.setProperty("--dl", (-rand() * 8).toFixed(2) + "s");
-    c.style.setProperty("--dx", ((rand() > 0.5 ? 1 : -1) * (8 + rand() * 14)).toFixed(0) + "px");
-    flies.appendChild(c);
-  }
-
-  const bflies = $("#butterflies");
-  const colors = ["#f59e0b", "#38bdf8", "#f472b6", "#2563eb"];
-  for (let i = 0; i < 9; i++) {
-    const x = 60 + rand() * 1320, y = 300 + rand() * 100, col = colors[Math.floor(rand() * colors.length)];
-    const g = el("g", { transform: `translate(${x.toFixed(1)} ${y.toFixed(1)})` });
-    const flight = el("g", { class: "bfly" });
-    flight.style.setProperty("--d", (5 + rand() * 4).toFixed(2) + "s");
-    flight.style.setProperty("--dl", (-rand() * 8).toFixed(2) + "s");
-    flight.style.setProperty("--dx", ((rand() > 0.5 ? 1 : -1) * (10 + rand() * 16)).toFixed(0) + "px");
-    const wings = el("g", { class: "bfly__wings" });
-    // upper wings larger and swept, lower wings small: reads as a butterfly, not a dot pair
-    wings.appendChild(el("path", { d: "M0 0 C-3 -9 -11 -10 -11 -4 C-11 0 -5 1 0 0Z", fill: col }));
-    wings.appendChild(el("path", { d: "M0 0 C3 -9 11 -10 11 -4 C11 0 5 1 0 0Z", fill: col }));
-    wings.appendChild(el("path", { d: "M0 0 C-2 5 -7 7 -8 4 C-8 1 -4 0 0 0Z", fill: col, opacity: ".85" }));
-    wings.appendChild(el("path", { d: "M0 0 C2 5 7 7 8 4 C8 1 4 0 0 0Z", fill: col, opacity: ".85" }));
-    flight.appendChild(wings);
-    flight.appendChild(el("rect", { x: -0.8, y: -5, width: 1.6, height: 9, rx: 0.8, fill: "#3b2a1a" }));
-    g.appendChild(flight);
-    bflies.appendChild(g);
-  }
-
-  /* ---------------- Trail path through the camps ---------------- */
-  const trail = $(".trail");
-  const trailSvg = $(".trail__path");
-  const trailPath = $("#trailPath");
-  function drawTrail() {
-    const box = trail.getBoundingClientRect();
-    trailSvg.setAttribute("viewBox", `0 0 ${box.width} ${box.height}`);
-    const pts = $$(".camp__mark", trail).map((m) => {
-      const r = m.getBoundingClientRect();
-      return [r.left - box.left + r.width / 2, r.top - box.top + r.height / 2];
-    });
-    if (!pts.length) return;
-    let d = `M ${pts[0][0]} ${pts[0][1] - 40}`;
-    let prev = [pts[0][0], pts[0][1] - 40];
-    // Walk straight down under each marker, and only swing sideways in the gap
-    // just above the next camp so the trail never crosses a project's text.
-    for (const p of pts) {
-      const bendTop = Math.max(prev[1], p[1] - 150);
-      if (bendTop > prev[1]) d += ` L ${prev[0]} ${bendTop}`;
-      const my = bendTop + (p[1] - bendTop) / 2;
-      d += ` C ${prev[0]} ${my}, ${p[0]} ${my}, ${p[0]} ${p[1]}`;
-      prev = p;
-    }
-    d += ` C ${prev[0]} ${prev[1] + 80}, ${prev[0] + 40} ${box.height}, ${prev[0] + 40} ${box.height + 60}`;
-    trailPath.setAttribute("d", d);
-  }
-
-  /* ---------------- Scroll-driven sky ---------------- */
-  const dawn = $(".sky__layer--dawn");
-  const day = $(".sky__layer--day");
-  const night = $(".sky__layer--night");
-  const moon = $(".moon");
-  const sun = $(".sun");
-  const topbar = $(".topbar");
-  const clock = $(".clock");
-  const clockTime = $("#clockTime");
-  const clockLabel = $("#clockLabel");
-  const parallax = $$(".land--night g[data-depth]");
-  const hero = $(".hero");
-  const sections = { about: $("#about"), projects: $("#projects"), stack: $("#stack"), contact: $("#contact") };
-
-  const clamp = (v, a = 0, b = 1) => Math.min(b, Math.max(a, v));
-  const smooth = (a, b, v) => { const t = clamp((v - a) / (b - a)); return t * t * (3 - 2 * t); };
-  const lerp = (a, b, t) => a + (b - a) * t;
-
-  let lastClockKey = "";
-  let ticking = false;
-
-  function progressAt(elm) {
-    const max = document.documentElement.scrollHeight - innerHeight;
-    const top = elm.getBoundingClientRect().top + scrollY;
-    return max > 0 ? clamp((top - innerHeight * 0.5) / max) : 0;
-  }
-  let marks = {};
-  let small = innerWidth < 860;
-  const hillPath = $("#hill");
-  const hillEdge = $("#hillEdge");
-  // On narrow screens, frame the landscapes on the volcano instead of the empty middle
-  const nightLand = $(".land--night");
-  const dayLand = $(".land--day");
-  function fitLand() {
-    const small = innerWidth < 700;
-    nightLand.setAttribute("viewBox", small ? "700 0 740 560" : "0 0 1440 560");
-    dayLand.setAttribute("viewBox", small ? "830 0 400 420" : "0 0 1440 420");
-  }
-  function measure() {
-    fitLand();
-    marks = {
-      // Dawn breaks as the trail begins and the day arrives while you walk it
-      dawnStart: progressAt(sections.projects) - 0.09,
-      dawnFull: progressAt(sections.projects) + 0.04,
-      dayStart: progressAt($("#ciudad-pastel")) ,
-      dayFull: progressAt(sections.stack) - 0.03,
-      hillStart: progressAt(sections.projects) - 0.04,
-      hillEnd: progressAt(sections.stack) - 0.02
-    };
-    small = innerWidth < 860;
-    sections.projects.style.backgroundColor = "";
-    drawTrail();
-  }
-
+  /* ---------------- World + clock ---------------- */
+  PixelWorld.init($("#world"), { reduce: reduceMotion });
+  const clockTime = $("#clockTime"), clockLabel = $("#clockLabel");
+  let lastClock = "", ticking = false;
   function update() {
     ticking = false;
     const max = document.documentElement.scrollHeight - innerHeight;
     const p = max > 0 ? clamp(scrollY / max) : 0;
-    const vw = innerWidth, vh = innerHeight;
-
-    const dawnO = smooth(marks.dawnStart, marks.dawnFull, p);
-    const dayO = smooth(marks.dayStart, marks.dayFull, p);
-    dawn.style.opacity = (dawnO * (1 - dayO)).toFixed(3);
-    day.style.opacity = dayO.toFixed(3);
-    night.style.opacity = (1 - dayO).toFixed(3);
-
-    // Moon starts clear of the name (above "Arce") and sets to the right
-    const m = clamp(p / Math.max(marks.dawnFull, 0.01));
-    const moonX0 = small ? vw * 0.6 : vw * 0.5, moonX1 = small ? vw * 0.75 : vw * 0.86;
-    moon.style.transform = `translate(${lerp(moonX0, moonX1, m)}px, ${lerp(vh * 0.07, vh * 0.55, m * m)}px)`;
-    moon.style.opacity = (1 - smooth(marks.dawnStart, marks.dawnFull, p)).toFixed(3);
-
-    // Sun climbs in the strip of sky right of the hillside, then settles high for noon
-    const s = clamp((p - marks.dawnStart) / Math.max(1 - marks.dawnStart, 0.01));
-    const sunW = sun.getBoundingClientRect().width || 150;
-    const sx = small ? lerp(vw - sunW - 8, vw - sunW - 12, s) : lerp(vw * 0.86, vw * 0.6, s * s);
-    const sy = small ? lerp(vh * 0.5, 54, 1 - (1 - s) * (1 - s)) : lerp(vh * 0.78, vh * 0.05, 1 - (1 - s) * (1 - s));
-    sun.style.transform = `translate(${sx.toFixed(1)}px, ${sy.toFixed(1)}px)`;
-    sun.style.opacity = smooth(marks.dawnStart, marks.dawnFull, p).toFixed(3);
-
-    // The hillside warms from pre-dawn blue-green to lit morning green as you walk it
-    const h = smooth(marks.hillStart, marks.hillEnd, p);
-    const hill = `rgb(${Math.round(lerp(14, 31, h))} ${Math.round(lerp(42, 84, h))} ${Math.round(lerp(38, 52, h))})`;
-    hillPath.style.fill = hill;
-    hillEdge.style.opacity = (0.25 + 0.6 * smooth(marks.dawnStart, marks.dawnFull, p)).toFixed(3);
-    if (small) sections.projects.style.backgroundColor = hill;
-
-    // Parallax on the night landscape while the hero is on screen
-    if (!reduceMotion && scrollY < hero.offsetHeight) {
-      for (const g of parallax) g.style.transform = `translateY(${(scrollY * parseFloat(g.dataset.depth)).toFixed(1)}px)`;
-    }
-
-    // Clock: 00:00 at the top, 12:00 at the bottom
-    const minutes = Math.round(p * 720);
-    const hh = String(Math.floor(minutes / 60)).padStart(2, "0");
-    const mm = String(minutes % 60).padStart(2, "0");
-    const idx = p < 0.12 ? 0 : p < marks.dawnStart ? 1 : p < marks.dayStart ? 2 : p < 0.94 ? 3 : 4;
-    const key = `${hh}:${mm}|${idx}|${lang}`;
-    if (key !== lastClockKey) {
-      clockTime.textContent = `${hh}:${mm}`;
-      clockLabel.textContent = CLOCK[lang][idx];
-      lastClockKey = key;
-    }
-
-    // Tone of the fixed UI follows the ground under it
-    const y = scrollY + 40;
-    const inJungle = y >= sections.projects.offsetTop - 60 && y < sections.stack.offsetTop - 30;
-    const inDay = y >= sections.stack.offsetTop - 30;
-    const tone = inDay ? "day" : inJungle ? "jungle" : "night";
-    if (topbar.dataset.tone !== tone) topbar.dataset.tone = tone;
-    if (scrollY > 20) topbar.setAttribute("data-scrolled", ""); else topbar.removeAttribute("data-scrolled");
-    const clockTone = (scrollY + innerHeight - 40) >= sections.stack.offsetTop + 100 ? "day" : "night";
-    if (clock.dataset.tone !== clockTone) clock.dataset.tone = clockTone;
+    PixelWorld.setProgress(p);
+    const minutes = Math.round(420 + p * 900); // 07:00 → 22:00
+    const t = `${String(Math.floor(minutes / 60)).padStart(2, "0")}:${String(minutes % 60).padStart(2, "0")}`;
+    const hrs = minutes / 60;
+    const idx = hrs < 12 ? 0 : hrs < 17 ? 1 : hrs < 18.5 ? 2 : hrs < 20 ? 3 : 4;
+    const key = `${t}|${idx}|${lang}`;
+    if (key !== lastClock) { clockTime.textContent = t; clockLabel.textContent = CLOCK[lang][idx]; lastClock = key; }
   }
-
-  const requestUpdate = () => { if (!ticking) { ticking = true; requestAnimationFrame(update); } };
-  addEventListener("scroll", requestUpdate, { passive: true });
-  addEventListener("resize", () => { measure(); requestUpdate(); });
-  if (document.fonts && document.fonts.ready) document.fonts.ready.then(() => { measure(); update(); });
-
-  /* ---------------- Reveal on enter (opt-in; content visible without JS) ---------------- */
-  // Only the camps arrive; the sky is the page's one authored motion
-  const revealTargets = [".camp"];
-  if ("IntersectionObserver" in window) {
-    const groups = new Map();
-    revealTargets.forEach((sel) => $$(sel).forEach((n) => {
-      n.setAttribute("data-reveal", "");
-      const parent = n.parentElement;
-      const i = groups.get(parent) || 0;
-      n.style.setProperty("--rd", `${[0, 60, 110, 150, 180][Math.min(i, 4)]}ms`);
-      groups.set(parent, i + 1);
-    }));
-    document.documentElement.classList.add("js-reveal");
-    const io = new IntersectionObserver((entries) => {
-      for (const e of entries) if (e.isIntersecting) { e.target.setAttribute("data-in", ""); io.unobserve(e.target); }
-    }, { rootMargin: "0px 0px -12% 0px" });
-    $$("[data-reveal]").forEach((n) => io.observe(n));
+  // Each section brings its own place into view: on wide screens beside the panel,
+  // on phones in the open stretch of world below each panel.
+  function anchors() {
+    const max = document.documentElement.scrollHeight - innerHeight;
+    if (max <= 0) return;
+    const P = PixelWorld.places, phone = innerWidth < 860;
+    const at = (el, k) => clamp((el.getBoundingClientRect().top + scrollY + k) / max);
+    const sec = (id) => document.getElementById(id);
+    const panelEnd = (id) => { const pn = sec(id).querySelector(".panel"); return at(pn, pn.offsetHeight - innerHeight * 0.35); };
+    const list = phone
+      ? [[0, P.tower], [panelEnd("about"), P.falls], [panelEnd("projects"), P.sword], [panelEnd("stack"), P.village], [1, P.fire]]
+      : [[0, P.tower], [at(sec("about"), -innerHeight * 0.2), P.falls], [at(sec("projects"), 0), P.sword], [at(sec("stack"), -innerHeight * 0.5), P.bridge], [at(sec("stack"), 0), P.village], [1, P.fire]];
+    for (let i = 1; i < list.length; i++) list[i][0] = Math.max(list[i][0], list[i - 1][0] + 0.01);
+    PixelWorld.setAnchors(list, phone ? 0.5 : 0.66);
   }
+  addEventListener("scroll", () => { if (!ticking) { ticking = true; requestAnimationFrame(update); } }, { passive: true });
+  addEventListener("resize", () => { anchors(); update(); });
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(() => { anchors(); update(); });
+  anchors();
 
-  /* ---------------- The fairy (decorative, follows the pointer with a spring) ---------------- */
+  /* ---------------- The fairy: a 9×8 sprite that follows the pointer on a spring ---------------- */
   const fairy = $("#fairy");
   if (finePointer && !reduceMotion) {
-    let tx = innerWidth * 0.8, ty = innerHeight * 0.3, x = tx, y = ty, vx = 0, vy = 0, running = false, idle = 0;
-    const step = () => {
-      const k = 0.06, damp = 0.78; // soft spring, slight lag
-      vx = (vx + (tx - x) * k) * damp;
-      vy = (vy + (ty - y) * k) * damp;
+    const fx = fairy.getContext("2d");
+    const frames = [
+      [".WW...WW.", "WWWW.WWWW", ".WWWbWWW.", "...bLb...", "..bLLLb..", "...bLb...", "....b....", "........."],
+      ["........", ".WW...WW.", "WWWWbWWWW", "...bLb...", "..bLLLb..", "...bLb...", "....b....", "........."]
+    ];
+    const col = { W: "#e0f2fe", b: "#38bdf8", L: "#f0fbff" };
+    let frame = 0, tx = innerWidth * 0.7, ty = innerHeight * 0.3, x = tx, y = ty, vx = 0, vy = 0, running = false, idle = 0, lastFlap = 0;
+    const draw = () => {
+      fx.clearRect(0, 0, 9, 8);
+      frames[frame].forEach((row, j) => [...row].forEach((c, i) => { if (col[c]) { fx.fillStyle = col[c]; fx.fillRect(i, j, 1, 1); } }));
+    };
+    const size = () => { const s = PixelWorld.scale; fairy.style.width = 9 * s + "px"; fairy.style.height = 8 * s + "px"; };
+    size(); addEventListener("resize", size); draw();
+    const step = (now) => {
+      vx = (vx + (tx - x) * 0.06) * 0.78;
+      vy = (vy + (ty - y) * 0.06) * 0.78;
       x += vx; y += vy;
-      const bob = Math.sin(performance.now() / 380) * 3;
-      fairy.style.transform = `translate(${x.toFixed(1)}px, ${(y + bob).toFixed(1)}px)`;
+      if (now - lastFlap > 140) { frame ^= 1; draw(); lastFlap = now; }
+      const s = PixelWorld.scale, bob = Math.round(Math.sin(now / 380) * 2) * s;
+      // snap to the world's pixel grid so the sprite never sits between pixels
+      fairy.style.transform = `translate(${Math.round(x / s) * s}px, ${Math.round(y / s) * s + bob}px)`;
       if (Math.abs(vx) + Math.abs(vy) < 0.02 && ++idle > 240) { running = false; return; }
       requestAnimationFrame(step);
     };
     addEventListener("pointermove", (e) => {
-      tx = e.clientX + 18; ty = e.clientY - 26; idle = 0;
+      tx = e.clientX + 18; ty = e.clientY - 30; idle = 0;
       fairy.setAttribute("data-on", "");
       if (!running) { running = true; requestAnimationFrame(step); }
     }, { passive: true });
     document.addEventListener("pointerleave", () => fairy.removeAttribute("data-on"));
   }
 
-  /* ---------------- Init ---------------- */
-  document.documentElement.classList.add("js-sky");
-  measure();
   applyLang(lang);
 })();

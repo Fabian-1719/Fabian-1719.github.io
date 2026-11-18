@@ -38,6 +38,24 @@
         ],
         "createdAt": "2026-11-18T07:17:59.755Z",
         "reason": "finish reviewer: false positive, #about copy is inset by the .wrap gutter (130px desktop, 20px mobile)"
+      },
+      {
+        "rule": "low-contrast",
+        "value": "*",
+        "files": [
+          ".impeccable/mocks/decision/model-pick2.html"
+        ],
+        "createdAt": "2026-11-18T07:29:32.059Z",
+        "reason": "Claude: throwaway decision-round sketch drawn on canvas; the detector reads text against the empty page, not the canvas sky behind it"
+      },
+      {
+        "rule": "hard-offset-shadow",
+        "value": "*",
+        "files": [
+          "css/style.css"
+        ],
+        "createdAt": "2026-11-18T07:49:00.393Z",
+        "reason": "Claude: pixel-art world per direction contract; zero-blur one-step edges are the native depth of pixel UI (button base, bar edge, panel frame)"
       }
     ]
   }
