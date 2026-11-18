@@ -675,7 +675,8 @@
       reduce = !!opts.reduce;
       resize();
       addEventListener("resize", resize);
-      if (reduce) render(0); else raf = requestAnimationFrame(loop);
+      render(performance.now()); // first frame right away, not on the next animation tick
+      if (!reduce) raf = requestAnimationFrame(loop);
     },
     setProgress(p) {
       progress = clamp(p);
