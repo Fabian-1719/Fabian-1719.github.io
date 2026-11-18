@@ -77,84 +77,46 @@
     ["#ffe0aa", "#e4f3fb", "#ffd9a0", "#ffb36b", "#2a3462"]
   ];
 
-  /* The sword in its pedestal: a pixel sprite supplied by the site owner, 38×76. */
+  /* The sword in its pedestal: the site owner's sprite, hand-reduced from 38×76 to 19×38 so it sits at the world's scale. */
   const SWORD_ROWS = [
-    "..................ab..................",
-    "..................ab..................",
-    ".................abbc.................",
-    "................babbbc................",
-    ".................baab.................",
-    "..................db..................",
-    "..................bd..................",
-    "..................db..................",
-    "..................bb..................",
-    "..................bd..................",
-    "..................db..................",
-    "..................bd..................",
-    "..................bb..................",
-    "..................db..................",
-    "..................bd..................",
-    "..................db..................",
-    ".................bbbc.................",
-    "...............abbbbbbc...............",
-    ".............c..abbbbc..b.............",
-    "............bac..aabc..bbc............",
-    "............abaccbbbccbbcb............",
-    "...........aabbbbefefbbbcbb...........",
-    "..........babaaabbefbbcbbcbc..........",
-    ".........babaa.aabbbbcc.bbcbc.........",
-    "........baa.....aabbcc.....bbc........",
-    ".................aggb.................",
-    ".................aggb.................",
-    ".................fggf.................",
-    ".................hggi.................",
-    "................hggggi................",
-    "...............hggggggi...............",
-    "...............gghihigg...............",
-    "...............hgghiggi...............",
-    "................hggggi................",
-    "................hggggi................",
-    "................hggggi................",
-    "................hggggi................",
-    "................hggggi................",
-    "................hggggi................",
-    "................hggggi................",
-    "................hggggi................",
-    "................hggggi................",
-    "................hggggi................",
-    "................hggggi................",
-    "................hggggi................",
-    "................hggggi................",
-    "................hggggi................",
-    "................hggggi................",
-    "................hggggi................",
-    "................hggggi................",
-    "................hggggi................",
-    "................hggggi................",
-    "................hggggi................",
-    "................hggggi................",
-    "................hggggi................",
-    "................hggggi................",
-    "................hggggi................",
-    "................hggggi................",
-    "..........jkkkkkhggggilllkkl..........",
-    ".........jkkkkkkhggggillkkkkl.........",
-    "........jkkkkkkkhggggilkkkkkkl........",
-    ".......jkkkkkkkkkkkkkkkkkkkkkkl.......",
-    "......jkkkkkkkkkkkkkkkkkkkkkkkkl......",
-    ".....jjjjjjjjjjjjjjjjjjjjjjjjjjkl.....",
-    ".....kkkkkkkkkkkkkkkkkkkkkkkkkkkl.....",
-    "....jkkkkkkkkkkkkkjjkkkkkkkkkkkkkl....",
-    "....jkkkkkkkkkkkkjkklkkkkkkkkkkkkl....",
-    "...jkkkkkkkkkkkkjkkkklkkkkkkkkkkkkl...",
-    "...jkkkkkkkkkkkjkkkkkklkkkkkkkkkkkl...",
-    "..jkkkkkkkkkkkjkjjjjjjklkkkkkkkkkkkl..",
-    "..jkkkkkkkkkkjkklkkkkkjklkkkkkkkkkkl..",
-    ".jkkkkkkkkkkjkkkklkkkjkkklkkkkkkkkkkl.",
-    ".jkkkkkkkkkjkkkkkklkjkkkkklkkkkkkkkkl.",
-    "jkkkkkkkkkjjjjjjjjjjjjjjjjjlkkkkkkkkkl",
-    "jkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkl",
-    "jkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkl"
+    ".........a.........",
+    "........abc........",
+    ".........b.........",
+    ".........d.........",
+    ".........b.........",
+    ".........d.........",
+    ".........b.........",
+    ".........d.........",
+    "........abc........",
+    ".......abbbc.......",
+    ".....c.abebc.b.....",
+    "....bac.aec.bbc....",
+    "...aba..bbc..cbc...",
+    "..ba....agb....bc..",
+    "........fgf........",
+    ".......hgggi.......",
+    "........hgi........",
+    "........hgi........",
+    "........hgi........",
+    "........hgi........",
+    "........hgi........",
+    "........hgi........",
+    "........hgi........",
+    "........hgi........",
+    "........hgi........",
+    "........hgi........",
+    "........hgi........",
+    "........hgi........",
+    "........hgi........",
+    "....jkkkhgilkkl....",
+    "...jkkkkkkkkkkkl...",
+    "..jjjjjjjjjjjjjjkl.",
+    "..kkkkkkkjjkkkkkkl.",
+    ".jkkkkkkjklkkkkkkl.",
+    ".jkkkkkjjjjlkkkkkl.",
+    "jkkkkkjklkjklkkkkkl",
+    "jkkkkjjjjjjjjlkkkkl",
+    "jkkkkkkkkkkkkkkkkkl"
   ];
   const SWORD_COLORS: Record<string, string> = { a: "#4c4c84", b: "#3f3f74", c: "#2f2f5d", d: "#37946e", e: "#fbf236", f: "#8f974a", g: "#9badb7", h: "#cbdbfc", i: "#8599a5", j: "#847e87", k: "#696a6a", l: "#595652" };
   // each sprite colour gets day/golden/dusk/night keys, tinted like the rest of the world
@@ -548,13 +510,13 @@
   tower(196);
   flowers(10, 240, 40);
   const forest = [];
-  for (let x = 436; x < 636; x += 9 + Math.floor(rnd() * 8)) { if (x > 514 && x < 578) continue; forest.push(x); }
+  for (let x = 436; x < 636; x += 9 + Math.floor(rnd() * 8)) { if (x > 528 && x < 564) continue; forest.push(x); }
   forest.forEach((x, i) => {
     if (i % 3 === 1) pine(x, G[x] + 1, 20 + Math.floor(rnd() * 10));
     else broadleaf(x, G[x] + 1, 6 + Math.floor(rnd() * 6), 7 + Math.floor(rnd() * 4));
   });
   sword(545);
-  flowers(516, 576, 18);
+  flowers(530, 562, 12);
   bridge();
   house(732, "wood"); house(784, "stone"); house(842, "wood");
   lampPost(770); lampPost(828); lampPost(880);
@@ -753,6 +715,24 @@
         for (let x = 0; x < W; x++) {
           const c = buf[row + ((x + ox) % WW)];
           if (c) px32[out + x] = pal[c];
+        }
+      }
+    }
+    // Reflections: the lake and the river mirror whatever stands above them, rippled and faded with depth
+    {
+      const sy0 = WATER - off + 18, ox = Math.round(camX);
+      const avg = (a: number, b: number) => pack(((a & 255) + (b & 255)) >> 1, (((a >> 8) & 255) + ((b >> 8) & 255)) >> 1, (((a >> 16) & 255) + ((b >> 16) & 255)) >> 1);
+      for (let y = sy0 + 1; y < Math.min(H, sy0 + 26); y++) {
+        const d = y - sy0, my = sy0 - d;
+        if (my < 0) break;
+        if (d % 4 === 3) continue; // ripple gaps keep the surface reading as water
+        const wobble = reduce ? 0 : Math.round(Math.sin(clock * 2.2 + d * 0.9) * (d > 8 ? 2 : 1));
+        for (let x = 0; x < W; x++) {
+          const wx = x + ox;
+          if (wx < 0 || wx >= WW || G[wx] <= WATER || y >= G[wx] - off + 18) continue;
+          if (!dith(x, y, 0.82 - d * 0.03)) continue;
+          const sx = Math.min(W - 1, Math.max(0, x + wobble));
+          px32[y * W + x] = avg(px32[y * W + x], px32[my * W + sx]);
         }
       }
     }
