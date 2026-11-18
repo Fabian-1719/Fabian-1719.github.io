@@ -129,6 +129,25 @@
     ROLES["sw_" + k] = [h, tint(h, "#ffb070", 0.14, 1), tint(h, "#6a4a7a", 0.3, 0.86), glow ? tint(h, "#ffd060", 0.2, 0.8) : tint(h, "#1a2246", 0.52, 0.7)];
   }
 
+  /* The walker: the site owner's sprite sheet, right-facing walk cycle (10 frames, 27×25),
+     quantised to 16 colours. Facing left mirrors these frames. */
+  const LINK_FRAMES: string[][] = [
+    ["...........ojiekfll........", "..........ikkkeknnpnl......", "......eiikkkkkekppnppl.....", ".....eiikkkkkeknnpnnnp.....", "....eiiikieekekpplfnff.....", "...aiiiiikkkekpnlmmb.......", "...aiiiiiieeigpnmomb.......", "..aeiieeieeienlpobfb.......", "..aeieaeemoomfnlo.jmb......", "..aeiaoaalmoofpfo.jmb......", "...cga..ablmmnpfoohj.......", "...dcc..fclamnnmoohd.......", "........omcabpfmmmb........", "........bbaedfbeeaj........", "........cdgigblaiaa........", "......objccfgfaagpka.......", "......ambedffag.aika.......", "......aaekkkkaojjaga.......", ".......aagkkkeaffaaa.......", ".......afcekkkaooaddbb.....", ".......afdcaaaaaaadffb.....", "........cddda....abbb......", ".........jbaa..............", "...........................", "..........................."],
+    ["........oiikkkgegflo.......", ".......oikkkkegpppnnl......", "......eikkkkeklnnnppnl.....", ".....eiikkkkeknpplnnppl....", "...maiiiikkkeklnplfnnpl....", "...maiiiiikekpnnlmmllf.....", "...aeiiiiiieipnmmomd.......", "...aeiiiiieimlnpobfa.......", "...aeiieeoomfnlnohjma......", "...aeieaaloofpllohjma......", "...aeia.abmhlplloohj.......", "...daga.dcbjpnlmomhd.......", "....aca.omaapfhmmma........", "........bdeamaeeebd........", "........afgigaeikpa........", "......ocjafgfgmmaikdo......", "......bmaiifaohjjagab......", ".......baekkiacjfbbdfa.....", "......afdaekkieffdbdfa.....", "......bfdaaaaaaaabddb......", "......bddb.....maaaa.......", "......adda.................", ".......ba..................", "...........................", "..........................."],
+    ["............ikkkegfl.......", "........eeikkkkekpnnl......", "........eikkkkeknnppnlo....", "........eikkkkekpplnpplm...", "......eiiikeekeknplfnpfm...", ".....aeiiiikkekpnlmmffo....", ".....aeiiiiiieipnmombfo....", ".....aeiiiiieenlpobfb......", ".....aceiieoomfnlo.jmbm....", ".....maeiebloofpfo.jmam....", "......degaadmhlpfoohj......", "......deaamfjannmoohd......", "......dcaaboaapfmmma.......", "........aabaeamaeenf..jj...", "........jcdfiigaiepa..dbd..", "......doaggfigfi.aakaadfda.", "......dbgkkkffa.jjfbfddfda.", ".....abccakkkkiajffobddcd..", ".....adfdfdakkkgabobddb....", ".....affcba.aaaaa...abm....", ".....addca.................", ".....addcb.................", "......daj..................", "...........................", "..........................."],
+    ["...........oo..............", "...........kkkegfl.........", "........ikkkkkekpnnl.......", "......eikkkkkkeknppnl......", ".....eikkkkkkekppnnppl.....", "....eiikkeekkeknplfnpf.....", "....eiiiikkiekpnlmmlf......", "...eiiiiiieeigpnmomb.......", "...eiiiiieeeeflpobfb.......", "..deieaaemmmffnloojhd......", "..aeea..cmooffpfo.jmb......", "..aead..ajmomppfoojhd......", "..aaa...bbfhmppmooba.......", "........fdcacpfmmda........", "........aaeacmaeea.........", "........oaeigaeeiiao.......", "........ajgiggieaiga.......", "........oadggd.magpa.......", "........bgkgdajjfagaa......", ".......aagkkkkaffobda......", ".......afbaekkcjobdb.......", ".......afddcaaaabaa........", "........bfddba.............", ".........bbbaa.............", "..........................."],
+    ["..........oo...............", ".........ikkeigfll.........", "......eikkkkeknpnnnl.......", "..jeeikkkkkkeknppppnl......", ".geiikkkkkkekpppnnnpp......", "oaiiiikkeekekpnnlllnf......", "aiiiiiiikkekpnllmm.........", "aiiiiiiiieiipnmmoma........", "iieeaeeeeieflpohbfa........", "eeaaoaeemmhfnlmojjhd.......", "ac....camomfpfmojjfa.......", "dd....dablofpfmoojmc.......", ".......bbhhnpfmomma........", ".......pmaapfmmmmb.........", ".......aaeambeeac..........", "........aiiaeiiiga.........", "........aiagiaeipca........", ".......agfa..adfgga........", ".......aikajjagkkab........", "........akaffbgkkaa........", ".........aaoobaaaa.........", "..........abaacffa.........", "...........aadffba.........", "............abbbba.........", "..........................."],
+    ["...........oiekfllo........", "........oikkkeknpnnl.......", ".....giiikkkkekpnppnlo.....", "....eiiikkkkeknnpnnppl.....", "...eiiiikeekekpplfnffo.....", "...giiiiiikekpnlmmb........", "..aiiiiiiiiegpnmomb........", ".aeiiiiiiieenlpobfb........", ".aeieaeeooomfnlo.jmb.......", ".aeiamjabloofpfo.jmb.......", "..ceaomaadmhlpfoohj........", "..dcd..mdcjhnnfoohd........", ".......obcaapfmmmb.........", ".......maagambeeabj........", "........oaigamaiafc........", "........oagajaiigajao......", ".......mbfa..gagpkada......", "......jeiaajjaffkkab.......", "......jaabffjaikkia........", ".......aaaofaikkkab........", "........aaadaaaaadfb.......", ".........daba.addffb.......", "...............abbb........", "...........................", "..........................."],
+    [".........ikkkgegfl.........", "......oiikkkegpppnnl.......", ".....eikkkkeklnnnppnl......", "....eiikkkkeknpplnnppl.....", "..maeiiieekeklnplfnnpl.....", "..maiiiiikekpnnlmmllf......", "..oaiiiiiieippnmomb........", "..aeiiiieegmlnpobfd........", "..aeiieeoomfnnlohjma.......", "..oaieaaloofpllohjma.......", "..maea.admmlpllohhj........", "...dcd.dmbannlmomhd........", ".......omaapfhmmoaa........", ".......aajakaeecaddj.......", ".........aagaiieejfa.......", ".......oaa.jfgiieafa.......", ".......aajj.deigpka........", "......bbffjadffkkka........", "......bfmfagkkkkkeabb......", "......bdbbgkkkkkgabffb.....", ".......bdbaaaaaadfddfb.....", "........aa.....bbdddb......", "................dbaa.......", "...........................", "..........................."],
+    ["........oikkkegflo.........", ".....oeikkkkekpnnlm........", "....deikkkkeknnppnlo.......", "....oeikkkkekppnnpppl......", "...meiikeekeknplfnppl......", "...aeiiikkekpnlmmllnl......", "...aeiiiieeipnmomccf.......", "...aeiiieiemlpobfb.........", "...oaieeoomfnlo.jmjd.......", "...oaiealoofpfo.jhjd.......", "...oaeaadmhlpfoohj.........", "...odcddcjannmooha.........", ".....aoomaapfmmmab.........", ".......aacalaeeajc.........", "........afakagiiaa.........", ".....jaaeb.ifggpke.ooo.....", "....bbfabfj.affgkeaaaaa....", "...abffcoffaikkkiaffffa....", "...mbfdab.bgkkiaacddffa....", "...mbdda..aaaaa.addddm.....", "....baa..........daaa......", "...........................", "...........................", "...........................", "..........................."],
+    ["...........................", ".........oikkeifl..........", ".......mikkkkekpnnl........", ".....eikkkkkkeknppnl.......", "....egkkkkkkekppnnpplo.....", "...eiikkkeekeknplfnpfo.....", "...eiiiiikkekpnlmmlf.......", "..eiiiiiiieiipnmomb........", "..eiiiiiieeeflpobfb........", ".deieaeegmmmfnloojhd.......", ".aeea.dccooofpfo.jmb.......", ".aead..abfohfpfoojhd.......", ".aca....bbhhnpfooma........", "........pmabpfmmdm.........", "........aaeamaeea..........", "........oaeiiaiiiao........", "........oaa..aiiiia........", "........agdjjaigfpabb......", "......jegbffjaffkiafb......", "......jegblfaikkkadfb......", "........bbaaaaiiaddb.......", "........bddaaaaa.ba........", "........aaaa...............", "...........................", "..........................."],
+    ["...........................", ".........ikkeigfll.........", ".....iikkkkkeilpnnnl.......", "..meiikkkkkkeglnpppnl......", "..eiikkkkkkeknppnnnpp......", "geiiiikkeekeknnplllnf......", "aiiiiiiikkekpnnlmmd........", "aiiiiiiiieiipnmmoma........", "iieeaeeeeieflnpobfa........", "eeaaoaeemmhfnlnoojhd.......", "cc....aamoofpllohjma.......", "dc....daboompllohjhd.......", ".......bblhmplmomoa........", ".......pmaapfmmmoa.........", ".......aaeamaeeea..........", "........aiiaeiiig..........", "........agagiaginpa........", ".......aifb..jffgia........", ".......aikajjcekkeb........", "........akaffceke..........", ".........aamojaaa..........", ".........adbacddf..........", "..........bdbbbbb..........", "...........ba..............", "..........................."]
+  ];
+  const LINK_COLORS: Record<string, string> = { a: "#020802", b: "#0e0503", c: "#222213", d: "#423123", e: "#0b430c", f: "#67481e", g: "#2c6826", h: "#818d88", i: "#177929", j: "#47525d", k: "#469f2f", l: "#9e7f3c", m: "#efc89c", n: "#d3b441", o: "#fff0d6", p: "#f7f234" };
+  for (const [k, h] of Object.entries(LINK_COLORS)) {
+    ROLES["lk_" + k] = [h, tint(h, "#ffb070", 0.14, 1), tint(h, "#6a4a7a", 0.28, 0.88), tint(h, "#1a2246", 0.45, 0.75)];
+  }
+
   const names = Object.keys(ROLES);
   const R: Record<string, number> = {}; names.forEach((n, i) => { R[n] = i + 1; }); // 0 = transparent
   const N = names.length + 1;
@@ -297,8 +316,8 @@
   water(240, 450, false);
   water(636, 728, true);
   // Stream across the plateau feeding the falls
-  for (let x = 220; x < 247; x++) {
-    const w = 2 + ((x - 220) >> 3);
+  for (let x = 239; x < 247; x++) {
+    const w = 2 + ((x - 239) >> 2);
     for (let k = 0; k < w; k++) put(main, x, G[x] + k, k === 0 ? R.water2 : R.water0 + ((x + k) & 3));
     put(main, x, G[x] + w, R.rockDk);
   }
@@ -322,6 +341,26 @@
     put(main, x, y, rnd() > 0.5 ? R.foam : R.fall0 + Math.floor(rnd() * 4));
   }
   for (let x = 236; x < 270; x++) if (hash(x * 4.1) > 0.35) put(main, x, WATER + 1 + (Math.abs(x - 252) > 10 ? 1 : 0), R.foam); // foam ring
+  // Carved stairs from the tower plateau down toward the falls
+  const stairY = (x: number) => Math.min(150, 112 + Math.ceil(Math.ceil((x - 216) / 2) * 3.5));
+  for (let x = 216; x < 239; x++) {
+    const sy = stairY(x);
+    for (let y = G[x]; y < sy; y++) put(main, x, y, (x + y) % 5 === 0 ? R.rock : R.rockDk); // the cut wall behind
+    put(main, x, sy, R.rockHi); put(main, x, sy + 1, R.rock); // tread
+    if ((x - 216) % 2 === 1) for (let k = 1; k <= 3; k++) put(main, x, sy + 1 + k, R.rockDk); // riser shadow
+  }
+  // Ledge behind the waterfall, then a few steps down to the dock
+  for (let x = 238; x < 256; x++) { put(main, x, 150, R.rockHi); put(main, x, 151, R.rock); put(main, x, 152, R.rockDk); }
+  for (let x = 256; x < 262; x++) { const y = 150 + Math.ceil((x - 255) * 5 / 6); put(main, x, y, R.rockHi); put(main, x, y + 1, R.rockDk); }
+  // Dock across the lake: planks, a dark edge and posts into the lake bed
+  let dockEnd = 262;
+  for (let x = 262; x < 460; x++) {
+    if (G[x] <= 156) { dockEnd = x; break; }
+    const seam = (x - 262) % 4 === 0;
+    put(main, x, 155, seam ? R.woodDk : R.wood); put(main, x, 156, R.woodDk);
+    if ((x - 262) % 14 === 6) for (let y = 157; y < Math.min(G[x], LH); y++) { put(main, x, y, R.woodDk); }
+    dockEnd = x;
+  }
   // Paths through the village and up the hill
   for (let x = 730; x < 1150; x++) {
     const t = G[x];
@@ -455,9 +494,11 @@
     for (let y = -1; y <= 1; y++) for (let x = -1; x <= 1; x++) put(main, x0 + x, base - 13 + y, R.lamp);
     put(main, x0, base - 15, R.woodDk);
   }
+  const BRIDGE_X0 = 634, BRIDGE_X1 = 730;
+  const bridgeY = (x: number) => Math.round(147 - Math.sin(Math.PI * (x - BRIDGE_X0) / (BRIDGE_X1 - BRIDGE_X0)) * 3);
   function bridge() {
-    const x0 = 634, x1 = 730;
-    const yAt = (x: number) => Math.round(147 - Math.sin(Math.PI * (x - x0) / (x1 - x0)) * 3); // gentle arch
+    const x0 = BRIDGE_X0, x1 = BRIDGE_X1;
+    const yAt = bridgeY; // gentle arch
     // stone abutments where the deck meets each bank
     for (const [ax, dir] of [[x0, 1], [x1, -1]] as const) {
       for (let i = 0; i < 6; i++) for (let y = yAt(ax) + 2; y < G[ax + dir * i] + 3; y++) put(main, ax + dir * i, y, (y + i) % 3 ? R.stone : R.stoneDk);
@@ -550,6 +591,17 @@
   flowers(900, 1180, 20);
 
   const SWORD_X = 545, FIRE_X = 1088, TOWER_X = 205;
+  const pathY = (x: number): number => {
+    const xi = Math.round(x);
+    if (xi < 216) return G[Math.max(0, xi)];
+    if (xi < 239) return stairY(xi);
+    if (xi < 256) return 150;
+    if (xi < 262) return 150 + Math.ceil((xi - 255) * 5 / 6);
+    if (xi <= dockEnd) return 155;
+    if (xi >= BRIDGE_X0 && xi <= BRIDGE_X1) return bridgeY(xi);
+    return G[Math.min(WW - 1, xi)];
+  };
+  const LINK_FEET = LINK_FRAMES.map((f) => { let b = f.length - 1; while (b > 0 && !/[^.]/.test(f[b])) b--; return b; });
 
   /* ---------------- Dynamic elements ---------------- */
   type Cloud = { m: [number, number, number][]; w: number; x: number; y: number; v: number };
@@ -622,6 +674,7 @@
   }
 
   let anchors: [number, number][] | null = null, focus = 0.62;
+  const walker = { x: TOWER_X - 5, dir: 1, dist: 0, still: -1e9 };
   function camera() {
     if (anchors && anchors.length > 1) {
       let i = 0;
@@ -738,6 +791,32 @@
         for (let x = 0; x < W; x++) {
           const c = buf[row + ((x + ox) % WW)];
           if (c) px32[out + x] = pal[c];
+        }
+      }
+    }
+    // The walker follows the camera along the path, stepping with the scroll
+    {
+      const target = clamp(camX + W * focus - 16, 150, FIRE_X - 18);
+      const moved = target - walker.x;
+      if (Math.abs(moved) > 0.3) { walker.dir = moved > 0 ? 1 : -1; walker.dist += Math.abs(moved); walker.still = now; }
+      walker.x = target;
+      const walking = now - walker.still < 220;
+      const f = walking ? Math.floor(walker.dist / 3) % LINK_FRAMES.length : 3;
+      const rows = LINK_FRAMES[f], fw = rows[0].length;
+      const feet = pathY(walker.x);
+      const sx0 = Math.round(walker.x - camX) - (fw >> 1), sy0 = feet - off + 18 - LINK_FEET[f];
+      for (let j = 0; j < rows.length; j++) {
+        const y = sy0 + j; if (y < 0 || y >= H) continue;
+        const row = rows[j];
+        for (let i = 0; i < fw; i++) {
+          const ch = row[walker.dir > 0 ? i : fw - 1 - i];
+          if (ch === ".") continue;
+          const x = sx0 + i; if (x < 0 || x >= W) continue;
+          // behind the waterfall: falling water stays in front of him
+          const wx = x + Math.round(camX), wy = y + off - 18;
+          const under = wx >= 0 && wx < WW && wy >= 0 && wy < LH ? main[wy * WW + wx] : 0;
+          if (under >= R.fall0 && under <= R.fall0 + 3) continue;
+          px32[y * W + x] = pal[R["lk_" + ch]];
         }
       }
     }
