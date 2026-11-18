@@ -77,7 +77,8 @@
     ["#ffe0aa", "#e4f3fb", "#ffd9a0", "#ffb36b", "#2a3462"]
   ];
 
-  /* The sword in its pedestal: the site owner's sprite, hand-reduced from 38×76 to 19×38; the giant forest trees around it stand taller. */
+  /* The sword in its pedestal: the site owner's sprite, hand-reduced from 38×76 to 19×38 and drawn on the fine grid
+     (the walker's resolution), so it stands about 1.5× his height. */
   const SWORD_ROWS = [
     ".........a.........",
     "........abc........",
@@ -133,18 +134,18 @@
      quantised to 16 colours and cleaned of compression halos. Facing left mirrors these frames.
      The world is drawn at half his resolution and upscaled with EPX, so he stands at its scale. */
   const LINK_FRAMES: string[][] = [
-    ["............kiekfll........", "..........ikkkeknnpnl......", "......eiikkkkkekppnppl.....", ".....eiikkkkkeknnpnnnp.....", "....eiiikieekekpplfnff.....", "...aiiiiikkkekpnlmmb.......", "...aiiiiiieeippnmmmb.......", "..aeiieeieeienlp.bfb.......", "..aeieaeemmmmfnl..jmb......", "..aeia.aalmmmfpf..jmb......", "...cca..ablmmnpf...j.......", "...dcc..fclamnnm...d.......", "..........cabpfmmmb........", "........bbaedfbeeaa........", "........cdcigbaaiaa........", ".......bcccfgfaaapka.......", "......ambedffaa.aika.......", "......aaekkkkaaqqaaa.......", ".......aakkkkeaffaaa.......", ".......afcekkkaaaaddbb.....", ".......afdcaaaaaaadffb.....", "........dddda....abbb......", ".........dbaa..............", "...........................", "..........................."],
-    [".........iikkkgepfn........", "........ikkkkegpppnnl......", "......eikkkkeknnnnppnl.....", ".....eiikkkkeknpplnnppl....", "....aiiiikkkeknnplfnnpl....", "....aiiiiikekpnnlmmllf.....", "...aeiiiiiieipnmmmmd.......", "...aeiiiiieimlnpmbfa.......", "...aeiieeommfnlnmhjma......", "...aeieaammmfpllmhjma......", "...aeia.abmmppllmmhj.......", "...daaa.dbbppnlmmmhd.......", "....aaa..maapfmmmma........", "........bdeamaeeebd........", "........afgigaeikpa........", ".......aaafgfgmmaikd.......", "......bmaiifammqqaaab......", ".......baekkiaqqfbbdfa.....", "......afdaekkieffdbdfa.....", "......bfdaaaaaaaabddb......", "......bddb......aaaa.......", "......adda.................", ".......ba..................", "...........................", "..........................."],
-    ["............ikkkeffl.......", "........eeikkkkekpnnl......", "........eikkkkeknnppnl.....", "........eikkkkekpplnppl....", "......eiiikeekeknplfnpf....", ".....aeiiiikkekpnlmmff.....", ".....aeiiiiiieipnmmmbf.....", ".....aeiiiiieenlp.bfb......", ".....aeeiieommfnl..jmbm....", "......aeiebmmmfpf..jmam....", "......deeaadmmppf...j......", "......deaamfaannm...d......", "......daaabmaapfmmma.......", "........aabaeamaeenf..qq...", "........aadfiigaiepa..dbd..", "......d.aggfigfi.aakaadfda.", "......dbgkkkffa.qqfbfddfda.", ".....abccakkkkiaqffbbdddd..", ".....adfdfdakkkaab.bddb....", ".....affcba.aaaaa...ab.....", ".....addca.................", ".....addcb.................", "......daa..................", "...........................", "..........................."],
-    ["...........................", "...........kkkeefn.........", "........ikkkkkekpnnl.......", "......eikkkkkkeknppnl......", ".....eikkkkkkekppnnppl.....", "....eiikkeekkeknplfnpf.....", "....eiiiikkiekpnlmmff......", "...eiiiiiieeippnmmmb.......", "...eiiiiieeeeflpmbfb.......", "..deieaaemmmffnl..jjd......", "..aeea..mmmmffpf..jmb......", "..aead..ammmmppf..jjd......", "..aaa...bbfmmppm..ba.......", "........fdaacpfmmda........", "........aaeacmaeea.........", ".........aeigaeeiia........", "........aagiggieaiga.......", ".........adggd..agpa.......", "........bgkgdaqqfagaa......", ".......aagkkkkaffbbda......", ".......afbaekkaabbdb.......", ".......afdddaaaabaa........", "........bfddba.............", ".........bbbaa.............", "..........................."],
-    ["...........................", ".........ikkeiffll.........", "......eikkkkeknpnnnl.......", "..eeeikkkkkkeknppppnl......", ".eeiikkkkkkekpppnnnpp......", ".aiiiikkeekekpnnlllnf......", "aiiiiiiikkekpnllmm.........", "aiiiiiiiieiipnmmmma........", "iieeaeeeeieflpmmbfa........", "eeaa.aeemmffnlmmjjjd.......", "aa....aammmfpfmmjjfa.......", "dd....dabmmfpfmmmjma.......", ".......bbhhnpfmmmma........", ".......pmaapfmmmmb.........", ".......aaeambeeaa..........", "........aiiaeiiiaa.........", "........aiaaiaeipaa........", ".......aafa..adfgga........", ".......aikaqqagkkab........", "........akaffbgkkaa........", ".........aaabbaaaa.........", "..........abaafffa.........", "...........aadffba.........", "............abbbba.........", "..........................."],
-    ["............iekfll.........", ".........ikkkeknpnnl.......", ".....iiiikkkkekpnppnl......", "....eiiikkkkeknnpnnppl.....", "...eiiiikeekekpplfnff......", "...iiiiiiikekpnlmmb........", "..aiiiiiiiieepnmmmb........", ".aeiiiiiiieenlp.bfb........", ".aeieaeeiimmfnl..jmb.......", ".aeiamaabmmmfpf..jmb.......", "..cea.maadmhppf...j........", "..dcd..mdchhnnf...d........", "........bcaapfmmmb.........", "........aagambeeabb........", ".........aigamaiafb........", ".........agaaaiigaaa.......", "........bfa..aagpkada......", "......qeiaaqqaffkkab.......", "......qaabffqaikkia........", ".......aaaffaikkkab........", "........aaadaaaaadfb.......", ".........daba.addffb.......", "...............abbb........", "...........................", "..........................."],
-    [".........ikkkgepfn.........", ".......iikkkegpppnnl.......", ".....eikkkkeknnnnppnl......", "....eiikkkkeknpplnnppl.....", "...aeiiieekeknnplfnnpl.....", "...aiiiiikekpnnlmmllf......", "...aiiiiiieippnmmmb........", "..aeiiiieemmnnpmbfd........", "..aeiieeemmfnnlmhjma.......", "...aieaammmfpllmhjma.......", "...aea.admmppllmhhj........", "...ddd.dmbannlmmmhd........", "........maapfmmmmaa........", ".......aaaakaeeeadda.......", ".........aaaaiieeffa.......", "........aa.qfiiieafa.......", ".......aaqq.deiipka........", "......bbffqadffkkka........", "......bfmfagkkkkkeabb......", "......bdbbgkkkkkkabffb.....", ".......bdbaaaaaadfddfb.....", "........aa.....bbdddb......", "................dbaa.......", "...........................", "..........................."],
-    [".........ikkkeffl..........", "......eikkkkekpnnl.........", "....deikkkkeknnppnl........", ".....eikkkkekppnnpppl......", "....eiikeekeknplfnppl......", "...aeiiikkekpnlmmllnl......", "...aeiiiieeipnmmmccf.......", "...aeiiieiemlp.bfb.........", "....aieeommfnl..jmjd.......", "....aieammmfpf..jjjd.......", "....aeaadmmppf...j.........", "....dadddaannm...a.........", ".....a..maapfmmmab.........", ".......aaaaaaeeaaa.........", "........afakagiiaa.........", ".....baaeb.ifggpke.........", "....bbfabff.affgkeaaaaa....", "...abffffffaikkkiaffffa....", "....bfdab.bakkiaadddffa....", "....bdda..aaaaa.adddd......", "....baa..........daaa......", "...........................", "...........................", "...........................", "..........................."],
-    ["...........................", "..........ikkeifn..........", "........ikkkkekpnnl........", ".....eikkkkkkeknppnl.......", "....eikkkkkkekppnnppl......", "...eiikkkeekeknplfnpf......", "...eiiiiikkekpnlmmff.......", "..eiiiiiiieiipnmmmb........", "..eiiiiiieeeflpmbfb........", ".deieaeemmmmfnl..jjd.......", ".aeea.dccmmmfpf..jmb.......", ".aead..abfmhfpf..jjd.......", ".aaa....bbhhnpf..ma........", "........pmabpfmmdm.........", "........aaeamaeea..........", ".........aeiiaiiia.........", ".........aa..aiiiia........", "........agdqqaiifpabb......", "......qegbffqaffkiafb......", "......qegbffaikkkadfb......", "........bbaaaaiiaddb.......", "........bddaaaaa.ba........", "........aaaa...............", "...........................", "..........................."],
-    ["...........................", ".........ikkeiifll.........", ".....iikkkkkeilpnnnl.......", "...eiikkkkkkellnpppnl......", "..eiikkkkkkeknppnnnpp......", "eeiiiikkeekeknnplllnf......", "aiiiiiiikkekpnnlmmd........", "aiiiiiiiieiipnmmmma........", "iieeaeeeeieflnpmbfa........", "eeaa.aeemmffnlnmmjjd.......", "cc....aammmfpllmhjma.......", "dc....dabmmmpllmhjjd.......", ".......bbmmmplmmmma........", ".......pmaapfmmmma.........", ".......aaeamaeeea..........", "........aiiaeiiii..........", "........aaaiiaiinpa........", ".......aifb..qffiia........", ".......aikaqqcekkeb........", "........akaffceke..........", ".........aammaaaa..........", ".........adbaaddf..........", "..........bdbbbbb..........", "...........ba..............", "..........................."]
+    [".............iekfll........", "..........ikkkeknnpnl......", "......eiikkkkkekppnppl.....", ".....eiikkkkkeknnpnnnp.....", "....eiiikieekekpplfnff.....", "...aiiiiikkkekpnlmmb.......", "...aiiiiiieeippnmmmb.......", "..aeiieeieeienlphbfb.......", "..aeieaeemmmmfnl..jmb......", "..aeiaaaalmmmfpf..jmb......", "...cca..ablmmnpf..hj.......", "...dcc..fclamnnm..hd.......", "........hmcabpfmmmb........", "........bbaedfbeeaq........", "........cdcigbaaiaa........", ".......bqccfgfaaapka.......", "......ambedffaaaaika.......", "......aaekkkkaaqqaaa.......", ".......aakkkkeaffaaa.......", ".......afcekkkaaaaddbb.....", ".......afdcaaaaaaadffb.....", "........dddda....abbb......", ".........qbaa..............", "...........................", "..........................."],
+    [".........iikkkgepfn........", "........ikkkkegpppnnl......", "......eikkkkeknnnnppnl.....", ".....eiikkkkeknpplnnppl....", "...maiiiikkkeknnplfnnpl....", "...maiiiiikekpnnlmmllf.....", "...aeiiiiiieipnmmmmd.......", "...aeiiiiieimlnpmbfa.......", "...aeiieeommfnlnmhjma......", "...aeieaammmfpllmhjma......", "...aeiaaabmhppllmmhj.......", "...daaaadbbjpnlmmmhd.......", "....aaahhmaapfhmmma........", "........bdeamaeeebd........", "........afgigaeikpa........", ".......aqafgfgmmaikd.......", "......bmaiifamqqqaaab......", "......bbaekkiaqqfbbdfa.....", "......afdaekkieffdbdfa.....", "......bfdaaaaaaaabddb......", "......bddb......aaaa.......", "......adda.................", ".......ba..................", "...........................", "..........................."],
+    ["............ikkkeffl.......", "........eeikkkkekpnnl......", "........eikkkkeknnppnl.....", "........eikkkkekpplnpplm...", "......eiiikeekeknplfnpfm...", ".....aeiiiikkekpnlmmff.....", ".....aeiiiiiieipnmmmbf.....", ".....aeiiiiieenlphbfbb.....", ".....aeeiieommfnl..jmbm....", "......aeiebmmmfpf..jmam....", "......deeaadmhppf..hj......", "......deaamfjannm..hd......", "......daaabmaapfmmma.......", "........aabaeamaeenf..qq...", "........qadfiigaiepa..dbd..", "......daaggfigfiiaakaadfda.", "......dbgkkkffaaqqfbfddfda.", ".....abccakkkkiaqffbbdddd..", ".....adfdfdakkkaabbbddb....", ".....affcbaaaaaaa...ab.....", ".....addca.................", ".....addcb.................", "......daq..................", "...........................", "..........................."],
+    ["...........................", "...........kkkeefn.........", "........ikkkkkekpnnl.......", "......eikkkkkkeknppnl......", ".....eikkkkkkekppnnppl.....", "....eiikkeekkeknplfnpf.....", "....eiiiikkiekpnlmmff......", "...eiiiiiieeippnmmmb.......", "...eiiiiieeeeflpmbfb.......", "..deieaaemmmffnl..jhd......", "..aeea..mmmmffpf..jmb......", "..aead..ajmmmppf..jhd......", "..aaa...bbfhmppm..ba.......", "........fdaacpfmmda........", "........aaeacmaeeaa........", "........aaeigaeeiia........", "........aqgiggieaiga.......", "........aadggdmmagpa.......", "........bgkgdaqqfagaa......", ".......aagkkkkaffbbda......", ".......afbaekkaqbbdb.......", ".......afdddaaaabaa........", "........bfddba.............", ".........bbbaa.............", "..........................."],
+    ["...........................", ".........ikkeiffll.........", "......eikkkkeknpnnnl.......", "...eeikkkkkkeknppppnl......", ".eeiikkkkkkekpppnnnpp......", ".aiiiikkeekekpnnlllnf......", "aiiiiiiikkekpnllmmh........", "aiiiiiiiieiipnmmmma........", "iieeaeeeeieflpmhbfa........", "eeaaaaeemmhfnlmmjjhd.......", "aa....aammmfpfmmjjfa.......", "dd....dabmmfpfmmmjma.......", ".......bbhhnpfmmmma........", ".......pmaapfmmmmb.........", ".......aaeambeeacc.........", "........aiiaeiiica.........", "........aiaaiaeipca........", ".......aafaaaadfgga........", ".......aikaqqagkkab........", "........akaffbgkkaa........", ".........aaabbaaaa.........", "..........abaafffa.........", "...........aadffba.........", "............abbbba.........", "..........................."],
+    ["............iekfll.........", ".........ikkkeknpnnl.......", ".....iiiikkkkekpnppnl......", "....eiiikkkkeknnpnnppl.....", "...eiiiikeekekpplfnff......", "...iiiiiiikekpnlmmb........", "..aiiiiiiiieepnmmmb........", ".aeiiiiiiieenlphbfb........", ".aeieaeeiimmfnl..jmb.......", ".aeiamjabmmmfpf..jmb.......", "..ceahmaadmhppf..hj........", "..dcd..mdcjhnnf..hd........", ".......hbcaapfmmmbh........", "........aagambeeabq........", ".........aigamaiafq........", ".........agaqaiigaqa.......", "........bfaaqaagpkada......", "......qeiaaqqaffkkab.......", "......qaabffqaikkia........", ".......aaaffaikkkab........", "........aaadaaaaadfb.......", ".........dabaaaddffb.......", "...............abbb........", "...........................", "..........................."],
+    [".........ikkkgepfn.........", ".......iikkkegpppnnl.......", ".....eikkkkeknnnnppnl......", "....eiikkkkeknpplnnppl.....", "..maeiiieekeknnplfnnpl.....", "..maiiiiikekpnnlmmllf......", "..haiiiiiieippnmmmb........", "..aeiiiieemmnnpmbfd........", "..aeiieeemmfnnlmhjma.......", "...aieaammmfpllmhjma.......", "...aeaaadmmppllmhhj........", "...dddddmbannlmmmhd........", ".......hmaapfhmmmaa........", ".......aaqakaeeeaddq.......", "........aaaaaiieeqfa.......", "........aaqqfiiieafa.......", ".......aaqqqdeiipka........", "......bbffqadffkkka........", "......bfmfagkkkkkeabb......", "......bdbbgkkkkkkabffb.....", ".......bdbaaaaaadfddfb.....", "........aa.....bbdddb......", "................dbaa.......", "...........................", "..........................."],
+    [".........ikkkeffl..........", "......eikkkkekpnnl.........", "....deikkkkeknnppnl........", "....eeikkkkekppnnpppl......", "....eiikeekeknplfnppl......", "...aeiiikkekpnlmmllnl......", "...aeiiiieeipnmmmccf.......", "...aeiiieiemlphbfbhh.......", "....aieeommfnl..jmjd.......", "....aieammmfpf..jhjd.......", "....aeaadmhppf..hj.........", "....dadddjannm..ha.........", ".....ahhmaapfmmmab.........", ".......aaaaaaeeaqa.........", ".......aafakagiiaa.........", ".....qaaebiifggpke.........", "....bbfabfqaaffgkeaaaaa....", "...abffffffaikkkiaffffa....", "...mbfdabbbakkiaadddffa....", "...mbdda..aaaaaaadddd......", "....baa..........daaa......", "...........................", "...........................", "...........................", "..........................."],
+    ["...........................", "..........ikkeifn..........", "........ikkkkekpnnl........", ".....eikkkkkkeknppnl.......", "....eikkkkkkekppnnppl......", "...eiikkkeekeknplfnpf......", "...eiiiiikkekpnlmmff.......", "..eiiiiiiieiipnmmmb........", "..eiiiiiieeeflpmbfb........", ".deieaeemmmmfnl..jhd.......", ".aeeaadccmmmfpf..jmb.......", ".aead..abfmhfpf..jhd.......", ".aaa....bbhhnpf..ma........", "........pmabpfmmdm.........", "........aaeamaeeaa.........", ".........aeiiaiiia.........", ".........aaaaaiiiia........", "........agdqqaiifpabb......", "......qegbffqaffkiafb......", "......qegbffaikkkadfb......", "........bbaaaaiiaddb.......", "........bddaaaaaaba........", "........aaaa...............", "...........................", "..........................."],
+    ["...........................", ".........ikkeiifll.........", ".....iikkkkkeilpnnnl.......", "...eiikkkkkkellnpppnl......", "..eiikkkkkkeknppnnnpp......", "eeiiiikkeekeknnplllnf......", "aiiiiiiikkekpnnlmmd........", "aiiiiiiiieiipnmmmma........", "iieeaeeeeieflnpmbfa........", "eeaaaaeemmhfnlnmmjhd.......", "cc....aammmfpllmhjma.......", "dc....dabmmmpllmhjhd.......", ".......bbmhmplmmmma........", ".......pmaapfmmmma.........", ".......aaeamaeeea..........", "........aiiaeiiii..........", "........aaaiiaiinpa........", ".......aifbbqqffiia........", ".......aikaqqcekkeb........", "........akaffceke..........", ".........aammqaaa..........", ".........adbabddf..........", "..........bdbbbbb..........", "...........ba..............", "..........................."]
   ];
-  const LINK_COLORS: Record<string, string> = { a: "#020802", b: "#0e0503", c: "#222213", d: "#423123", e: "#0b430c", f: "#67481e", g: "#2c6826", h: "#e4ecf6", i: "#177929", j: "#3a5aa8", k: "#469f2f", l: "#9e7f3c", m: "#efc89c", n: "#d3b441", o: "#fff0d6", p: "#f7f234", q: "#3c414c" };
+  const LINK_COLORS: Record<string, string> = { a: "#020802", b: "#0e0503", c: "#222213", d: "#423123", e: "#0b430c", f: "#67481e", g: "#2c6826", h: "#f4f8ff", i: "#177929", j: "#3a5aa8", k: "#469f2f", l: "#9e7f3c", m: "#efc89c", n: "#d3b441", o: "#fff0d6", p: "#f7f234", q: "#3c414c" };
   for (const [k, h] of Object.entries(LINK_COLORS)) {
     ROLES["lk_" + k] = [h, tint(h, "#ffb070", 0.14, 1), tint(h, "#6a4a7a", 0.28, 0.88), tint(h, "#1a2246", 0.45, 0.75)];
   }
@@ -461,12 +462,16 @@
       put(main, x0 + x, y, c);
     }
     // windows with a warm glow ring that only shows at night
-    for (const [wx, wy] of [[7, 14], [7, 30], [7, 44]]) {
+    for (const [wx, wy] of [[7, 8], [7, 22]]) {
       for (let y = -1; y <= 4; y++) for (let x = -1; x <= 3; x++) put(main, x0 + wx + x, base - h + wy + y, R.glowWall);
       for (let y = 0; y < 4; y++) for (let x = 0; x < 2; x++) put(main, x0 + wx + x, base - h + wy + y, R.glass);
     }
-    put(main, x0 + 8, base, R.woodDk); put(main, x0 + 9, base, R.woodDk);
-    for (let y = 1; y < 6; y++) { put(main, x0 + 8, base - y, R.wood); put(main, x0 + 9, base - y, R.woodDk); }
+    for (let y = 0; y < 15; y++) for (let x = 6; x <= 11; x++) { // arched door, 15 px: the walker fits
+      if (y === 14 && (x === 6 || x === 11)) continue;
+      const frame = x === 6 || x === 11 || y === 14;
+      put(main, x0 + x, base - y, frame ? R.stoneDk : x === 10 ? R.woodDk : (y % 4 === 0 ? R.woodDk : R.wood));
+    }
+    put(main, x0 + 9, base - 7, R.gem); // handle
     // conical roof with a small spire
     for (let i = 0; i < 16; i++) {
       const y = base - h - 1 - i, half = Math.round(11 - i * 0.68);
@@ -476,28 +481,34 @@
     put(main, x0 + 10, base - h - 21, R.gem);
   }
   function house(x0: number, wall: "wood" | "stone") {
-    const base = G[x0 + 11], w = 22, h = 13;
+    const w = 34, h = 22, base = G[x0 + (w >> 1)];
     for (let y = base - h; y <= base; y++) for (let x = 0; x < w; x++) {
-      let c = wall === "wood" ? ((x % 4 === 0) ? R.woodDk : R.wood) : ((base - y) % 4 === 0 ? R.stoneDk : R.stone);
-      if (x === w - 1) c = wall === "wood" ? R.woodDk : R.stoneDk;
+      let c = wall === "wood" ? ((x % 4 === 0) ? R.woodDk : R.wood) : ((base - y) % 4 === 0 ? R.stoneDk : ((x + (Math.floor((base - y) / 4) % 2) * 3) % 7 === 0 ? R.stoneDk : R.stone));
+      if (x === w - 1 || x === 0) c = wall === "wood" ? R.woodDk : R.stoneDk;
       put(main, x0 + x, y, c);
     }
-    for (const wx of [3, 15]) {
-      for (let y = -1; y <= 3; y++) for (let x = -1; x <= 3; x++) put(main, x0 + wx + x, base - 9 + y, R.glowWall);
-      for (let y = 0; y < 3; y++) for (let x = 0; x < 3; x++) put(main, x0 + wx + x, base - 9 + y, R.glass);
+    for (let x = -1; x <= w; x++) put(main, x0 + x, base - h, R.woodDk); // eave beam
+    for (const wx of [4, 24]) { // windows with a warm glow ring for the evening
+      for (let y = -1; y <= 6; y++) for (let x = -1; x <= 6; x++) put(main, x0 + wx + x, base - 17 + y, R.glowWall);
+      for (let y = 0; y < 6; y++) for (let x = 0; x < 6; x++) put(main, x0 + wx + x, base - 17 + y, x === 2 || y === 2 ? R.woodDk : R.glass);
     }
-    for (let y = 0; y < 7; y++) for (let x = 9; x < 13; x++) put(main, x0 + x, base - y, x === 12 ? R.woodDk : R.wood);
-    for (let i = 0; i < 10; i++) {
+    for (let y = 0; y < 16; y++) for (let x = 14; x < 21; x++) { // door, 16 px tall
+      const frame = x === 14 || x === 20 || y === 15;
+      put(main, x0 + x, base - y, frame ? R.woodDk : (x === 19 ? R.woodDk : R.wood));
+    }
+    put(main, x0 + 18, base - 7, R.gem);
+    for (let i = 0; i < 15; i++) { // roof with overhang and shingle rows
       const y = base - h - 1 - i;
-      for (let x = -2 + i; x < w + 2 - i; x++) put(main, x0 + x, y, (x - i) % 3 === 0 ? R.roofDk : R.roof);
+      for (let x = -3 + i; x < w + 3 - i; x++) put(main, x0 + x, y, (y % 3 === 0) ? R.roofDk : ((x - i) % 4 === 0 ? R.roofDk : R.roof));
     }
-    for (let y = 0; y < 6; y++) { put(main, x0 + 16, base - h - 4 - y, R.stoneDk); put(main, x0 + 17, base - h - 4 - y, R.stone); }
+    for (let y = 0; y < 9; y++) { put(main, x0 + 25, base - h - 6 - y, R.stoneDk); put(main, x0 + 26, base - h - 6 - y, R.stone); put(main, x0 + 27, base - h - 6 - y, R.stoneDk); }
   }
-  function lampPost(x0: number) {
+  function lampPost(x0: number) { // 22 px: taller than the walker
     const base = G[x0];
-    for (let y = 1; y < 12; y++) put(main, x0, base - y, R.woodDk);
-    for (let y = -1; y <= 1; y++) for (let x = -1; x <= 1; x++) put(main, x0 + x, base - 13 + y, R.lamp);
-    put(main, x0, base - 15, R.woodDk);
+    for (let y = 1; y < 19; y++) { put(main, x0, base - y, R.woodDk); put(main, x0 + 1, base - y, y % 5 === 0 ? R.woodDk : R.wood); }
+    for (let x = -1; x <= 2; x++) put(main, x0 + x, base, R.stoneDk);
+    for (let y = -2; y <= 1; y++) for (let x = -1; x <= 2; x++) put(main, x0 + x, base - 20 + y, (x === -1 || x === 2) ? R.woodDk : R.lamp);
+    for (let x = -2; x <= 3; x++) put(main, x0 + x, base - 23, R.roofDk);
   }
   const BRIDGE_X0 = 634, BRIDGE_X1 = 730;
   const bridgeY = (x: number) => Math.round(147 - Math.sin(Math.PI * (x - BRIDGE_X0) / (BRIDGE_X1 - BRIDGE_X0)) * 3);
@@ -534,12 +545,12 @@
   }
   function tentAndFire(tx: number, fx: number) {
     const base = G[tx + 10];
-    for (let i = 0; i < 14; i++) {
-      const y = base - i, half = Math.round(11 - i * 0.78);
+    for (let i = 0; i < 19; i++) {
+      const y = base - i, half = Math.round(14 - i * 0.75);
       for (let x = -half; x <= half; x++) {
         let c = x < 0 ? R.tent : R.tentDk;
         if (x === 0 || (i === 2 && Math.abs(x) < half)) c = R.stripe;
-        if (x === 1 && i < 6) c = R.soilDk;
+        if (x === 1 && i < 9) c = R.soilDk;
         put(main, tx + 10 + x, y, c);
       }
     }
@@ -557,13 +568,6 @@
     const flame = ["..2..", ".212.", ".101.", "21012", "20102", ".222."];
     flame.forEach((row, i) => [...row].forEach((ch, j) => { if (ch !== ".") put(main, fx - 2 + j, fb - 7 + i, R.fire0 + Number(ch)); }));
     for (const [sx, sy] of [[-5, 0], [5, 0], [-4, 1], [4, 1]]) put(main, fx + sx, fb + sy, R.rock);
-  }
-  function sword(x0: number) {
-    const w = SWORD_ROWS[0].length, h = SWORD_ROWS.length;
-    const base = G[x0] + 2; // pedestal sits a little into the clearing
-    SWORD_ROWS.forEach((row, i) => [...row].forEach((ch, j) => {
-      if (ch !== ".") put(main, x0 - (w >> 1) + j, base - h + 1 + i, R["sw_" + ch]);
-    }));
   }
   function flowers(x0: number, x1: number, n: number) {
     for (let i = 0; i < n; i++) {
@@ -584,15 +588,14 @@
     giantTree(x, G[x] + 1, 26 + Math.floor(rnd() * 6), 14 + Math.floor(rnd() * 4));
   }
   pine(588, G[588] + 1, 40);
-  sword(545);
-  flowers(522, 568, 14);
+  flowers(530, 560, 10);
   bridge();
-  house(732, "wood"); house(784, "stone"); house(842, "wood");
-  lampPost(770); lampPost(828); lampPost(880);
-  broadleaf(812, G[812], 7, 8);
+  house(732, "wood"); house(780, "stone"); house(834, "wood");
+  lampPost(771); lampPost(821); lampPost(876);
+  broadleaf(893, G[893], 8, 9);
   flowers(720, 900, 26);
   pine(960, G[960], 24); pine(1000, G[1000], 30); pine(1150, G[1150], 22);
-  tentAndFire(1040, 1088);
+  tentAndFire(1032, 1088);
   flowers(900, 1180, 20);
 
   const SWORD_X = 545, FIRE_X = 1088, TOWER_X = 205;
@@ -858,10 +861,23 @@
         fine32[o0 + o] = p1; fine32[o0 + o + 1] = p2; fine32[o1 + o] = p3; fine32[o1 + o + 1] = p4;
       }
     }
+    // The sword in its pedestal, on the fine grid so it stands half again the walker's height
+    {
+      const sw = SWORD_ROWS[0].length, sh = SWORD_ROWS.length, FH = H * 2;
+      const cx = Math.round((SWORD_X - camX) * 2), bottom = (G[SWORD_X] + 1 - off + 18) * 2 + 1;
+      for (let j = 0; j < sh; j++) {
+        const y = bottom - sh + 1 + j; if (y < 0 || y >= FH) continue;
+        for (let i = 0; i < sw; i++) {
+          const ch = SWORD_ROWS[j][i]; if (ch === ".") continue;
+          const x = cx - (sw >> 1) + i; if (x < 0 || x >= FW) continue;
+          fine32[y * FW + x] = pal[R["sw_" + ch]];
+        }
+      }
+    }
     // The walker follows the camera along the path, stepping with the scroll, at full resolution
     {
       const lead = Math.min(24, W * focus - 30) * (1 - clamp(progress / 0.05)); // starts a little before the tower
-      const target = clamp(camX + W * focus - 16 - lead, 150, FIRE_X - 18);
+      const target = clamp(camX + W * focus - 14 - lead, 150, FIRE_X - 11); // ends between the tent and the fire
       const moved = target - walker.x;
       if (Math.abs(moved) > 0.3) { walker.dir = moved > 0 ? 1 : -1; walker.dist += Math.abs(moved); walker.still = now; }
       walker.x = target;
