@@ -77,46 +77,32 @@
     ["#ffe0aa", "#e4f3fb", "#ffd9a0", "#ffb36b", "#2a3462"]
   ];
 
-  /* The sword in its pedestal: the site owner's sprite, hand-reduced from 38×76 to 19×38 so it sits at the world's scale. */
+  /* The sword in its pedestal: the site owner's sprite, hand-reduced from 38×76 to 13×24 so it stands a little shorter than the trees. */
   const SWORD_ROWS = [
-    ".........a.........",
-    "........abc........",
-    ".........b.........",
-    ".........d.........",
-    ".........b.........",
-    ".........d.........",
-    ".........b.........",
-    ".........d.........",
-    "........abc........",
-    ".......abbbc.......",
-    ".....c.abebc.b.....",
-    "....bac.aec.bbc....",
-    "...aba..bbc..cbc...",
-    "..ba....agb....bc..",
-    "........fgf........",
-    ".......hgggi.......",
-    "........hgi........",
-    "........hgi........",
-    "........hgi........",
-    "........hgi........",
-    "........hgi........",
-    "........hgi........",
-    "........hgi........",
-    "........hgi........",
-    "........hgi........",
-    "........hgi........",
-    "........hgi........",
-    "........hgi........",
-    "........hgi........",
-    "....jkkkhgilkkl....",
-    "...jkkkkkkkkkkkl...",
-    "..jjjjjjjjjjjjjjkl.",
-    "..kkkkkkkjjkkkkkkl.",
-    ".jkkkkkkjklkkkkkkl.",
-    ".jkkkkkjjjjlkkkkkl.",
-    "jkkkkkjklkjklkkkkkl",
-    "jkkkkjjjjjjjjlkkkkl",
-    "jkkkkkkkkkkkkkkkkkl"
+    "......a......",
+    ".....abc.....",
+    "......d......",
+    "......b......",
+    "......d......",
+    ".....abc.....",
+    "...c.aec.b...",
+    "..bab.b.bcb..",
+    ".ba..agb..bc.",
+    ".....fgf.....",
+    ".....hgi.....",
+    ".....hgi.....",
+    ".....hgi.....",
+    ".....hgi.....",
+    ".....hgi.....",
+    ".....hgi.....",
+    ".....hgi.....",
+    ".....hgi.....",
+    "...jkhgilk...",
+    "..jjjjjjjjkl.",
+    ".jkkkkjkkkkl.",
+    ".jkkkjjlkkkl.",
+    "jkkkjklkjlkkl",
+    "jkkkkkkkkkkkl"
   ];
   const SWORD_COLORS: Record<string, string> = { a: "#4c4c84", b: "#3f3f74", c: "#2f2f5d", d: "#37946e", e: "#fbf236", f: "#8f974a", g: "#9badb7", h: "#cbdbfc", i: "#8599a5", j: "#847e87", k: "#696a6a", l: "#595652" };
   // each sprite colour gets day/golden/dusk/night keys, tinted like the rest of the world
@@ -510,13 +496,13 @@
   tower(196);
   flowers(10, 240, 40);
   const forest = [];
-  for (let x = 436; x < 636; x += 9 + Math.floor(rnd() * 8)) { if (x > 528 && x < 564) continue; forest.push(x); }
+  for (let x = 436; x < 636; x += 9 + Math.floor(rnd() * 8)) { if (x > 533 && x < 558) continue; forest.push(x); }
   forest.forEach((x, i) => {
     if (i % 3 === 1) pine(x, G[x] + 1, 20 + Math.floor(rnd() * 10));
     else broadleaf(x, G[x] + 1, 6 + Math.floor(rnd() * 6), 7 + Math.floor(rnd() * 4));
   });
   sword(545);
-  flowers(530, 562, 12);
+  flowers(535, 556, 8);
   bridge();
   house(732, "wood"); house(784, "stone"); house(842, "wood");
   lampPost(770); lampPost(828); lampPost(880);
