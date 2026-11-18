@@ -99,7 +99,7 @@ export const projects: Project[] = [
   {
     slug: "ciudad-pastel",
     title: "Ciudad Pastel",
-    who: { en: meta("Team project", "4 people", "top contributor"), es: meta("Proyecto de equipo", "4 personas", "quien más aportó") },
+    who: { en: meta("Team project", "4 people", "Firebase"), es: meta("Proyecto de equipo", "4 personas", "Firebase") },
     summary: {
       en: "A web platform for a pastry business that combines an online store and a baking academy with courses and enrollments. A monorepo with a React web app and a REST API documented with Swagger.",
       es: "Una plataforma web para una pastelería que combina una tienda en línea y una academia de repostería con cursos y matrículas. Un monorepo con una app web en React y una API REST documentada con Swagger."
@@ -107,11 +107,11 @@ export const projects: Project[] = [
     details: {
       en: [
         "Ciudad Pastel brings the business's two sides into one platform: a store where customers browse products and build a cart, and an academy where they find courses and enroll.",
-        "It is a monorepo with two apps: a React web app built with Vite, and an Express API on Firebase with its endpoints documented in Swagger and tested with Vitest. I'm the top contributor on the team."
+        "It is a monorepo with two apps: a React web app built with Vite, and an Express API on Firebase with its endpoints documented in Swagger and tested with Vitest."
       ],
       es: [
         "Ciudad Pastel junta los dos lados del negocio en una sola plataforma: una tienda donde los clientes ven productos y arman un carrito, y una academia donde encuentran cursos y se matriculan.",
-        "Es un monorepo con dos apps: una app web en React hecha con Vite, y una API en Express sobre Firebase con sus endpoints documentados en Swagger y probados con Vitest. Soy quien más ha aportado en el equipo."
+        "Es un monorepo con dos apps: una app web en React hecha con Vite, y una API en Express sobre Firebase con sus endpoints documentados en Swagger y probados con Vitest."
       ]
     },
     facts: [

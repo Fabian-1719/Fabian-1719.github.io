@@ -550,12 +550,16 @@
     const base = G[tx + 10], ax = tx + 10, ay = base - 19; // front apex
     const bx = ax - 9, by = ay - 3; // back apex: the tent recedes to the left
     // side panel (shade), from the front-left edge back toward the far apex
-    for (let y = by; y <= base - 3; y++) {
-      const t = (y - by) / (base - 3 - by);
-      const xl = Math.round(bx - t * 14), xr = Math.round(ax - (y - ay) * 0.74);
-      for (let x = xl; x <= Math.max(xl, xr); x++) {
-        let c = (x - xl) % 5 === 0 ? R.tentDk : (dith(x, y, 0.35) ? R.tentDk : R.tent);
-        if (y === base - 3 || x === xl) c = R.stripe; // hem and back edge
+    // bounded by the back edge, the ridge (above the front apex) and the front-left edge, down to the ground
+    const SL = 0.74, backFoot = Math.round(bx - (base - by) * SL);
+    for (let y = by; y <= base; y++) {
+      const xl = Math.round(bx - (y - by) * SL);
+      const xr = y < ay ? Math.round(bx + ((y - by) / (ay - by)) * (ax - bx)) : Math.round(ax - (y - ay) * SL) - 1;
+      for (let x = xl; x <= xr; x++) {
+        let c = dith(x, y, 0.22) ? R.tent : R.tentDk; // the side away from the light
+        if ((x - xl) % 6 === 3) c = R.stripe; // canvas seams running back
+        if (x === xl || y === base - 1) c = R.stripe; // back edge and hem
+        if (y === base) c = R.tentDk; // where it meets the ground
         put(main, x, y, c);
       }
     }
@@ -581,7 +585,7 @@
     put(main, ax, ay - 1, R.wood); put(main, ax, ay - 2, R.woodDk);
     for (let k = 0; k <= 16; k++) if (k % 2 === 0) put(main, ax + 1 + k, ay + Math.round(k * 1.15), R.pathDk);
     put(main, ax + 17, base, R.woodDk); put(main, ax + 17, base - 1, R.wood);
-    put(main, bx - 15, base - 3, R.woodDk);
+    put(main, backFoot - 1, base, R.woodDk); put(main, backFoot - 1, base - 1, R.wood);
 
     // warm light on the ground around the fire, only visible at night
     const fb = G[fx];
