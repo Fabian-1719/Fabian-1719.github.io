@@ -2,11 +2,8 @@
    An indexed-colour landscape drawn pixel by pixel. Every pixel stores a palette
    role; the time of day remaps the palette and cycle groups rotate to animate
    water, falls and fire (classic colour cycling). */
-(() => {
-  "use strict";
-
   /* ---------------- Palette roles: [day, golden, dusk, night] ---------------- */
-  const ROLES = {
+  const ROLES: Record<string, string[]> = {
     farLit:   ["#a9c2dc", "#dcae96", "#9a77a4", "#2e3760"],
     farMid:   ["#86a2c4", "#bf9088", "#76598a", "#242c50"],
     farHaze:  ["#c3d8ea", "#efc8a6", "#b28296", "#323d68"],
@@ -77,9 +74,9 @@
   ];
 
   const names = Object.keys(ROLES);
-  const R = {}; names.forEach((n, i) => { R[n] = i + 1; }); // 0 = transparent
+  const R: Record<string, number> = {}; names.forEach((n, i) => { R[n] = i + 1; }); // 0 = transparent
   const N = names.length + 1;
-  const hex = (h) => [parseInt(h.slice(1, 3), 16), parseInt(h.slice(3, 5), 16), parseInt(h.slice(5, 7), 16)];
+  const hex = (h: string): number[] => [parseInt(h.slice(1, 3), 16), parseInt(h.slice(3, 5), 16), parseInt(h.slice(5, 7), 16)];
   // morning is derived: day warmed toward golden, so every role gets a soft early light
   const KEYS = names.map((n) => {
     const k = ROLES[n].map(hex);
@@ -91,23 +88,23 @@
   /* ---------------- Helpers ---------------- */
   let seed = 1719;
   const rnd = () => ((seed = (seed * 16807) % 2147483647) - 1) / 2147483646;
-  const hash = (i) => { let x = Math.sin(i * 127.1 + 311.7) * 43758.5453; return x - Math.floor(x); };
-  const noise = (x) => { const i = Math.floor(x), f = x - i, u = f * f * (3 - 2 * f); return hash(i) * (1 - u) + hash(i + 1) * u; };
-  const fbm = (x) => noise(x) * 0.55 + noise(x * 2.03 + 17) * 0.28 + noise(x * 4.1 + 41) * 0.17;
+  const hash = (i: number): number => { let x = Math.sin(i * 127.1 + 311.7) * 43758.5453; return x - Math.floor(x); };
+  const noise = (x: number): number => { const i = Math.floor(x), f = x - i, u = f * f * (3 - 2 * f); return hash(i) * (1 - u) + hash(i + 1) * u; };
+  const fbm = (x: number): number => noise(x) * 0.55 + noise(x * 2.03 + 17) * 0.28 + noise(x * 4.1 + 41) * 0.17;
   const BAYER = [0, 8, 2, 10, 12, 4, 14, 6, 3, 11, 1, 9, 15, 7, 13, 5];
-  const dith = (x, y, t) => t * 16 > BAYER[(y & 3) * 4 + (x & 3)] + 0.5;
-  const clamp = (v, a = 0, b = 1) => Math.min(b, Math.max(a, v));
+  const dith = (x: number, y: number, t: number): boolean => t * 16 > BAYER[(y & 3) * 4 + (x & 3)] + 0.5;
+  const clamp = (v: number, a = 0, b = 1): number => Math.min(b, Math.max(a, v));
 
   /* ---------------- World layers ---------------- */
   const WW = 1200, LH = 200;
   const far = new Uint8Array(WW * LH), mid = new Uint8Array(WW * LH), main = new Uint8Array(WW * LH);
-  const put = (buf, x, y, c) => { if (x >= 0 && x < WW && y >= 0 && y < LH) buf[y * WW + x] = c; };
-  const get = (buf, x, y) => (x >= 0 && x < WW && y >= 0 && y < LH ? buf[y * WW + x] : 0);
+  const put = (buf: Uint8Array, x: number, y: number, c: number): void => { if (x >= 0 && x < WW && y >= 0 && y < LH) buf[y * WW + x] = c; };
+  const get = (buf: Uint8Array, x: number, y: number): number => (x >= 0 && x < WW && y >= 0 && y < LH ? buf[y * WW + x] : 0);
 
   // Far range with snow, faceted light from the left, hazed base
-  const PK = [];
+  const PK: [number, number, number][] = [];
   for (let px = -40; px < WW + 60; px += 46 + Math.floor(rnd() * 90)) PK.push([px, 26 + rnd() * 52, 48 + rnd() * 96]);
-  const farTop = (x) => {
+  const farTop = (x: number): number => {
     let h = 0;
     for (const [c, a, w] of PK) { const d = Math.abs(x - c) / w; if (d < 1) h = Math.max(h, a * Math.pow(1 - d, 1.25)); }
     return Math.round(122 - h - fbm(x * 0.05) * 6);
@@ -138,7 +135,7 @@
     }
   }
   // Mid hills: rolling, with tree-top bumps and dithered shading
-  const midTop = (x) => Math.round(138 - fbm(x * 0.011 + 50) * 38 - Math.abs(Math.sin(x * 0.55)) * 2.5 * noise(x * 0.2));
+  const midTop = (x: number): number => Math.round(138 - fbm(x * 0.011 + 50) * 38 - Math.abs(Math.sin(x * 0.55)) * 2.5 * noise(x * 0.2));
   for (let x = 0; x < WW; x++) {
     const t = midTop(x);
     for (let y = t; y < LH; y++) {
@@ -153,7 +150,7 @@
   /* Main layer: one continuous walk. Key places (logical x):
      tower 205 · cliff 250 · waterfall 250-258 · lake 262-430 · forest 430-640 ·
      sword 545 · river + bridge 640-720 · village 720-900 · hill + camp 900-1200 */
-  const ground = (x) => {
+  const ground = (x: number): number => {
     if (x < 250) return Math.round(112 + noise(x * 0.08) * 3);
     if (x < 430) return 164;
     if (x < 640) return Math.round(150 + Math.sin(x * 0.02) * 3 + noise(x * 0.1) * 2);
@@ -246,18 +243,19 @@
   }
 
   /* ---------------- Sprites drawn into the main layer ---------------- */
-  function disc(cx, cy, r, fn) {
+  type PixelFn = (x: number, y: number, lx: number, ly: number, d: number) => void;
+  function disc(cx: number, cy: number, r: number, fn: PixelFn) {
     for (let y = -r; y <= r; y++) for (let x = -r; x <= r; x++) {
       const d = Math.hypot(x + 0.3, y + 0.3) / r;
       if (d <= 1) fn(cx + x, cy + y, x, y, d);
     }
   }
-  function broadleaf(x0, base, h, r) {
+  function broadleaf(x0: number, base: number, h: number, r: number) {
     for (let y = base - h; y <= base; y++) { put(main, x0, y, R.trunk); put(main, x0 + 1, y, R.trunkDk); }
     put(main, x0 - 1, base, R.trunkDk); put(main, x0 + 2, base, R.trunkDk);
     const cy = base - h - r * 0.4;
     const blobs = [[0, 0, r], [-r * 0.7, r * 0.35, r * 0.7], [r * 0.75, r * 0.3, r * 0.72], [-r * 0.2, -r * 0.6, r * 0.65], [r * 0.4, -r * 0.4, r * 0.55]];
-    const mask = new Map();
+    const mask = new Map<string, number>();
     for (const [bx, by, br] of blobs) disc(Math.round(x0 + bx), Math.round(cy + by), Math.round(br), (x, y, lx, ly, d) => {
       const light = (-lx - ly) / br - d * 0.6 + noise(x * 0.9 + y * 0.7) * 0.5;
       const prev = mask.get(x + "," + y);
@@ -276,7 +274,7 @@
       }
     }
   }
-  function pine(x0, base, h) {
+  function pine(x0: number, base: number, h: number) {
     for (let y = base - 4; y <= base; y++) { put(main, x0, y, R.trunk); put(main, x0 + 1, y, R.trunkDk); }
     const tiers = Math.max(3, Math.round(h / 6));
     for (let t = 0; t < tiers; t++) {
@@ -296,7 +294,7 @@
     }
     put(main, x0, base - 4 - h, R.pineHi);
   }
-  function tower(x0) {
+  function tower(x0: number) {
     const base = G[x0 + 9], w = 18, h = 54;
     for (let y = base - h; y <= base; y++) for (let x = 0; x < w; x++) {
       const row = base - y;
@@ -322,7 +320,7 @@
     for (let y = 0; y < 5; y++) put(main, x0 + 9, base - h - 17 - y, R.woodDk);
     put(main, x0 + 10, base - h - 21, R.gem);
   }
-  function house(x0, wall) {
+  function house(x0: number, wall: "wood" | "stone") {
     const base = G[x0 + 11], w = 22, h = 13;
     for (let y = base - h; y <= base; y++) for (let x = 0; x < w; x++) {
       let c = wall === "wood" ? ((x % 4 === 0) ? R.woodDk : R.wood) : ((base - y) % 4 === 0 ? R.stoneDk : R.stone);
@@ -340,7 +338,7 @@
     }
     for (let y = 0; y < 6; y++) { put(main, x0 + 16, base - h - 4 - y, R.stoneDk); put(main, x0 + 17, base - h - 4 - y, R.stone); }
   }
-  function lampPost(x0) {
+  function lampPost(x0: number) {
     const base = G[x0];
     for (let y = 1; y < 12; y++) put(main, x0, base - y, R.woodDk);
     for (let y = -1; y <= 1; y++) for (let x = -1; x <= 1; x++) put(main, x0 + x, base - 13 + y, R.lamp);
@@ -354,7 +352,7 @@
       put(main, x, 144 + sag, R.wood);
     }
   }
-  function tentAndFire(tx, fx) {
+  function tentAndFire(tx: number, fx: number) {
     const base = G[tx + 10];
     for (let i = 0; i < 14; i++) {
       const y = base - i, half = Math.round(11 - i * 0.78);
@@ -380,7 +378,7 @@
     flame.forEach((row, i) => [...row].forEach((ch, j) => { if (ch !== ".") put(main, fx - 2 + j, fb - 7 + i, R.fire0 + Number(ch)); }));
     for (const [sx, sy] of [[-5, 0], [5, 0], [-4, 1], [4, 1]]) put(main, fx + sx, fb + sy, R.rock);
   }
-  function sword(x0) {
+  function sword(x0: number) {
     const base = G[x0];
     const S = [
       "....g....",
@@ -397,10 +395,10 @@
       ".sSSSSSs.",
       "sSSSSSSSs"
     ];
-    const map = { g: R.gem, h: R.hilt, b: R.blade, s: R.rockHi, S: R.rock };
+    const map: Record<string, number> = { g: R.gem, h: R.hilt, b: R.blade, s: R.rockHi, S: R.rock };
     S.forEach((row, i) => [...row].forEach((ch, j) => { if (map[ch]) put(main, x0 - 4 + j, base - S.length + i + 1, map[ch]); }));
   }
-  function flowers(x0, x1, n) {
+  function flowers(x0: number, x1: number, n: number) {
     for (let i = 0; i < n; i++) {
       const x = Math.floor(x0 + rnd() * (x1 - x0));
       const c = rnd() > 0.5 ? R.flowerA : R.flowerB;
@@ -432,16 +430,17 @@
   const SWORD_X = 545, FIRE_X = 1088, TOWER_X = 205;
 
   /* ---------------- Dynamic elements ---------------- */
-  const clouds = [];
+  type Cloud = { m: [number, number, number][]; w: number; x: number; y: number; v: number };
+  const clouds: Cloud[] = [];
   for (let i = 0; i < 6; i++) {
     const w = 34 + Math.floor(rnd() * 34), base = 16;
-    const n = 3 + Math.floor(rnd() * 3), puffs = [];
+    const n = 3 + Math.floor(rnd() * 3), puffs: [number, number, number][] = [];
     for (let j = 0; j < n; j++) {
       const mid = 1 - Math.abs(j - (n - 1) / 2) / n;
       const r = Math.round(3 + rnd() * 3 + mid * 5);
       puffs.push([6 + j * (w - 12) / (n - 1) + rnd() * 3, base - r * 0.55, r]);
     }
-    const m = [];
+    const m: [number, number, number][] = [];
     for (let y = 0; y <= base; y++) for (let x = 0; x < w + 4; x++) {
       let best = -1, nx = 0, ny = 0;
       for (const [cx, cy, r] of puffs) {
@@ -457,22 +456,23 @@
     }
     clouds.push({ m, w, x: i * 120 + rnd() * 60, y: 6 + rnd() * 34, v: 0.5 + rnd() * 0.7 });
   }
-  const stars = [];
+  const stars: [number, number, number, number][] = [];
   for (let i = 0; i < 160; i++) stars.push([rnd(), rnd() * 0.7, rnd(), rnd() * 6.28]);
-  const birds = [];
+  const birds: { x: number; y: number; v: number; ph: number }[] = [];
   for (let i = 0; i < 5; i++) birds.push({ x: rnd() * 300, y: 30 + rnd() * 40, v: 6 + rnd() * 6, ph: rnd() * 6 });
-  const flies = [];
+  const flies: { x: number; y: number; ph: number; r: number }[] = [];
   for (let i = 0; i < 34; i++) { const x = 430 + rnd() * 700; flies.push({ x, y: G[Math.floor(x)] - 4 - rnd() * 18, ph: rnd() * 6.28, r: 3 + rnd() * 5 }); }
 
   /* ---------------- Renderer ---------------- */
-  let canvas, ctx, img, px32, W = 0, H = 0, scale = 1;
-  let progress = 0, reduce = false, last = 0, timeAcc = 0;
+  let canvas: HTMLCanvasElement, ctx: CanvasRenderingContext2D, img: ImageData, px32: Uint32Array, W = 0, H = 0, scale = 1;
+  let progress = 0, reduce = false, last = 0;
   const pal = new Uint32Array(N);
-  const skyPal = new Array(SKY.length);
+  type RGB = [number, number, number];
+  const skyPal: RGB[] = new Array(SKY.length);
   const littleEndian = new Uint8Array(new Uint32Array([1]).buffer)[0] === 1;
-  const pack = (r, g, b) => littleEndian ? (255 << 24) | (b << 16) | (g << 8) | r : (r << 24) | (g << 16) | (b << 8) | 255;
+  const pack = (r: number, g: number, b: number): number => littleEndian ? (255 << 24) | (b << 16) | (g << 8) | r : (r << 24) | (g << 16) | (b << 8) | 255;
 
-  function timeWeights(p) {
+  function timeWeights(p: number): [number, number, number] {
     // day holds until .42, then golden (.6), dusk (.76) and night from .9
     const stops = [[0, 0], [0.2, 1], [0.42, 1], [0.6, 2], [0.76, 3], [0.9, 4], [1, 4]];
     for (let i = 0; i < stops.length - 1; i++) {
@@ -481,16 +481,16 @@
     }
     return [4, 4, 0];
   }
-  function mix(keys, ka, kb, t) {
+  function mix(keys: number[][], ka: number, kb: number, t: number): RGB {
     const A = keys[ka], B = keys[kb];
     return [Math.round(A[0] + (B[0] - A[0]) * t), Math.round(A[1] + (B[1] - A[1]) * t), Math.round(A[2] + (B[2] - A[2]) * t)];
   }
-  function buildPalette(p, clock) {
+  function buildPalette(p: number, clock: number) {
     const [ka, kb, t] = timeWeights(p);
     const rgb = KEYS.map((k) => mix(k, ka, kb, t));
     for (let i = 0; i < rgb.length; i++) pal[i + 1] = pack(...rgb[i]);
     // colour cycling
-    const cyc = (base, n, speed) => {
+    const cyc = (base: number, n: number, speed: number) => {
       const ph = Math.floor(clock * speed) % n;
       for (let i = 0; i < n; i++) pal[base + i] = pack(...rgb[base - 1 + ((i + ph) % n)]);
     };
@@ -499,7 +499,7 @@
     return { night: ka === 4 ? 1 : kb === 4 ? t : 0, day: kb <= 1 ? 1 : ka <= 1 ? 1 - t : 0, rgb };
   }
 
-  let anchors = null, focus = 0.62;
+  let anchors: [number, number][] | null = null, focus = 0.62;
   function camera() {
     if (anchors && anchors.length > 1) {
       let i = 0;
@@ -515,7 +515,7 @@
     return c0 + (c1 - c0) * e;
   }
 
-  function render(now) {
+  function render(now: number) {
     const clock = reduce ? 0 : now / 1000;
     const { night, day, rgb } = buildPalette(progress, clock);
     const camX = camera();
@@ -540,13 +540,12 @@
       }
     }
     // Sun on its arc, moon after sunset
-    const sunT = clamp(progress / 0.82);
     const rise = clamp(progress / 0.3), set = clamp((progress - 0.3) / 0.52);
     const sunX = Math.round(W * (progress < 0.3 ? 0.82 - 0.2 * rise : 0.62 + 0.22 * set));
     const sunY = Math.round(H * (progress < 0.3 ? 0.2 - 0.12 * Math.sin(rise * Math.PI / 2) : 0.08 + 0.6 * set * set));
     const sunCol = mix([hex("#ffe2a0"), hex("#fff4c0"), hex("#ffd36a"), hex("#ff8a4a"), hex("#ff6a3a")], ...timeWeights(progress));
     if (progress < 0.84) {
-      disc(sunX, sunY, 16, (x, y, lx, ly, d) => {
+      disc(sunX, sunY, 16, (x, y, _lx, _ly, d) => {
         if (x < 0 || y < 0 || x >= W || y >= H) return;
         if (d < 0.45) px32[y * W + x] = pack(...sunCol);
         else if (dith(x, y, (1 - d) * 0.55)) {
@@ -557,7 +556,7 @@
     }
     if (progress > 0.7) {
       const mx = Math.round(W * 0.22), my = Math.round(H * 0.16), a = clamp((progress - 0.7) / 0.15);
-      disc(mx, my, 6, (x, y, lx, ly, d) => {
+      disc(mx, my, 6, (x, y, lx, ly) => {
         if (Math.hypot(lx - 2.5, ly + 1.5) < 5.2) return; // crescent
         if (dith(x, y, a)) px32[y * W + x] = pack(244, 233, 200);
       });
@@ -599,7 +598,7 @@
       }
     }
     // Layers with parallax
-    const layers = [[far, 0.25, 0], [mid, 0.55, 6], [main, 1, 18]];
+    const layers: [Uint8Array, number, number][] = [[far, 0.25, 0], [mid, 0.55, 6], [main, 1, 18]];
     for (const [li, [buf, k, drop]] of layers.entries()) {
       if (li === 1) { // a band of valley mist in front of the far range
         const mTop = 96 - off, mBot = 126 - off, haze = pal[R.farHaze];
@@ -650,9 +649,9 @@
   }
 
   /* ---------------- Public API ---------------- */
-  let raf = 0, dirty = true;
-  function loop(now) {
-    raf = requestAnimationFrame(loop);
+  let dirty = true;
+  function loop(now: number) {
+    requestAnimationFrame(loop);
     // palette cycling and sprites read best at a deliberate low frame rate
     if (!dirty && now - last < 1000 / 14) return;
     last = now; dirty = false;
@@ -669,22 +668,21 @@
     dirty = true;
     if (reduce) render(performance.now());
   }
-  window.PixelWorld = {
-    init(el, opts = {}) {
-      canvas = el; ctx = canvas.getContext("2d", { alpha: false });
+  export const PixelWorld = {
+    init(el: HTMLCanvasElement, opts: { reduce?: boolean } = {}) {
+      canvas = el; ctx = canvas.getContext("2d", { alpha: false })!;
       reduce = !!opts.reduce;
       resize();
       addEventListener("resize", resize);
       render(performance.now()); // first frame right away, not on the next animation tick
-      if (!reduce) raf = requestAnimationFrame(loop);
+      if (!reduce) requestAnimationFrame(loop);
     },
-    setProgress(p) {
+    setProgress(p: number) {
       progress = clamp(p);
       dirty = true;
       if (reduce) render(0);
     },
-    setAnchors(list, f) { anchors = list; if (f) focus = f; dirty = true; if (reduce) render(0); },
+    setAnchors(list: [number, number][], f?: number) { anchors = list; if (f) focus = f; dirty = true; if (reduce) render(0); },
     places: { tower: TOWER_X + 9, falls: 285, sword: SWORD_X, bridge: 680, village: 800, fire: FIRE_X },
     get scale() { return scale; }
   };
-})();

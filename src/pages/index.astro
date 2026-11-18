@@ -1,0 +1,99 @@
+---
+import Base from "../layouts/Base.astro";
+import { UI } from "../i18n";
+import { projects } from "../data/projects";
+---
+<Base
+  title={{ en: "Fabian Aragón Arce · Computer Engineering student", es: "Fabian Aragón Arce · Estudiante de Ingeniería en Computación" }}
+  description="Portfolio of Fabian Aragón Arce, Computer Engineering student at Instituto Tecnológico de Costa Rica. Distributed systems, full-stack projects and a growing interest in cybersecurity."
+>
+  <section class="scene scene--hero" id="top">
+    <div class="panel panel--hero">
+      <h1 class="hero__name">Fabian<br>Aragón Arce</h1>
+      <p class="hero__lede" data-es={UI.heroLede.es}>{UI.heroLede.en}</p>
+      <div class="hero__actions">
+        <a class="btn" href="#projects">
+          <span data-es={UI.heroCta.es}>{UI.heroCta.en}</span>
+          <svg class="i" viewBox="0 0 16 16" aria-hidden="true"><path d="M7 2h2v8h2v2H9v2H7v-2H5v-2h2z"/><path d="M3 8h2v2H3zM11 8h2v2h-2z"/></svg>
+        </a>
+        <a class="link" href="https://github.com/Fabian-1719" rel="noopener">github.com/Fabian-1719</a>
+      </div>
+    </div>
+  </section>
+
+  <section class="scene" id="about" aria-labelledby="about-title">
+    <div class="panel">
+      <h2 id="about-title" data-es={UI.aboutTitle.es}>{UI.aboutTitle.en}</h2>
+      <p class="lead" data-es={UI.aboutP1.es}>{UI.aboutP1.en}</p>
+      <p data-es={UI.aboutP2.es}>{UI.aboutP2.en}</p>
+      <dl class="focus">
+        <div>
+          <dt data-es={UI.focusSecT.es}>{UI.focusSecT.en}</dt>
+          <dd data-es={UI.focusSecD.es}>{UI.focusSecD.en}</dd>
+        </div>
+        <div>
+          <dt data-es={UI.focusArchT.es}>{UI.focusArchT.en}</dt>
+          <dd data-es={UI.focusArchD.es}>{UI.focusArchD.en}</dd>
+        </div>
+      </dl>
+    </div>
+  </section>
+
+  <section class="scene scene--long" id="projects" aria-labelledby="projects-title">
+    <div class="panel panel--wide">
+      <h2 id="projects-title" data-es={UI.projectsTitle.es}>{UI.projectsTitle.en}</h2>
+      <p data-es={UI.projectsIntro.es}>{UI.projectsIntro.en}</p>
+
+      <ol class="quests">
+        {projects.map((p) => (
+          <li class="quest" id={p.slug}>
+            <h3>
+              <a class="quest__title" href={`/projects/${p.slug}/`}>
+                {p.titleParts ? <>{p.titleParts[0]} <span class="amp">+</span> {p.titleParts[1]}</> : p.title}
+              </a>
+            </h3>
+            <p class="quest__who" data-es={p.who.es}>{p.who.en}</p>
+            <p data-es={p.summary.es}>{p.summary.en}</p>
+            {p.facts.length > 0 && (
+              <ul class="quest__facts">
+                {p.facts.map((f) => <li data-es={f.es}>{f.en}</li>)}
+              </ul>
+            )}
+            <p class="quest__stack">{p.stack.join(" · ")}</p>
+            <p class="quest__links">
+              <a class="btn btn--sm" href={`/projects/${p.slug}/`} data-es={UI.more.es}>{UI.more.en}</a>
+              {p.live && <a class="link" href={p.live} rel="noopener" data-es={UI.live.es}>{UI.live.en}</a>}
+              {p.code.map((c) => c.label
+                ? <a class="link" href={c.href} rel="noopener">{c.label}</a>
+                : <a class="link" href={c.href} rel="noopener" data-es={UI.code.es}>{UI.code.en}</a>)}
+              {p.private && <span class="private" data-es={UI.private.es}>{UI.private.en}</span>}
+            </p>
+          </li>
+        ))}
+      </ol>
+    </div>
+  </section>
+
+  <section class="scene" id="stack" aria-labelledby="stack-title">
+    <div class="panel">
+      <h2 id="stack-title" data-es={UI.stackTitle.es}>{UI.stackTitle.en}</h2>
+      <dl class="inventory">
+        <div><dt data-es={UI.stackLang.es}>{UI.stackLang.en}</dt><dd>Python, Java, TypeScript, JavaScript, Go, Scala, C++, Prolog, x86&nbsp;Assembly</dd></div>
+        <div><dt data-es={UI.stackFw.es}>{UI.stackFw.en}</dt><dd>React, Spring Boot, FastAPI, Express, Fastify, Flask, Pygame</dd></div>
+        <div><dt data-es={UI.stackTools.es}>{UI.stackTools.en}</dt><dd>Azure, Firebase, Docker, Redis, Git, GitHub&nbsp;Actions</dd></div>
+      </dl>
+    </div>
+  </section>
+
+  <section class="scene scene--end" id="contact" aria-labelledby="contact-title">
+    <div class="panel">
+      <h2 class="contact__title" id="contact-title">Pura vida.</h2>
+      <p data-es={UI.contactLede.es}>{UI.contactLede.en}</p>
+      <p class="contact__links">
+        <a class="btn" href="mailto:fabsarceargon@gmail.com">fabsarceargon@gmail.com</a>
+        <a class="link" href="https://www.linkedin.com/in/fabian-arce-570038402" rel="noopener">LinkedIn</a>
+        <a class="link" href="https://github.com/Fabian-1719" rel="noopener">GitHub</a>
+      </p>
+    </div>
+  </section>
+</Base>

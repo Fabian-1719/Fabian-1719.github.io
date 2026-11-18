@@ -3,19 +3,19 @@
 
 @font-face {
   font-family: "Pixelify Sans";
-  src: url("../assets/fonts/pixelify.woff2") format("woff2");
+  src: url("/fonts/pixelify.woff2") format("woff2");
   font-weight: 400 700;
   font-display: swap;
 }
 @font-face {
   font-family: "Atkinson Hyperlegible";
-  src: url("../assets/fonts/atkinson-400.woff2") format("woff2");
+  src: url("/fonts/atkinson-400.woff2") format("woff2");
   font-weight: 400;
   font-display: swap;
 }
 @font-face {
   font-family: "Atkinson Hyperlegible";
-  src: url("../assets/fonts/atkinson-700.woff2") format("woff2");
+  src: url("/fonts/atkinson-700.woff2") format("woff2");
   font-weight: 700;
   font-display: swap;
 }
@@ -175,3 +175,24 @@ html[lang="en"] .lang__opt[data-lang="en"], html[lang="es"] .lang__opt[data-lang
 .fairy { position: fixed; left: 0; top: 0; z-index: 30; pointer-events: none; image-rendering: pixelated; opacity: 0; transition: opacity 400ms ease; }
 .fairy[data-on] { opacity: 1; }
 @media (prefers-reduced-motion: reduce) { .fairy { display: none; } }
+
+/* ---------- Project titles link to their own page ---------- */
+.quest__title { color: inherit; text-decoration: none; background-image: linear-gradient(var(--gold), var(--gold)); background-size: 0 2px; background-position: 0 100%; background-repeat: no-repeat; transition: background-size 200ms var(--ease-out), color 160ms ease; }
+@media (hover: hover) and (pointer: fine) { .quest__title:hover { color: var(--gold); background-size: 100% 2px; } }
+.quest__title:focus-visible { color: var(--gold); }
+
+/* ---------- Project page ---------- */
+.scene--project { min-height: 100svh; padding-bottom: 18vh; }
+.project { gap: 1.1rem; }
+.back { display: inline-flex; align-items: center; gap: .5em; width: fit-content; }
+.project__head { display: grid; gap: .5rem; margin-top: .2rem; }
+.panel .project__title { font-size: clamp(2.2rem, 1.5rem + 2.6vw, 3.6rem); color: var(--line); }
+.project__title .amp { color: var(--text-soft); font-weight: 400; }
+.project__block { display: grid; gap: .7rem; padding-top: 1.1rem; border-top: var(--px) dashed var(--line-dim); }
+.panel .project__block h2 { font-size: 1.15rem; color: var(--meta); }
+.tags { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: .5rem; }
+.tags li { font-family: var(--pixel); font-size: .92rem; color: var(--text); padding: .3em .7em; box-shadow: 0 0 0 2px var(--line-dim); }
+.gallery { display: grid; gap: 1rem; }
+.shot { margin: 0; box-shadow: 0 0 0 var(--px) var(--line-dim); }
+.shot img { display: block; width: 100%; height: auto; }
+.project__nav { display: flex; flex-wrap: wrap; justify-content: space-between; gap: .8rem 1.6rem; padding-top: 1.1rem; border-top: var(--px) dashed var(--line-dim); }

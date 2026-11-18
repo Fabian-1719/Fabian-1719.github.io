@@ -1,0 +1,67 @@
+---
+import "../styles/global.css";
+import { UI, type Text } from "../i18n";
+import type { Place } from "../data/projects";
+
+interface Props {
+  title: Text;
+  description: string;
+  /** Project pages pin the world to one place and hour instead of scrolling through the day. */
+  world?: { place: Place; time: number };
+  /** Section links point at the home page sections when we are on a sub-page. */
+  home?: boolean;
+}
+const { title, description, world, home = true } = Astro.props;
+const base = home ? "" : "/";
+const canonical = new URL(Astro.url.pathname, Astro.site).href;
+---
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title data-es={title.es}>{title.en}</title>
+  <meta name="description" content={description}>
+  <meta name="theme-color" content="#151229">
+  <link rel="canonical" href={canonical}>
+  <meta property="og:title" content={title.en}>
+  <meta property="og:description" content={description}>
+  <meta property="og:type" content="website">
+  <meta property="og:url" content={canonical}>
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <link rel="preload" href="/fonts/pixelify.woff2" as="font" type="font/woff2" crossorigin>
+</head>
+<body data-world-place={world?.place} data-world-time={world?.time}>
+  <a class="skip" href="#content" data-es={UI.skip.es}>{UI.skip.en}</a>
+
+  <!-- The world: one long pixel landscape drawn in code -->
+  <canvas class="world" id="world" aria-hidden="true"></canvas>
+
+  <header class="bar">
+    <a class="bar__handle" href="/">Fabian-1719</a>
+    <nav class="bar__nav" aria-label="Sections">
+      <a href={`${base}#about`} data-es={UI.navAbout.es}>{UI.navAbout.en}</a>
+      <a href={`${base}#projects`} data-es={UI.navProjects.es}>{UI.navProjects.en}</a>
+      <a href={`${base}#stack`} data-es={UI.navStack.es}>{UI.navStack.en}</a>
+      <a href={`${base}#contact`} data-es={UI.navContact.es}>{UI.navContact.en}</a>
+    </nav>
+    <button class="lang" type="button" id="lang" aria-label="Cambiar a español">
+      <span class="lang__opt" data-lang="en">EN</span><span class="lang__opt" data-lang="es">ES</span>
+    </button>
+  </header>
+
+  <main id="content">
+    <slot />
+  </main>
+
+  <footer class="foot">
+    <p>© 2026 Fabian Aragón Arce · Santa Clara, Costa Rica</p>
+    <p data-es={UI.footerMade.es}>{UI.footerMade.en}</p>
+  </footer>
+
+  <p class="clock" aria-hidden="true"><span id="clockTime">07:00</span><span id="clockLabel">morning</span></p>
+  <canvas class="fairy" id="fairy" width="9" height="8" aria-hidden="true"></canvas>
+
+  <script src="../scripts/main.ts"></script>
+</body>
+</html>

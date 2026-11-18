@@ -1,0 +1,85 @@
+---
+import Base from "../../layouts/Base.astro";
+import { UI } from "../../i18n";
+import { projects, type Project } from "../../data/projects";
+
+export function getStaticPaths() {
+  return projects.map((project, i) => ({
+    params: { slug: project.slug },
+    props: { project, prev: projects[i - 1], next: projects[i + 1] }
+  }));
+}
+
+interface Props { project: Project; prev?: Project; next?: Project }
+const { project: p, prev, next } = Astro.props;
+---
+<Base
+  title={{ en: `${p.title} · Fabian Aragón Arce`, es: `${p.title} · Fabian Aragón Arce` }}
+  description={p.summary.en}
+  world={p.world}
+  home={false}
+>
+  <section class="scene scene--project">
+    <article class="panel panel--wide project">
+      <a class="link back" href={`/#${p.slug}`}>
+        <svg class="i" viewBox="0 0 16 16" aria-hidden="true"><path d="M6 3h2v2H6zM4 5h2v2H4zM2 7h12v2H2zM4 9h2v2H4zM6 11h2v2H6z"/></svg>
+        <span data-es={UI.back.es}>{UI.back.en}</span>
+      </a>
+
+      <header class="project__head">
+        <h1 class="project__title">
+          {p.titleParts ? <>{p.titleParts[0]} <span class="amp">+</span> {p.titleParts[1]}</> : p.title}
+        </h1>
+        <p class="quest__who" data-es={p.who.es}>{p.who.en}</p>
+      </header>
+
+      <p class="lead" data-es={p.summary.es}>{p.summary.en}</p>
+      {p.details.en.map((para, i) => <p data-es={p.details.es[i]}>{para}</p>)}
+
+      {p.images.length > 0 && (
+        <section class="project__block">
+          <h2 data-es={UI.gallery.es}>{UI.gallery.en}</h2>
+          <div class="gallery">
+            {p.images.map((img) => (
+              <figure class="shot">
+                <img src={img.src} alt={img.alt.en} data-es-alt={img.alt.es} loading="lazy" decoding="async">
+              </figure>
+            ))}
+          </div>
+        </section>
+      )}
+
+      {p.facts.length > 0 && (
+        <section class="project__block">
+          <h2 data-es={UI.highlights.es}>{UI.highlights.en}</h2>
+          <ul class="quest__facts">
+            {p.facts.map((f) => <li data-es={f.es}>{f.en}</li>)}
+          </ul>
+        </section>
+      )}
+
+      <section class="project__block">
+        <h2 data-es={UI.builtWith.es}>{UI.builtWith.en}</h2>
+        <ul class="tags">
+          {p.stack.map((t) => <li>{t}</li>)}
+        </ul>
+      </section>
+
+      <section class="project__block">
+        <h2 data-es={UI.links.es}>{UI.links.en}</h2>
+        <p class="quest__links">
+          {p.live && <a class="btn btn--sm" href={p.live} rel="noopener" data-es={UI.live.es}>{UI.live.en}</a>}
+          {p.code.map((c) => c.label
+            ? <a class="link" href={c.href} rel="noopener">{c.label}</a>
+            : <a class="link" href={c.href} rel="noopener" data-es={UI.code.es}>{UI.code.en}</a>)}
+          {p.private && <span class="private" data-es={UI.private.es}>{UI.private.en}</span>}
+        </p>
+      </section>
+
+      <nav class="project__nav" aria-label="Projects">
+        {prev ? <a class="link" href={`/projects/${prev.slug}/`}><span data-es={UI.prev.es}>{UI.prev.en}</span>: {prev.title}</a> : <span></span>}
+        {next && <a class="link" href={`/projects/${next.slug}/`}><span data-es={UI.next.es}>{UI.next.en}</span>: {next.title}</a>}
+      </nav>
+    </article>
+  </section>
+</Base>
