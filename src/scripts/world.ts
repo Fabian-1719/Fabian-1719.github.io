@@ -77,32 +77,46 @@
     ["#ffe0aa", "#e4f3fb", "#ffd9a0", "#ffb36b", "#2a3462"]
   ];
 
-  /* The sword in its pedestal: the site owner's sprite, hand-reduced from 38×76 to 13×24 so it stands a little shorter than the trees. */
+  /* The sword in its pedestal: the site owner's sprite, hand-reduced from 38×76 to 19×38; the giant forest trees around it stand taller. */
   const SWORD_ROWS = [
-    "......a......",
-    ".....abc.....",
-    "......d......",
-    "......b......",
-    "......d......",
-    ".....abc.....",
-    "...c.aec.b...",
-    "..bab.b.bcb..",
-    ".ba..agb..bc.",
-    ".....fgf.....",
-    ".....hgi.....",
-    ".....hgi.....",
-    ".....hgi.....",
-    ".....hgi.....",
-    ".....hgi.....",
-    ".....hgi.....",
-    ".....hgi.....",
-    ".....hgi.....",
-    "...jkhgilk...",
-    "..jjjjjjjjkl.",
-    ".jkkkkjkkkkl.",
-    ".jkkkjjlkkkl.",
-    "jkkkjklkjlkkl",
-    "jkkkkkkkkkkkl"
+    ".........a.........",
+    "........abc........",
+    ".........b.........",
+    ".........d.........",
+    ".........b.........",
+    ".........d.........",
+    ".........b.........",
+    ".........d.........",
+    "........abc........",
+    ".......abbbc.......",
+    ".....c.abebc.b.....",
+    "....bac.aec.bbc....",
+    "...aba..bbc..cbc...",
+    "..ba....agb....bc..",
+    "........fgf........",
+    ".......hgggi.......",
+    "........hgi........",
+    "........hgi........",
+    "........hgi........",
+    "........hgi........",
+    "........hgi........",
+    "........hgi........",
+    "........hgi........",
+    "........hgi........",
+    "........hgi........",
+    "........hgi........",
+    "........hgi........",
+    "........hgi........",
+    "........hgi........",
+    "....jkkkhgilkkl....",
+    "...jkkkkkkkkkkkl...",
+    "..jjjjjjjjjjjjjjkl.",
+    "..kkkkkkkjjkkkkkkl.",
+    ".jkkkkkkjklkkkkkkl.",
+    ".jkkkkkjjjjlkkkkkl.",
+    "jkkkkkjklkjklkkkkkl",
+    "jkkkkjjjjjjjjlkkkkl",
+    "jkkkkkkkkkkkkkkkkkl"
   ];
   const SWORD_COLORS: Record<string, string> = { a: "#4c4c84", b: "#3f3f74", c: "#2f2f5d", d: "#37946e", e: "#fbf236", f: "#8f974a", g: "#9badb7", h: "#cbdbfc", i: "#8599a5", j: "#847e87", k: "#696a6a", l: "#595652" };
   // each sprite colour gets day/golden/dusk/night keys, tinted like the rest of the world
@@ -325,11 +339,14 @@
       if (d <= 1) fn(cx + x, cy + y, x, y, d);
     }
   }
-  function broadleaf(x0: number, base: number, h: number, r: number) {
-    for (let y = base - h; y <= base; y++) { put(main, x0, y, R.trunk); put(main, x0 + 1, y, R.trunkDk); }
+  function broadleaf(x0: number, base: number, h: number, r: number, back = false, wide = false) {
+    for (let y = base - h; y <= base; y++) { put(main, x0, y, back ? R.trunkDk : R.trunk); put(main, x0 + 1, y, R.trunkDk); }
     put(main, x0 - 1, base, R.trunkDk); put(main, x0 + 2, base, R.trunkDk);
     const cy = base - h - r * 0.4;
-    const blobs = [[0, 0, r], [-r * 0.7, r * 0.35, r * 0.7], [r * 0.75, r * 0.3, r * 0.72], [-r * 0.2, -r * 0.6, r * 0.65], [r * 0.4, -r * 0.4, r * 0.55]];
+    const blobs = wide
+      ? [[0, 0, r], [-r * 0.8, r * 0.3, r * 0.75], [r * 0.85, r * 0.25, r * 0.75], [-r * 0.35, -r * 0.6, r * 0.7], [r * 0.4, -r * 0.55, r * 0.65], [-r * 1.3, r * 0.55, r * 0.5], [r * 1.3, r * 0.5, r * 0.5], [0, -r * 0.95, r * 0.5]]
+      : [[0, 0, r], [-r * 0.7, r * 0.35, r * 0.7], [r * 0.75, r * 0.3, r * 0.72], [-r * 0.2, -r * 0.6, r * 0.65], [r * 0.4, -r * 0.4, r * 0.55]];
+    const HI = back ? R.leafMid : R.leafHi, MID = back ? R.leafLo : R.leafMid, LO = back ? R.leafOut : R.leafLo;
     const mask = new Map<string, number>();
     for (const [bx, by, br] of blobs) disc(Math.round(x0 + bx), Math.round(cy + by), Math.round(br), (x, y, lx, ly, d) => {
       const light = (-lx - ly) / br - d * 0.6 + noise(x * 0.9 + y * 0.7) * 0.5;
@@ -338,8 +355,8 @@
     });
     for (const [k, light] of mask) {
       const [x, y] = k.split(",").map(Number);
-      let c = light > 0.45 ? R.leafHi : light > -0.05 ? R.leafMid : R.leafLo;
-      if (c === R.leafMid && dith(x, y, (light + 0.05) * 2)) c = R.leafHi;
+      let c = light > 0.45 ? HI : light > -0.05 ? MID : LO;
+      if (c === MID && dith(x, y, (light + 0.05) * 2)) c = HI;
       put(main, x, y, c);
     }
     for (const [k] of mask) { // outline where the canopy meets something else
@@ -347,6 +364,25 @@
       for (const [dx, dy] of [[1, 0], [0, 1], [-1, 0], [0, -1]]) {
         if (!mask.has((x + dx) + "," + (y + dy))) { if (dy >= 0 || dx > 0) put(main, x, y, R.leafOut); break; }
       }
+    }
+  }
+  function giantTree(x0: number, base: number, h: number, r: number, back = false) {
+    broadleaf(x0, base, h, r, back, true);
+    const top = Math.round(base - h + r * 0.45), tw = Math.max(4, Math.round(r / 3));
+    for (let y = top; y <= base; y++) {
+      const flare = y > base - 6 ? Math.round((y - (base - 6)) * 0.9) : 0;
+      const half = (tw >> 1) + flare;
+      for (let x = -half; x <= half; x++) {
+        let c = (x + Math.round(noise(y * 0.3 + x0) * 2) + (y >> 2)) % 3 === 0 ? R.trunkDk : R.trunk;
+        if (x <= -half + 1) c = back ? R.trunk : R.wood;
+        if (x >= half - 1) c = R.trunkDk;
+        if (back && c === R.trunk && dith(x0 + x, y, 0.5)) c = R.trunkDk;
+        put(main, x0 + x, y, c);
+      }
+    }
+    for (const dir of [-1, 1]) { // roots creeping along the ground
+      let x = x0 + dir * ((tw >> 1) + 4), y = base;
+      for (let k = 0; k < 4 + Math.floor(rnd() * 4); k++) { put(main, x, y, R.trunkDk); put(main, x, y - 1, R.trunk); x += dir; if (k % 2) y += 1; }
     }
   }
   function pine(x0: number, base: number, h: number) {
@@ -495,14 +531,15 @@
   for (let x = 30; x < 150; x += 26 + Math.floor(rnd() * 10)) broadleaf(x, G[x], 6 + Math.floor(rnd() * 4), 7 + Math.floor(rnd() * 3));
   tower(196);
   flowers(10, 240, 40);
-  const forest = [];
-  for (let x = 436; x < 636; x += 9 + Math.floor(rnd() * 8)) { if (x > 533 && x < 558) continue; forest.push(x); }
-  forest.forEach((x, i) => {
-    if (i % 3 === 1) pine(x, G[x] + 1, 20 + Math.floor(rnd() * 10));
-    else broadleaf(x, G[x] + 1, 6 + Math.floor(rnd() * 6), 7 + Math.floor(rnd() * 4));
-  });
+  // A giant forest: a darker back row, then huge front trees leaving a clearing for the sword
+  for (let x = 452; x < 640; x += 24 + Math.floor(rnd() * 10)) giantTree(x, G[x] - 1, 32 + Math.floor(rnd() * 8), 13 + Math.floor(rnd() * 3), true);
+  for (let x = 462; x < 636; x += 30 + Math.floor(rnd() * 12)) {
+    if (x > 508 && x < 582) continue; // the clearing
+    giantTree(x, G[x] + 1, 26 + Math.floor(rnd() * 6), 14 + Math.floor(rnd() * 4));
+  }
+  pine(588, G[588] + 1, 40);
   sword(545);
-  flowers(535, 556, 8);
+  flowers(522, 568, 14);
   bridge();
   house(732, "wood"); house(784, "stone"); house(842, "wood");
   lampPost(770); lampPost(828); lampPost(880);
