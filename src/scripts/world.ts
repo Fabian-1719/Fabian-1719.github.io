@@ -130,20 +130,21 @@
   }
 
   /* The walker: the site owner's sprite sheet, right-facing walk cycle (10 frames, 27×25),
-     quantised to 16 colours. Facing left mirrors these frames. */
+     quantised to 16 colours and cleaned of compression halos. Facing left mirrors these frames.
+     The world is drawn at half his resolution and upscaled with EPX, so he stands at its scale. */
   const LINK_FRAMES: string[][] = [
-    ["...........ojiekfll........", "..........ikkkeknnpnl......", "......eiikkkkkekppnppl.....", ".....eiikkkkkeknnpnnnp.....", "....eiiikieekekpplfnff.....", "...aiiiiikkkekpnlmmb.......", "...aiiiiiieeigpnmomb.......", "..aeiieeieeienlpobfb.......", "..aeieaeemoomfnlo.jmb......", "..aeiaoaalmoofpfo.jmb......", "...cga..ablmmnpfoohj.......", "...dcc..fclamnnmoohd.......", "........omcabpfmmmb........", "........bbaedfbeeaj........", "........cdgigblaiaa........", "......objccfgfaagpka.......", "......ambedffag.aika.......", "......aaekkkkaojjaga.......", ".......aagkkkeaffaaa.......", ".......afcekkkaooaddbb.....", ".......afdcaaaaaaadffb.....", "........cddda....abbb......", ".........jbaa..............", "...........................", "..........................."],
-    ["........oiikkkgegflo.......", ".......oikkkkegpppnnl......", "......eikkkkeklnnnppnl.....", ".....eiikkkkeknpplnnppl....", "...maiiiikkkeklnplfnnpl....", "...maiiiiikekpnnlmmllf.....", "...aeiiiiiieipnmmomd.......", "...aeiiiiieimlnpobfa.......", "...aeiieeoomfnlnohjma......", "...aeieaaloofpllohjma......", "...aeia.abmhlplloohj.......", "...daga.dcbjpnlmomhd.......", "....aca.omaapfhmmma........", "........bdeamaeeebd........", "........afgigaeikpa........", "......ocjafgfgmmaikdo......", "......bmaiifaohjjagab......", ".......baekkiacjfbbdfa.....", "......afdaekkieffdbdfa.....", "......bfdaaaaaaaabddb......", "......bddb.....maaaa.......", "......adda.................", ".......ba..................", "...........................", "..........................."],
-    ["............ikkkegfl.......", "........eeikkkkekpnnl......", "........eikkkkeknnppnlo....", "........eikkkkekpplnpplm...", "......eiiikeekeknplfnpfm...", ".....aeiiiikkekpnlmmffo....", ".....aeiiiiiieipnmombfo....", ".....aeiiiiieenlpobfb......", ".....aceiieoomfnlo.jmbm....", ".....maeiebloofpfo.jmam....", "......degaadmhlpfoohj......", "......deaamfjannmoohd......", "......dcaaboaapfmmma.......", "........aabaeamaeenf..jj...", "........jcdfiigaiepa..dbd..", "......doaggfigfi.aakaadfda.", "......dbgkkkffa.jjfbfddfda.", ".....abccakkkkiajffobddcd..", ".....adfdfdakkkgabobddb....", ".....affcba.aaaaa...abm....", ".....addca.................", ".....addcb.................", "......daj..................", "...........................", "..........................."],
-    ["...........oo..............", "...........kkkegfl.........", "........ikkkkkekpnnl.......", "......eikkkkkkeknppnl......", ".....eikkkkkkekppnnppl.....", "....eiikkeekkeknplfnpf.....", "....eiiiikkiekpnlmmlf......", "...eiiiiiieeigpnmomb.......", "...eiiiiieeeeflpobfb.......", "..deieaaemmmffnloojhd......", "..aeea..cmooffpfo.jmb......", "..aead..ajmomppfoojhd......", "..aaa...bbfhmppmooba.......", "........fdcacpfmmda........", "........aaeacmaeea.........", "........oaeigaeeiiao.......", "........ajgiggieaiga.......", "........oadggd.magpa.......", "........bgkgdajjfagaa......", ".......aagkkkkaffobda......", ".......afbaekkcjobdb.......", ".......afddcaaaabaa........", "........bfddba.............", ".........bbbaa.............", "..........................."],
-    ["..........oo...............", ".........ikkeigfll.........", "......eikkkkeknpnnnl.......", "..jeeikkkkkkeknppppnl......", ".geiikkkkkkekpppnnnpp......", "oaiiiikkeekekpnnlllnf......", "aiiiiiiikkekpnllmm.........", "aiiiiiiiieiipnmmoma........", "iieeaeeeeieflpohbfa........", "eeaaoaeemmhfnlmojjhd.......", "ac....camomfpfmojjfa.......", "dd....dablofpfmoojmc.......", ".......bbhhnpfmomma........", ".......pmaapfmmmmb.........", ".......aaeambeeac..........", "........aiiaeiiiga.........", "........aiagiaeipca........", ".......agfa..adfgga........", ".......aikajjagkkab........", "........akaffbgkkaa........", ".........aaoobaaaa.........", "..........abaacffa.........", "...........aadffba.........", "............abbbba.........", "..........................."],
-    ["...........oiekfllo........", "........oikkkeknpnnl.......", ".....giiikkkkekpnppnlo.....", "....eiiikkkkeknnpnnppl.....", "...eiiiikeekekpplfnffo.....", "...giiiiiikekpnlmmb........", "..aiiiiiiiiegpnmomb........", ".aeiiiiiiieenlpobfb........", ".aeieaeeooomfnlo.jmb.......", ".aeiamjabloofpfo.jmb.......", "..ceaomaadmhlpfoohj........", "..dcd..mdcjhnnfoohd........", ".......obcaapfmmmb.........", ".......maagambeeabj........", "........oaigamaiafc........", "........oagajaiigajao......", ".......mbfa..gagpkada......", "......jeiaajjaffkkab.......", "......jaabffjaikkia........", ".......aaaofaikkkab........", "........aaadaaaaadfb.......", ".........daba.addffb.......", "...............abbb........", "...........................", "..........................."],
-    [".........ikkkgegfl.........", "......oiikkkegpppnnl.......", ".....eikkkkeklnnnppnl......", "....eiikkkkeknpplnnppl.....", "..maeiiieekeklnplfnnpl.....", "..maiiiiikekpnnlmmllf......", "..oaiiiiiieippnmomb........", "..aeiiiieegmlnpobfd........", "..aeiieeoomfnnlohjma.......", "..oaieaaloofpllohjma.......", "..maea.admmlpllohhj........", "...dcd.dmbannlmomhd........", ".......omaapfhmmoaa........", ".......aajakaeecaddj.......", ".........aagaiieejfa.......", ".......oaa.jfgiieafa.......", ".......aajj.deigpka........", "......bbffjadffkkka........", "......bfmfagkkkkkeabb......", "......bdbbgkkkkkgabffb.....", ".......bdbaaaaaadfddfb.....", "........aa.....bbdddb......", "................dbaa.......", "...........................", "..........................."],
-    ["........oikkkegflo.........", ".....oeikkkkekpnnlm........", "....deikkkkeknnppnlo.......", "....oeikkkkekppnnpppl......", "...meiikeekeknplfnppl......", "...aeiiikkekpnlmmllnl......", "...aeiiiieeipnmomccf.......", "...aeiiieiemlpobfb.........", "...oaieeoomfnlo.jmjd.......", "...oaiealoofpfo.jhjd.......", "...oaeaadmhlpfoohj.........", "...odcddcjannmooha.........", ".....aoomaapfmmmab.........", ".......aacalaeeajc.........", "........afakagiiaa.........", ".....jaaeb.ifggpke.ooo.....", "....bbfabfj.affgkeaaaaa....", "...abffcoffaikkkiaffffa....", "...mbfdab.bgkkiaacddffa....", "...mbdda..aaaaa.addddm.....", "....baa..........daaa......", "...........................", "...........................", "...........................", "..........................."],
-    ["...........................", ".........oikkeifl..........", ".......mikkkkekpnnl........", ".....eikkkkkkeknppnl.......", "....egkkkkkkekppnnpplo.....", "...eiikkkeekeknplfnpfo.....", "...eiiiiikkekpnlmmlf.......", "..eiiiiiiieiipnmomb........", "..eiiiiiieeeflpobfb........", ".deieaeegmmmfnloojhd.......", ".aeea.dccooofpfo.jmb.......", ".aead..abfohfpfoojhd.......", ".aca....bbhhnpfooma........", "........pmabpfmmdm.........", "........aaeamaeea..........", "........oaeiiaiiiao........", "........oaa..aiiiia........", "........agdjjaigfpabb......", "......jegbffjaffkiafb......", "......jegblfaikkkadfb......", "........bbaaaaiiaddb.......", "........bddaaaaa.ba........", "........aaaa...............", "...........................", "..........................."],
-    ["...........................", ".........ikkeigfll.........", ".....iikkkkkeilpnnnl.......", "..meiikkkkkkeglnpppnl......", "..eiikkkkkkeknppnnnpp......", "geiiiikkeekeknnplllnf......", "aiiiiiiikkekpnnlmmd........", "aiiiiiiiieiipnmmoma........", "iieeaeeeeieflnpobfa........", "eeaaoaeemmhfnlnoojhd.......", "cc....aamoofpllohjma.......", "dc....daboompllohjhd.......", ".......bblhmplmomoa........", ".......pmaapfmmmoa.........", ".......aaeamaeeea..........", "........aiiaeiiig..........", "........agagiaginpa........", ".......aifb..jffgia........", ".......aikajjcekkeb........", "........akaffceke..........", ".........aamojaaa..........", ".........adbacddf..........", "..........bdbbbbb..........", "...........ba..............", "..........................."]
+    ["............kiekfll........", "..........ikkkeknnpnl......", "......eiikkkkkekppnppl.....", ".....eiikkkkkeknnpnnnp.....", "....eiiikieekekpplfnff.....", "...aiiiiikkkekpnlmmb.......", "...aiiiiiieeippnmmmb.......", "..aeiieeieeienlp.bfb.......", "..aeieaeemmmmfnl..jmb......", "..aeia.aalmmmfpf..jmb......", "...cca..ablmmnpf...j.......", "...dcc..fclamnnm...d.......", "..........cabpfmmmb........", "........bbaedfbeeaa........", "........cdcigbaaiaa........", ".......bcccfgfaaapka.......", "......ambedffaa.aika.......", "......aaekkkkaaqqaaa.......", ".......aakkkkeaffaaa.......", ".......afcekkkaaaaddbb.....", ".......afdcaaaaaaadffb.....", "........dddda....abbb......", ".........dbaa..............", "...........................", "..........................."],
+    [".........iikkkgepfn........", "........ikkkkegpppnnl......", "......eikkkkeknnnnppnl.....", ".....eiikkkkeknpplnnppl....", "....aiiiikkkeknnplfnnpl....", "....aiiiiikekpnnlmmllf.....", "...aeiiiiiieipnmmmmd.......", "...aeiiiiieimlnpmbfa.......", "...aeiieeommfnlnmhjma......", "...aeieaammmfpllmhjma......", "...aeia.abmmppllmmhj.......", "...daaa.dbbppnlmmmhd.......", "....aaa..maapfmmmma........", "........bdeamaeeebd........", "........afgigaeikpa........", ".......aaafgfgmmaikd.......", "......bmaiifammqqaaab......", ".......baekkiaqqfbbdfa.....", "......afdaekkieffdbdfa.....", "......bfdaaaaaaaabddb......", "......bddb......aaaa.......", "......adda.................", ".......ba..................", "...........................", "..........................."],
+    ["............ikkkeffl.......", "........eeikkkkekpnnl......", "........eikkkkeknnppnl.....", "........eikkkkekpplnppl....", "......eiiikeekeknplfnpf....", ".....aeiiiikkekpnlmmff.....", ".....aeiiiiiieipnmmmbf.....", ".....aeiiiiieenlp.bfb......", ".....aeeiieommfnl..jmbm....", "......aeiebmmmfpf..jmam....", "......deeaadmmppf...j......", "......deaamfaannm...d......", "......daaabmaapfmmma.......", "........aabaeamaeenf..qq...", "........aadfiigaiepa..dbd..", "......d.aggfigfi.aakaadfda.", "......dbgkkkffa.qqfbfddfda.", ".....abccakkkkiaqffbbdddd..", ".....adfdfdakkkaab.bddb....", ".....affcba.aaaaa...ab.....", ".....addca.................", ".....addcb.................", "......daa..................", "...........................", "..........................."],
+    ["...........................", "...........kkkeefn.........", "........ikkkkkekpnnl.......", "......eikkkkkkeknppnl......", ".....eikkkkkkekppnnppl.....", "....eiikkeekkeknplfnpf.....", "....eiiiikkiekpnlmmff......", "...eiiiiiieeippnmmmb.......", "...eiiiiieeeeflpmbfb.......", "..deieaaemmmffnl..jjd......", "..aeea..mmmmffpf..jmb......", "..aead..ammmmppf..jjd......", "..aaa...bbfmmppm..ba.......", "........fdaacpfmmda........", "........aaeacmaeea.........", ".........aeigaeeiia........", "........aagiggieaiga.......", ".........adggd..agpa.......", "........bgkgdaqqfagaa......", ".......aagkkkkaffbbda......", ".......afbaekkaabbdb.......", ".......afdddaaaabaa........", "........bfddba.............", ".........bbbaa.............", "..........................."],
+    ["...........................", ".........ikkeiffll.........", "......eikkkkeknpnnnl.......", "..eeeikkkkkkeknppppnl......", ".eeiikkkkkkekpppnnnpp......", ".aiiiikkeekekpnnlllnf......", "aiiiiiiikkekpnllmm.........", "aiiiiiiiieiipnmmmma........", "iieeaeeeeieflpmmbfa........", "eeaa.aeemmffnlmmjjjd.......", "aa....aammmfpfmmjjfa.......", "dd....dabmmfpfmmmjma.......", ".......bbhhnpfmmmma........", ".......pmaapfmmmmb.........", ".......aaeambeeaa..........", "........aiiaeiiiaa.........", "........aiaaiaeipaa........", ".......aafa..adfgga........", ".......aikaqqagkkab........", "........akaffbgkkaa........", ".........aaabbaaaa.........", "..........abaafffa.........", "...........aadffba.........", "............abbbba.........", "..........................."],
+    ["............iekfll.........", ".........ikkkeknpnnl.......", ".....iiiikkkkekpnppnl......", "....eiiikkkkeknnpnnppl.....", "...eiiiikeekekpplfnff......", "...iiiiiiikekpnlmmb........", "..aiiiiiiiieepnmmmb........", ".aeiiiiiiieenlp.bfb........", ".aeieaeeiimmfnl..jmb.......", ".aeiamaabmmmfpf..jmb.......", "..cea.maadmhppf...j........", "..dcd..mdchhnnf...d........", "........bcaapfmmmb.........", "........aagambeeabb........", ".........aigamaiafb........", ".........agaaaiigaaa.......", "........bfa..aagpkada......", "......qeiaaqqaffkkab.......", "......qaabffqaikkia........", ".......aaaffaikkkab........", "........aaadaaaaadfb.......", ".........daba.addffb.......", "...............abbb........", "...........................", "..........................."],
+    [".........ikkkgepfn.........", ".......iikkkegpppnnl.......", ".....eikkkkeknnnnppnl......", "....eiikkkkeknpplnnppl.....", "...aeiiieekeknnplfnnpl.....", "...aiiiiikekpnnlmmllf......", "...aiiiiiieippnmmmb........", "..aeiiiieemmnnpmbfd........", "..aeiieeemmfnnlmhjma.......", "...aieaammmfpllmhjma.......", "...aea.admmppllmhhj........", "...ddd.dmbannlmmmhd........", "........maapfmmmmaa........", ".......aaaakaeeeadda.......", ".........aaaaiieeffa.......", "........aa.qfiiieafa.......", ".......aaqq.deiipka........", "......bbffqadffkkka........", "......bfmfagkkkkkeabb......", "......bdbbgkkkkkkabffb.....", ".......bdbaaaaaadfddfb.....", "........aa.....bbdddb......", "................dbaa.......", "...........................", "..........................."],
+    [".........ikkkeffl..........", "......eikkkkekpnnl.........", "....deikkkkeknnppnl........", ".....eikkkkekppnnpppl......", "....eiikeekeknplfnppl......", "...aeiiikkekpnlmmllnl......", "...aeiiiieeipnmmmccf.......", "...aeiiieiemlp.bfb.........", "....aieeommfnl..jmjd.......", "....aieammmfpf..jjjd.......", "....aeaadmmppf...j.........", "....dadddaannm...a.........", ".....a..maapfmmmab.........", ".......aaaaaaeeaaa.........", "........afakagiiaa.........", ".....baaeb.ifggpke.........", "....bbfabff.affgkeaaaaa....", "...abffffffaikkkiaffffa....", "....bfdab.bakkiaadddffa....", "....bdda..aaaaa.adddd......", "....baa..........daaa......", "...........................", "...........................", "...........................", "..........................."],
+    ["...........................", "..........ikkeifn..........", "........ikkkkekpnnl........", ".....eikkkkkkeknppnl.......", "....eikkkkkkekppnnppl......", "...eiikkkeekeknplfnpf......", "...eiiiiikkekpnlmmff.......", "..eiiiiiiieiipnmmmb........", "..eiiiiiieeeflpmbfb........", ".deieaeemmmmfnl..jjd.......", ".aeea.dccmmmfpf..jmb.......", ".aead..abfmhfpf..jjd.......", ".aaa....bbhhnpf..ma........", "........pmabpfmmdm.........", "........aaeamaeea..........", ".........aeiiaiiia.........", ".........aa..aiiiia........", "........agdqqaiifpabb......", "......qegbffqaffkiafb......", "......qegbffaikkkadfb......", "........bbaaaaiiaddb.......", "........bddaaaaa.ba........", "........aaaa...............", "...........................", "..........................."],
+    ["...........................", ".........ikkeiifll.........", ".....iikkkkkeilpnnnl.......", "...eiikkkkkkellnpppnl......", "..eiikkkkkkeknppnnnpp......", "eeiiiikkeekeknnplllnf......", "aiiiiiiikkekpnnlmmd........", "aiiiiiiiieiipnmmmma........", "iieeaeeeeieflnpmbfa........", "eeaa.aeemmffnlnmmjjd.......", "cc....aammmfpllmhjma.......", "dc....dabmmmpllmhjjd.......", ".......bbmmmplmmmma........", ".......pmaapfmmmma.........", ".......aaeamaeeea..........", "........aiiaeiiii..........", "........aaaiiaiinpa........", ".......aifb..qffiia........", ".......aikaqqcekkeb........", "........akaffceke..........", ".........aammaaaa..........", ".........adbaaddf..........", "..........bdbbbbb..........", "...........ba..............", "..........................."]
   ];
-  const LINK_COLORS: Record<string, string> = { a: "#020802", b: "#0e0503", c: "#222213", d: "#423123", e: "#0b430c", f: "#67481e", g: "#2c6826", h: "#818d88", i: "#177929", j: "#47525d", k: "#469f2f", l: "#9e7f3c", m: "#efc89c", n: "#d3b441", o: "#fff0d6", p: "#f7f234" };
+  const LINK_COLORS: Record<string, string> = { a: "#020802", b: "#0e0503", c: "#222213", d: "#423123", e: "#0b430c", f: "#67481e", g: "#2c6826", h: "#e4ecf6", i: "#177929", j: "#3a5aa8", k: "#469f2f", l: "#9e7f3c", m: "#efc89c", n: "#d3b441", o: "#fff0d6", p: "#f7f234", q: "#3c414c" };
   for (const [k, h] of Object.entries(LINK_COLORS)) {
     ROLES["lk_" + k] = [h, tint(h, "#ffb070", 0.14, 1), tint(h, "#6a4a7a", 0.28, 0.88), tint(h, "#1a2246", 0.45, 0.75)];
   }
@@ -345,13 +346,17 @@
   const stairY = (x: number) => Math.min(150, 112 + Math.ceil(Math.ceil((x - 216) / 2) * 3.5));
   for (let x = 216; x < 239; x++) {
     const sy = stairY(x);
-    for (let y = G[x]; y < sy; y++) put(main, x, y, (x + y) % 5 === 0 ? R.rock : R.rockDk); // the cut wall behind
+    for (let y = G[x]; y < sy; y++) put(main, x, y, y === G[x] ? R.rock : R.rockDk); // the cut wall behind
     put(main, x, sy, R.rockHi); put(main, x, sy + 1, R.rock); // tread
     if ((x - 216) % 2 === 1) for (let k = 1; k <= 3; k++) put(main, x, sy + 1 + k, R.rockDk); // riser shadow
   }
   // Ledge behind the waterfall, then a few steps down to the dock
-  for (let x = 238; x < 256; x++) { put(main, x, 150, R.rockHi); put(main, x, 151, R.rock); put(main, x, 152, R.rockDk); }
-  for (let x = 256; x < 262; x++) { const y = 150 + Math.ceil((x - 255) * 5 / 6); put(main, x, y, R.rockHi); put(main, x, y + 1, R.rockDk); }
+  for (let x = 238; x < 262; x++) { // footbridge across the face of the falls
+    const y = x < 256 ? 150 : 150 + Math.ceil((x - 255) * 5 / 6), seam = (x - 238) % 3 === 0;
+    put(main, x, y, seam ? R.woodDk : R.wood); put(main, x, y + 1, R.woodDk);
+    if ((x - 238) % 8 === 0) for (let k = 1; k <= 5; k++) put(main, x, y - k, k === 5 ? R.wood : R.woodDk);
+    put(main, x, y - 5, R.wood);
+  }
   // Dock across the lake: planks, a dark edge and posts into the lake bed
   let dockEnd = 262;
   for (let x = 262; x < 460; x++) {
@@ -638,7 +643,7 @@
   for (let i = 0; i < 34; i++) { const x = 430 + rnd() * 700; flies.push({ x, y: G[Math.floor(x)] - 4 - rnd() * 18, ph: rnd() * 6.28, r: 3 + rnd() * 5 }); }
 
   /* ---------------- Renderer ---------------- */
-  let canvas: HTMLCanvasElement, ctx: CanvasRenderingContext2D, img: ImageData, px32: Uint32Array, W = 0, H = 0, scale = 1;
+  let canvas: HTMLCanvasElement, ctx: CanvasRenderingContext2D, img: ImageData, px32: Uint32Array, fineImg: ImageData, fine32: Uint32Array, W = 0, H = 0, scale = 1;
   let progress = 0, reduce = false, last = 0;
   const pal = new Uint32Array(N);
   type RGB = [number, number, number];
@@ -794,32 +799,6 @@
         }
       }
     }
-    // The walker follows the camera along the path, stepping with the scroll
-    {
-      const target = clamp(camX + W * focus - 16, 150, FIRE_X - 18);
-      const moved = target - walker.x;
-      if (Math.abs(moved) > 0.3) { walker.dir = moved > 0 ? 1 : -1; walker.dist += Math.abs(moved); walker.still = now; }
-      walker.x = target;
-      const walking = now - walker.still < 220;
-      const f = walking ? Math.floor(walker.dist / 3) % LINK_FRAMES.length : 3;
-      const rows = LINK_FRAMES[f], fw = rows[0].length;
-      const feet = pathY(walker.x);
-      const sx0 = Math.round(walker.x - camX) - (fw >> 1), sy0 = feet - off + 18 - LINK_FEET[f];
-      for (let j = 0; j < rows.length; j++) {
-        const y = sy0 + j; if (y < 0 || y >= H) continue;
-        const row = rows[j];
-        for (let i = 0; i < fw; i++) {
-          const ch = row[walker.dir > 0 ? i : fw - 1 - i];
-          if (ch === ".") continue;
-          const x = sx0 + i; if (x < 0 || x >= W) continue;
-          // behind the waterfall: falling water stays in front of him
-          const wx = x + Math.round(camX), wy = y + off - 18;
-          const under = wx >= 0 && wx < WW && wy >= 0 && wy < LH ? main[wy * WW + wx] : 0;
-          if (under >= R.fall0 && under <= R.fall0 + 3) continue;
-          px32[y * W + x] = pal[R["lk_" + ch]];
-        }
-      }
-    }
     // Reflections: the lake and the river mirror whatever stands above them, rippled and faded with depth
     {
       const sy0 = WATER - off + 18, ox = Math.round(camX);
@@ -863,7 +842,55 @@
         if (on * night > 0.35) px32[y * W + x] = pack(217, 249, 157);
       }
     }
-    ctx.putImageData(img, 0, 0);
+    // EPX 2× upscale: the world doubles in resolution, smoothing its diagonals the classic way
+    const FW = W * 2;
+    for (let y = 0; y < H; y++) {
+      const r = y * W, ru = (y > 0 ? y - 1 : y) * W, rd = (y < H - 1 ? y + 1 : y) * W, o0 = (y * 2) * FW, o1 = o0 + FW;
+      for (let x = 0; x < W; x++) {
+        const P = px32[r + x], A = px32[ru + x], D = px32[rd + x];
+        const C = px32[r + (x > 0 ? x - 1 : x)], B = px32[r + (x < W - 1 ? x + 1 : x)];
+        let p1 = P, p2 = P, p3 = P, p4 = P;
+        if (C === A && C !== D && A !== B) p1 = A;
+        if (A === B && A !== C && B !== D) p2 = B;
+        if (D === C && D !== B && C !== A) p3 = C;
+        if (B === D && B !== A && D !== C) p4 = D;
+        const o = x * 2;
+        fine32[o0 + o] = p1; fine32[o0 + o + 1] = p2; fine32[o1 + o] = p3; fine32[o1 + o + 1] = p4;
+      }
+    }
+    // The walker follows the camera along the path, stepping with the scroll, at full resolution
+    {
+      const lead = Math.min(24, W * focus - 30) * (1 - clamp(progress / 0.05)); // starts a little before the tower
+      const target = clamp(camX + W * focus - 16 - lead, 150, FIRE_X - 18);
+      const moved = target - walker.x;
+      if (Math.abs(moved) > 0.3) { walker.dir = moved > 0 ? 1 : -1; walker.dist += Math.abs(moved); walker.still = now; }
+      walker.x = target;
+      const walking = now - walker.still < 220;
+      const f = walking ? Math.floor(walker.dist / 2) % LINK_FRAMES.length : 3;
+      const rows = LINK_FRAMES[f], fw = rows[0].length, FH = H * 2;
+      const feet = (pathY(walker.x) - off + 18) * 2;
+      const sx0 = Math.round((walker.x - camX) * 2) - (fw >> 1), sy0 = feet - 1 - LINK_FEET[f];
+      const overWater = G[Math.round(walker.x)] > WATER;
+      const wl = (WATER - off + 18) * 2; // water line on the fine grid
+      for (let j = 0; j < rows.length; j++) {
+        const y = sy0 + j, row = rows[j];
+        for (let i = 0; i < fw; i++) {
+          const ch = row[walker.dir > 0 ? i : fw - 1 - i];
+          if (ch === ".") continue;
+          const x = sx0 + i; if (x < 0 || x >= FW) continue;
+          const c = pal[R["lk_" + ch]];
+          if (y >= 0 && y < FH) fine32[y * FW + x] = c;
+          if (overWater) { // his reflection, rippled and faded
+            const my = 2 * wl - y + 4;
+            if (my > wl && my < FH && ((my + x) & 3) !== 0) {
+              const k = my * FW + x, s0 = fine32[k];
+              fine32[k] = pack(((s0 & 255) + (c & 255)) >> 1, (((s0 >> 8) & 255) + ((c >> 8) & 255)) >> 1, (((s0 >> 16) & 255) + ((c >> 16) & 255)) >> 1);
+            }
+          }
+        }
+      }
+    }
+    ctx.putImageData(fineImg, 0, 0);
     return rgb;
   }
 
@@ -878,12 +905,15 @@
   }
   function resize() {
     const vw = innerWidth, vh = innerHeight;
-    scale = Math.max(2, Math.round(vh / 190));
+    const fineScale = Math.max(1, Math.round(vh / 400)); // screen pixels per fine pixel
+    scale = fineScale * 2; // screen pixels per world pixel
     W = Math.min(WW, Math.ceil(vw / scale)); H = Math.ceil(vh / scale);
-    canvas.width = W; canvas.height = H;
+    canvas.width = W * 2; canvas.height = H * 2;
     canvas.style.width = W * scale + "px"; canvas.style.height = H * scale + "px";
     img = ctx.createImageData(W, H);
     px32 = new Uint32Array(img.data.buffer);
+    fineImg = ctx.createImageData(W * 2, H * 2);
+    fine32 = new Uint32Array(fineImg.data.buffer);
     dirty = true;
     if (reduce) render(performance.now());
   }
