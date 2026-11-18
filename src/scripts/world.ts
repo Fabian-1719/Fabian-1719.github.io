@@ -480,6 +480,7 @@
     for (let y = 0; y < 5; y++) put(main, x0 + 9, base - h - 17 - y, R.woodDk);
     put(main, x0 + 10, base - h - 21, R.gem);
   }
+  const CHIMNEYS: [number, number][] = [];
   function house(x0: number, wall: "wood" | "stone") {
     const w = 34, h = 22, base = G[x0 + (w >> 1)];
     for (let y = base - h; y <= base; y++) for (let x = 0; x < w; x++) {
@@ -502,6 +503,8 @@
       for (let x = -3 + i; x < w + 3 - i; x++) put(main, x0 + x, y, (y % 3 === 0) ? R.roofDk : ((x - i) % 4 === 0 ? R.roofDk : R.roof));
     }
     for (let y = 0; y < 9; y++) { put(main, x0 + 25, base - h - 6 - y, R.stoneDk); put(main, x0 + 26, base - h - 6 - y, R.stone); put(main, x0 + 27, base - h - 6 - y, R.stoneDk); }
+    for (let x = 24; x <= 28; x++) put(main, x0 + x, base - h - 15, R.stoneDk); // chimney cap
+    CHIMNEYS.push([x0 + 26, base - h - 16]);
   }
   function lampPost(x0: number) { // 22 px: taller than the walker
     const base = G[x0];
@@ -544,16 +547,42 @@
     }
   }
   function tentAndFire(tx: number, fx: number) {
-    const base = G[tx + 10];
-    for (let i = 0; i < 19; i++) {
-      const y = base - i, half = Math.round(14 - i * 0.75);
-      for (let x = -half; x <= half; x++) {
-        let c = x < 0 ? R.tent : R.tentDk;
-        if (x === 0 || (i === 2 && Math.abs(x) < half)) c = R.stripe;
-        if (x === 1 && i < 9) c = R.soilDk;
-        put(main, tx + 10 + x, y, c);
+    const base = G[tx + 10], ax = tx + 10, ay = base - 19; // front apex
+    const bx = ax - 9, by = ay - 3; // back apex: the tent recedes to the left
+    // side panel (shade), from the front-left edge back toward the far apex
+    for (let y = by; y <= base - 3; y++) {
+      const t = (y - by) / (base - 3 - by);
+      const xl = Math.round(bx - t * 14), xr = Math.round(ax - (y - ay) * 0.74);
+      for (let x = xl; x <= Math.max(xl, xr); x++) {
+        let c = (x - xl) % 5 === 0 ? R.tentDk : (dith(x, y, 0.35) ? R.tentDk : R.tent);
+        if (y === base - 3 || x === xl) c = R.stripe; // hem and back edge
+        put(main, x, y, c);
       }
     }
+    // front face: lit canvas with an open door and a folded-back flap
+    for (let i = 0; i <= 19; i++) {
+      const y = base - i, half = Math.round(i === 0 ? 14 : 14 - i * 0.74);
+      for (let x = -half; x <= half; x++) {
+        let c = x > half - 2 ? R.tentDk : R.tent;
+        const door = i < 13 && Math.abs(x - 1) <= Math.round((13 - i) * 0.42);
+        if (door) c = i < 2 ? R.soilDk : R.trunkDk; // dark interior
+        if (door && x - 1 > Math.round((13 - i) * 0.42) - 2 && i > 1) c = R.tentDk; // inner shadow edge
+        if (x === -half || x === half) c = R.stripe; // edge seams
+        if (i === 1 && !door) c = R.stripe; // hem
+        put(main, ax + x, y, c);
+      }
+    }
+    for (let i = 2; i < 12; i++) { // flap folded back to the left of the door
+      const w = Math.round((12 - i) * 0.5);
+      for (let k = 0; k < w; k++) put(main, ax - 4 - Math.round((13 - i) * 0.42) - k, base - i, k === 0 ? R.tentDk : R.tent);
+    }
+    // ridge pole, guy rope and pegs
+    for (let k = 0; k <= 9; k++) put(main, ax - k, ay - Math.round(k / 3), R.woodDk);
+    put(main, ax, ay - 1, R.wood); put(main, ax, ay - 2, R.woodDk);
+    for (let k = 0; k <= 16; k++) if (k % 2 === 0) put(main, ax + 1 + k, ay + Math.round(k * 1.15), R.pathDk);
+    put(main, ax + 17, base, R.woodDk); put(main, ax + 17, base - 1, R.wood);
+    put(main, bx - 15, base - 3, R.woodDk);
+
     // warm light on the ground around the fire, only visible at night
     const fb = G[fx];
     for (let x = fx - 22; x <= fx + 22; x++) for (let y = G[x]; y < G[x] + 6; y++) {
@@ -564,10 +593,16 @@
       else if (c === R.grass) put(main, x, y, R.grassGlow);
       else if (c === R.soil || c === R.path || c === R.pathDk) put(main, x, y, R.soilGlow);
     }
-    for (let x = -4; x <= 4; x++) { put(main, fx + x, fb, R.trunkDk); if (Math.abs(x) < 3) put(main, fx + x, fb - 1, R.trunk); }
-    const flame = ["..2..", ".212.", ".101.", "21012", "20102", ".222."];
-    flame.forEach((row, i) => [...row].forEach((ch, j) => { if (ch !== ".") put(main, fx - 2 + j, fb - 7 + i, R.fire0 + Number(ch)); }));
-    for (const [sx, sy] of [[-5, 0], [5, 0], [-4, 1], [4, 1]]) put(main, fx + sx, fb + sy, R.rock);
+    // ash bed, a ring of stones and two crossed logs
+    for (let x = -4; x <= 4; x++) put(main, fx + x, fb, x % 2 ? R.rockDk : R.soilDk);
+    for (const [sx, sy] of [[-7, 0], [-5, -1], [5, -1], [7, 0], [-6, 1], [6, 1], [-2, 1], [2, 1]]) {
+      put(main, fx + sx, fb + sy - 1, R.rockHi); put(main, fx + sx + 1, fb + sy - 1, R.rock);
+      put(main, fx + sx, fb + sy, R.rock); put(main, fx + sx + 1, fb + sy, R.rockDk);
+    }
+    for (let k = -5; k <= 5; k++) { // logs crossing over the pit
+      put(main, fx + k, fb - 1 - Math.round((k + 5) * 0.3), k === -5 || k === 5 ? R.wood : R.trunk);
+      put(main, fx - k, fb - 1 - Math.round((k + 5) * 0.3), k === -5 || k === 5 ? R.wood : R.trunkDk);
+    }
   }
   function flowers(x0: number, x1: number, n: number) {
     for (let i = 0; i < n; i++) {
@@ -599,6 +634,7 @@
   flowers(900, 1180, 20);
 
   const SWORD_X = 545, FIRE_X = 1088, TOWER_X = 205;
+  const FLAME_CORE = hex("#fff3b0");
   const pathY = (x: number): number => {
     const xi = Math.round(x);
     if (xi < 216) return G[Math.max(0, xi)];
@@ -820,6 +856,28 @@
         }
       }
     }
+    // Chimney smoke: soft puffs that rise and lean with the breeze, paler by day, dusky at night
+    {
+      const nt = night, sc = [Math.round(226 - 112 * nt), Math.round(228 - 112 * nt), Math.round(236 - 96 * nt)];
+      for (const [hx, hy] of CHIMNEYS) {
+        const cx = hx - Math.round(camX), cy = hy - off + 18;
+        if (cx < -20 || cx > W + 20) continue;
+        const lit = pack(sc[0], sc[1], sc[2]);
+        const shade = pack(Math.round(sc[0] * 0.8), Math.round(sc[1] * 0.8), Math.round(sc[2] * 0.86));
+        const SPAN = 36, N = 9; // puffs evenly spaced in age form one continuous column
+        for (let i = 0; i < N; i++) {
+          const age = ((reduce ? 0 : clock * 4) + i * SPAN / N + hx) % SPAN;
+          const px = cx + age * 0.45 + Math.sin(age * 0.22 + (reduce ? 0 : clock * 1.3) + hx) * 1.4, py = cy - age;
+          const r = 1 + age / 13, a = age < 20 ? 0.95 : 0.95 * (1 - (age - 20) / (SPAN - 20));
+          for (let dy = -Math.ceil(r); dy <= Math.ceil(r); dy++) for (let dx = -Math.ceil(r); dx <= Math.ceil(r); dx++) {
+            const d = Math.hypot(dx, dy); if (d > r) continue;
+            const X = Math.round(px + dx), Y = Math.round(py + dy);
+            if (X < 0 || X >= W || Y < 0 || Y >= H || !dith(X, Y, a * (1 - 0.35 * d / r))) continue;
+            px32[Y * W + X] = dx + dy > r * 0.4 ? shade : lit; // lit from the upper left
+          }
+        }
+      }
+    }
     // Embers rise from the fire and smoke drifts off after sunset
     if (progress > 0.6) {
       const fx = FIRE_X - Math.round(camX), fy = G[FIRE_X] - 7 - off + 18;
@@ -874,6 +932,29 @@
         }
       }
     }
+    // The campfire flame: three flickering tongues on the fine grid, growing as the evening comes
+    {
+      const FH = H * 2, fx2 = Math.round((FIRE_X - camX) * 2), fb2 = (G[FIRE_X] - 2 - off + 18) * 2;
+      const lit = 0.35 + 0.65 * clamp((progress - 0.5) / 0.3);
+      const t = reduce ? 0 : clock;
+      const tongues = [[-3, 0.7, 1.7], [0, 1, 0], [3, 0.75, 3.1]];
+      const core = pack(FLAME_CORE[0], FLAME_CORE[1], FLAME_CORE[2]);
+      for (const [ox, k, ph] of tongues) {
+        const h = Math.max(3, Math.round((12 + 4 * Math.sin(t * 9 + ph) + 2 * Math.sin(t * 23 + ph * 2)) * k * lit));
+        const sway = reduce ? 0 : Math.sin(t * 6 + ph) * 1.2;
+        for (let j = 0; j < h; j++) {
+          const f = j / h, half = Math.round((1 - f) * (ox === 0 ? 4 : 3));
+          const cx = fx2 + ox + Math.round(sway * f * 2);
+          for (let i = -half; i <= half; i++) {
+            const x = cx + i, y = fb2 - j;
+            if (x < 0 || x >= FW || y < 0 || y >= FH) continue;
+            const edge = Math.abs(i) === half;
+            const c = f > 0.72 ? pal[R.fire1] : edge ? pal[R.fire2] : (f < 0.45 && Math.abs(i) < half - 1 ? core : pal[R.fire0]);
+            fine32[y * FW + x] = c;
+          }
+        }
+      }
+    }
     // The walker follows the camera along the path, stepping with the scroll, at full resolution
     {
       const lead = Math.min(24, W * focus - 30) * (1 - clamp(progress / 0.05)); // starts a little before the tower
@@ -898,7 +979,9 @@
           if (y >= 0 && y < FH) fine32[y * FW + x] = c;
           if (overWater) { // his reflection, rippled and faded
             const my = 2 * wl - y + 4;
-            if (my > wl && my < FH && ((my + x) & 3) !== 0) {
+            const rwx = (x >> 1) + Math.round(camX), rwy = (my >> 1) + off - 18; // world pixel under the reflection
+            const isWater = rwx >= 0 && rwx < WW && rwy > WATER && rwy < G[rwx];
+            if (isWater && my > wl && my < FH && ((my + x) & 3) !== 0) {
               const k = my * FW + x, s0 = fine32[k];
               fine32[k] = pack(((s0 & 255) + (c & 255)) >> 1, (((s0 >> 8) & 255) + ((c >> 8) & 255)) >> 1, (((s0 >> 16) & 255) + ((c >> 16) & 255)) >> 1);
             }
