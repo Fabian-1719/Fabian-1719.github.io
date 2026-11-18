@@ -1,0 +1,35 @@
+{
+  "detector": {
+    "ignoreRules": [],
+    "ignoreFiles": [],
+    "ignoreValues": [
+      {
+        "rule": "hero-eyebrow-chip",
+        "value": "*",
+        "files": [
+          ".impeccable/mocks/decision/assigned.html"
+        ],
+        "createdAt": "2026-11-18T06:52:00.800Z",
+        "reason": "Claude: throwaway decision-round sketch, not shipping UI; the real build will not use an eyebrow"
+      },
+      {
+        "rule": "hero-eyebrow-chip",
+        "value": "*",
+        "files": [
+          ".impeccable/mocks/decision/model-pick.html"
+        ],
+        "createdAt": "2026-11-18T06:52:00.917Z",
+        "reason": "Claude: throwaway decision-round sketch, not shipping UI; the real build will not use an eyebrow"
+      },
+      {
+        "rule": "cream-palette",
+        "value": "*",
+        "files": [
+          ".impeccable/mocks/decision/challenger-zine.html"
+        ],
+        "createdAt": "2026-11-18T06:52:01.041Z",
+        "reason": "Claude: sketch of the dealt zine challenger, whose catalog palette is cream paper; not shipping UI"
+      }
+    ]
+  }
+}
