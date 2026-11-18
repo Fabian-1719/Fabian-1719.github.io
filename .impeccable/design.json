@@ -48,7 +48,7 @@
       { "name": "bar-compact", "value": "760px" }
     ],
     "world": {
-      "source": "js/world.js",
+      "source": "src/scripts/world.ts",
       "logicalSize": "1200 x 200 buffers, bottom-aligned; scale max(2, round(vh / 190)); nearest-neighbour",
       "layers": [ { "name": "far range", "parallax": 0.25 }, { "name": "hills", "parallax": 0.55 }, { "name": "main walk", "parallax": 1.0 } ],
       "timeKeys": ["morning (derived: 62% day + 38% golden)", "day", "golden", "dusk", "night"],
@@ -58,7 +58,7 @@
       "camera": "Section-anchored via setAnchors: desktop focus 0.66 beside the panel, phone (<860px) focus 0.5 in the open stretch below each panel."
     },
     "detectorExceptions": [
-      { "rule": "hard-offset-shadow", "files": ["css/style.css"], "reason": "Zero-blur one-step edges are the native depth of pixel UI (button base, bar edge, panel frame)." },
+      { "rule": "hard-offset-shadow", "files": ["src/styles/global.css"], "reason": "Zero-blur one-step edges are the native depth of pixel UI (button base, bar edge, panel frame)." },
       { "rule": "cramped-padding", "files": ["index.html"], "reason": "False positive recorded by the finish reviewer; panel copy is inset by the panel padding." }
     ]
   },
@@ -142,7 +142,7 @@
       { "name": "The Palette Role Rule", "body": "Every world pixel is a palette role index, never a literal colour. Time of day changes the palette, not the pixels.", "section": "colors" },
       { "name": "The Two Voices Rule", "body": "Pixelify Sans names and labels; Atkinson Hyperlegible explains. If a line is read as a sentence, it is Atkinson.", "section": "typography" },
       { "name": "The No Tracking Rule", "body": "Pixelify sets at letter-spacing 0; it is a pixel grid and spacing it out breaks the grid.", "section": "typography" },
-      { "name": "The Stepped Depth Rule", "body": "Every UI shadow has zero blur and offsets in whole `--px` steps. A blurred shadow is foreign to this world. (The detector's hard-offset-shadow rule is suppressed for `css/style.css` for exactly this reason.)", "section": "elevation" }
+      { "name": "The Stepped Depth Rule", "body": "Every UI shadow has zero blur and offsets in whole `--px` steps. A blurred shadow is foreign to this world. (The detector's hard-offset-shadow rule is suppressed for `src/styles/global.css` for exactly this reason.)", "section": "elevation" }
     ],
     "dos": [
       "**Do** reserve gold for clickable things, their focus ring and selection.",

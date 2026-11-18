@@ -52,7 +52,7 @@
         "rule": "hard-offset-shadow",
         "value": "*",
         "files": [
-          "css/style.css"
+          "src/styles/global.css"
         ],
         "createdAt": "2026-11-18T07:49:00.393Z",
         "reason": "Claude: pixel-art world per direction contract; zero-blur one-step edges are the native depth of pixel UI (button base, bar edge, panel frame)"

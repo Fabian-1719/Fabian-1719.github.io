@@ -144,7 +144,7 @@ A night-ink interface laid over a full-spectrum, time-keyed pixel world; the UI 
 - **Day Sky Blue** (`sky-day`): the `html` background behind the canvas, so overscroll and first paint match the day sky.
 
 ### The World Palette
-The canvas owns its own palette in `js/world.js`, separate from the UI tokens. About 50 roles (far range lit/mid/haze/snow, hills, four leaf tones with outline, pine, trunk, grass, soil, path, rock, stone, roof, wood, glass, lamp, flowers, foam, tent, sword blade/hilt/gem, three cloud tones), each with explicit day, golden, dusk and night keys; morning is derived per role as 62% day + 38% golden. Five sky bands carry their own five-key ramp. Cycle groups: water (4 steps, 5 Hz), waterfall (4 steps, 11 Hz), fire (3 steps, 8 Hz). Window glass, lamps, fire and the ground around the fire brighten toward night rather than darken.
+The canvas owns its own palette in `src/scripts/world.ts`, separate from the UI tokens. About 50 roles (far range lit/mid/haze/snow, hills, four leaf tones with outline, pine, trunk, grass, soil, path, rock, stone, roof, wood, glass, lamp, flowers, foam, tent, sword blade/hilt/gem, three cloud tones), each with explicit day, golden, dusk and night keys; morning is derived per role as 62% day + 38% golden. Five sky bands carry their own five-key ramp. Cycle groups: water (4 steps, 5 Hz), waterfall (4 steps, 11 Hz), fire (3 steps, 8 Hz). Window glass, lamps, fire and the ground around the fire brighten toward night rather than darken.
 
 ### Named Rules
 **The Gold Means Click Rule.** Gold (and its hover, edge and ink) appears only on elements a visitor can activate, plus the focus ring and selection that serve them. A gold non-interactive element is a bug.
@@ -190,7 +190,7 @@ Depth is pixel-UI depth: zero-blur, one-step solid offsets and stacked rings, ne
 - **HUD ring** (`box-shadow: 0 0 0 4px dusk-line`): the clock on wide screens.
 
 ### Named Rules
-**The Stepped Depth Rule.** Every UI shadow has zero blur and offsets in whole `--px` steps. A blurred shadow is foreign to this world. (The detector's hard-offset-shadow rule is suppressed for `css/style.css` for exactly this reason.)
+**The Stepped Depth Rule.** Every UI shadow has zero blur and offsets in whole `--px` steps. A blurred shadow is foreign to this world. (The detector's hard-offset-shadow rule is suppressed for `src/styles/global.css` for exactly this reason.)
 
 ## Shapes
 
@@ -236,7 +236,7 @@ A fixed game HUD, bottom-right on wide screens (never over the left reading colu
 A 9x8 two-frame sprite (pale blue wings, cyan body) that follows the pointer on a damped spring, flaps every 140ms, bobs, snaps to the world pixel grid and sleeps when idle. Hover-and-fine-pointer devices only; removed under reduced motion.
 
 ### The World (signature)
-`js/world.js` draws the far range, hills and main walk into indexed buffers 1200 logical pixels wide and 200 tall, bottom-aligned to the viewport; scale is `max(2, round(viewport height / 190))`. Sky is five bands dithered with a 4x4 Bayer matrix; mist and rock speckle use hashed stipple. The sun arcs across the first 82% of the scroll and sets warm; stars, a three-triangle constellation, fireflies and lit windows fade in with night; birds fly by day; embers rise from the campfire after 60%. The loop runs on requestAnimationFrame but renders at about 14 fps unless scroll marks it dirty.
+`src/scripts/world.ts` draws the far range, hills and main walk into indexed buffers 1200 logical pixels wide and 200 tall, bottom-aligned to the viewport; scale is `max(2, round(viewport height / 190))`. Sky is five bands dithered with a 4x4 Bayer matrix; mist and rock speckle use hashed stipple. The sun arcs across the first 82% of the scroll and sets warm; stars, a three-triangle constellation, fireflies and lit windows fade in with night; birds fly by day; embers rise from the campfire after 60%. The loop runs on requestAnimationFrame but renders at about 14 fps unless scroll marks it dirty.
 
 **Known ceiling (shipped without, not rules):** the lake has no reflections, the sky bands are dithered but not colour-cycled, there is no chimney smoke in the village, panels use ring shadows rather than notched 9-slice pixel corners, and the valley mist reads more as grain than haze. These are open improvements, not part of the system to defend.
 
