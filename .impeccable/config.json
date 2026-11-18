@@ -29,6 +29,15 @@
         ],
         "createdAt": "2026-11-18T06:52:01.041Z",
         "reason": "Claude: sketch of the dealt zine challenger, whose catalog palette is cream paper; not shipping UI"
+      },
+      {
+        "rule": "cramped-padding",
+        "value": "*",
+        "files": [
+          "index.html"
+        ],
+        "createdAt": "2026-11-18T07:17:59.755Z",
+        "reason": "finish reviewer: false positive, #about copy is inset by the .wrap gutter (130px desktop, 20px mobile)"
       }
     ]
   }
