@@ -22,7 +22,6 @@
 
 :root {
   --ink: #151229;          /* panel ground */
-  --ink-2: #221d3f;        /* raised rows inside a panel */
   --line: #f1e6cc;         /* parchment frame line and headings */
   --line-dim: #6a5f8c;     /* inner frame line and dividers */
   --text: #f4efe4;

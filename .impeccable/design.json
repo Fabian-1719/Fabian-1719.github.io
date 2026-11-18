@@ -1,0 +1,167 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-11-18T08:20:00.000Z",
+  "title": "Design System: Fabian Aragón Arce · Portfolio",
+  "extensions": {
+    "colorMeta": {
+      "ink": { "role": "neutral", "displayName": "Night Ink", "canonical": "#151229", "tonalRamp": ["#0b0918", "#151229", "#221d3f", "#3a3463", "#5a5288", "#8a83b0", "#bdb8d6", "#ebe9f4"] },
+      "parchment-line": { "role": "neutral", "displayName": "Parchment Line", "canonical": "#f1e6cc", "tonalRamp": ["#2e2716", "#544a30", "#7d7050", "#a89a76", "#cbbd98", "#e2d5b5", "#f1e6cc", "#fbf6ea"] },
+      "dusk-line": { "role": "neutral", "displayName": "Dusk Line", "canonical": "#6a5f8c", "tonalRamp": ["#17132a", "#2b2547", "#463e68", "#6a5f8c", "#8c82ab", "#afa7c8", "#d2cde3", "#efedf6"] },
+      "text": { "role": "neutral", "displayName": "Warm Paper Text", "canonical": "#f4efe4", "tonalRamp": ["#2c2820", "#4f493d", "#757061", "#9e9888", "#c4bfb0", "#e1dccf", "#f4efe4", "#fcfaf5"] },
+      "text-soft": { "role": "neutral", "displayName": "Lavender Soft Text", "canonical": "#cdc6df", "tonalRamp": ["#221e30", "#3d3752", "#5c5574", "#7f7898", "#a59ebd", "#cdc6df", "#e4e0ee", "#f6f4fa"] },
+      "leaf-meta": { "role": "secondary", "displayName": "Leaf Meta Green", "canonical": "#a4dc72", "tonalRamp": ["#15260a", "#284516", "#3f6a24", "#5f9338", "#82b953", "#a4dc72", "#c9ecaa", "#eef9e3"] },
+      "gold": { "role": "primary", "displayName": "Key-Cap Gold", "canonical": "#ffcf5c", "tonalRamp": ["#2a1a00", "#4d3305", "#7a5410", "#b8862a", "#e6ad3c", "#ffcf5c", "#ffe08f", "#fff4d6"] },
+      "gold-hi": { "role": "primary", "displayName": "Lamplight Gold", "canonical": "#ffe08f" },
+      "gold-ink": { "role": "primary", "displayName": "Burnt Umber Ink", "canonical": "#2a1a00" },
+      "gold-edge": { "role": "primary", "displayName": "Brass Edge", "canonical": "#b8862a" },
+      "sky-day": { "role": "neutral", "displayName": "Day Sky Blue", "canonical": "#3a7bd5", "tonalRamp": ["#0b1d38", "#16345f", "#22518e", "#3a7bd5", "#5c9be6", "#8dc3f0", "#c0e2f7", "#e4f3fb"] }
+    },
+    "typographyMeta": {
+      "display": { "displayName": "Display", "purpose": "The hero name only; the contact sign-off uses a sibling clamp(2.6rem, 1.6rem + 4vw, 4.6rem)." },
+      "headline": { "displayName": "Headline", "purpose": "Panel h2s in parchment, balanced wrap." },
+      "title": { "displayName": "Title", "purpose": "Quest (project) names." },
+      "body": { "displayName": "Body", "purpose": "Every sentence; capped at 62ch inside panels." },
+      "lede": { "displayName": "Lede", "purpose": "The hero positioning line." },
+      "label": { "displayName": "Label", "purpose": "Meta lines, stack lines, nav, lang toggle, clock, focus and inventory categories." },
+      "button": { "displayName": "Button", "purpose": "Gold key-cap buttons." }
+    },
+    "shadows": [
+      { "name": "panel-frame", "value": "0 0 0 4px #151229, 0 0 0 8px #f1e6cc, 0 0 0 12px #151229", "purpose": "Three concentric rings around every framed panel." },
+      { "name": "key-cap-base", "value": "0 4px 0 #b8862a", "purpose": "Stepped base under gold buttons; collapses to 0 on press." },
+      { "name": "bar-edge", "value": "0 4px 0 #6a5f8c", "purpose": "Under the top bar; mirrored as 0 -4px 0 above the footer." },
+      { "name": "hud-ring", "value": "0 0 0 4px #6a5f8c", "purpose": "Ring around the clock HUD on wide screens." }
+    ],
+    "motion": [
+      { "name": "ease-out", "value": "cubic-bezier(0.23, 1, 0.32, 1)", "purpose": "Button press, lang toggle press, skip link reveal." },
+      { "name": "press", "value": "120ms ease-out; translateY(4px)", "purpose": "Gold key-cap press with base collapse." },
+      { "name": "color-hover", "value": "160ms ease", "purpose": "Link, nav and button colour on hover (fine pointers only)." },
+      { "name": "world-cadence", "value": "~14 fps (1000/14 ms frame gate)", "purpose": "Palette cycling and sprite loops in the canvas world; scroll marks a frame dirty immediately." },
+      { "name": "cycle-water", "value": "4 steps at 5 Hz", "purpose": "Lake and river colour cycling." },
+      { "name": "cycle-falls", "value": "4 steps at 11 Hz", "purpose": "Waterfall colour cycling." },
+      { "name": "cycle-fire", "value": "3 steps at 8 Hz", "purpose": "Campfire colour cycling." },
+      { "name": "time-keys", "value": "morning 0 · day 0.2-0.42 · golden 0.6 · dusk 0.76 · night 0.9-1 (scroll progress, smoothstep between keys); clock 07:00-22:00", "purpose": "Scroll-driven palette remap." },
+      { "name": "fairy-spring", "value": "stiffness 0.06, damping 0.78 per frame; flap 140ms", "purpose": "Pointer fairy follow; fine pointers only, removed under reduced motion." },
+      { "name": "reduced-motion", "value": "freeze cycling, birds, twinkle, embers drift and sprites; hide fairy; keep scroll-driven time and camera; scroll-behavior auto", "purpose": "prefers-reduced-motion: reduce." }
+    ],
+    "breakpoints": [
+      { "name": "panels-full", "value": "860px" },
+      { "name": "bar-compact", "value": "760px" }
+    ],
+    "world": {
+      "source": "js/world.js",
+      "logicalSize": "1200 x 200 buffers, bottom-aligned; scale max(2, round(vh / 190)); nearest-neighbour",
+      "layers": [ { "name": "far range", "parallax": 0.25 }, { "name": "hills", "parallax": 0.55 }, { "name": "main walk", "parallax": 1.0 } ],
+      "timeKeys": ["morning (derived: 62% day + 38% golden)", "day", "golden", "dusk", "night"],
+      "cycleGroups": ["water0-3", "fall0-3", "fire0-2"],
+      "dithering": "4x4 Bayer for sky bands and fades; hashed stipple for mist and rock speckle",
+      "places": { "tower": 214, "falls": 285, "sword": 545, "bridge": 680, "village": 800, "fire": 1088 },
+      "camera": "Section-anchored via setAnchors: desktop focus 0.66 beside the panel, phone (<860px) focus 0.5 in the open stretch below each panel."
+    },
+    "detectorExceptions": [
+      { "rule": "hard-offset-shadow", "files": ["css/style.css"], "reason": "Zero-blur one-step edges are the native depth of pixel UI (button base, bar edge, panel frame)." },
+      { "rule": "cramped-padding", "files": ["index.html"], "reason": "False positive recorded by the finish reviewer; panel copy is inset by the panel padding." }
+    ]
+  },
+  "components": [
+    {
+      "name": "Gold Key-Cap Button",
+      "kind": "button",
+      "refersTo": "button-primary",
+      "description": "The primary action; gold means clickable. Presses down 4px on activation.",
+      "html": "<a class=\"ds-btn\" href=\"#\">See the projects <svg class=\"ds-i\" viewBox=\"0 0 16 16\" aria-hidden=\"true\"><path d=\"M7 2h2v8h2v2H9v2H7v-2H5v-2h2z\"/><path d=\"M3 8h2v2H3zM11 8h2v2h-2z\"/></svg></a>",
+      "css": ".ds-btn { display: inline-flex; align-items: center; gap: .6em; padding: .72em 1.1em; background: #ffcf5c; color: #2a1a00; text-decoration: none; font: 700 1rem/1 'Pixelify Sans', 'Atkinson Hyperlegible', system-ui, sans-serif; box-shadow: 0 4px 0 #b8862a; transition: transform 120ms cubic-bezier(0.23,1,0.32,1), box-shadow 120ms cubic-bezier(0.23,1,0.32,1), background-color 160ms ease; } .ds-btn:hover { background: #ffe08f; } .ds-btn:active { transform: translateY(4px); box-shadow: 0 0 0 #b8862a; } .ds-btn:focus-visible { outline: 4px solid #ffcf5c; outline-offset: 2px; } .ds-i { width: 1em; height: 1em; fill: currentColor; shape-rendering: crispEdges; }"
+    },
+    {
+      "name": "Small Gold Button",
+      "kind": "button",
+      "refersTo": "button-primary-sm",
+      "description": "Live-site action inside a quest entry.",
+      "html": "<a class=\"ds-btn-sm\" href=\"#\">Live site</a>",
+      "css": ".ds-btn-sm { display: inline-flex; padding: .56em .9em; background: #ffcf5c; color: #2a1a00; text-decoration: none; font: 700 .92rem/1 'Pixelify Sans', system-ui, sans-serif; box-shadow: 0 4px 0 #b8862a; transition: transform 120ms cubic-bezier(0.23,1,0.32,1), box-shadow 120ms cubic-bezier(0.23,1,0.32,1); } .ds-btn-sm:hover { background: #ffe08f; } .ds-btn-sm:active { transform: translateY(4px); box-shadow: 0 0 0 #b8862a; } .ds-btn-sm:focus-visible { outline: 4px solid #ffcf5c; outline-offset: 2px; }"
+    },
+    {
+      "name": "Gold Link",
+      "kind": "custom",
+      "refersTo": "link",
+      "description": "Secondary action; always underlined so colour is never the only cue.",
+      "html": "<a class=\"ds-link\" href=\"#\">github.com/Fabian-1719</a>",
+      "css": ".ds-link { color: #ffcf5c; font-family: 'Pixelify Sans', system-ui, sans-serif; font-weight: 600; text-decoration: underline; text-decoration-thickness: 2px; text-underline-offset: 5px; transition: color 160ms ease; } .ds-link:hover { color: #ffe08f; } .ds-link:focus-visible { outline: 4px solid #ffcf5c; outline-offset: 2px; }"
+    },
+    {
+      "name": "Framed Panel",
+      "kind": "card",
+      "refersTo": "panel",
+      "description": "The dialogue-box window every section sits in: ink, parchment ring between dark rings, inner dusk rule. No entrance animation.",
+      "html": "<div class=\"ds-panel\"><h2>The trail so far</h2><p>Five projects, from the most recent.</p></div>",
+      "css": ".ds-panel { position: relative; width: min(560px, 100%); padding: clamp(22px, 2.4vw, 34px); background: #151229; color: #f4efe4; display: grid; gap: 1rem; margin: 12px; box-shadow: 0 0 0 4px #151229, 0 0 0 8px #f1e6cc, 0 0 0 12px #151229; } .ds-panel::before { content: ''; position: absolute; inset: 8px; border: 2px solid #6a5f8c; pointer-events: none; } .ds-panel h2 { margin: 0; font: 700 clamp(1.7rem, 1.2rem + 1.6vw, 2.5rem)/1.05 'Pixelify Sans', system-ui, sans-serif; color: #f1e6cc; } .ds-panel p { margin: 0; color: #cdc6df; font-family: 'Atkinson Hyperlegible', system-ui, sans-serif; line-height: 1.6; }"
+    },
+    {
+      "name": "Top Bar with EN/ES",
+      "kind": "nav",
+      "refersTo": "top-bar",
+      "description": "Fixed ink bar with a 4px dusk under-edge; nav hides at 760px and the clock takes the centre.",
+      "html": "<header class=\"ds-bar\"><a class=\"ds-bar-handle\" href=\"#\">Fabian-1719</a><nav class=\"ds-bar-nav\"><a href=\"#\">About</a><a href=\"#\">Projects</a><a href=\"#\">Stack</a><a href=\"#\">Contact</a></nav><button class=\"ds-lang\" type=\"button\"><span class=\"ds-lang-opt ds-on\">EN</span><span class=\"ds-lang-opt\">ES</span></button></header>",
+      "css": ".ds-bar { display: flex; align-items: center; gap: 1.5rem; padding: 10px 24px; background: #151229; color: #f4efe4; font-family: 'Pixelify Sans', system-ui, sans-serif; box-shadow: 0 4px 0 #6a5f8c; } .ds-bar-handle { margin-right: auto; text-decoration: none; font-weight: 700; color: #f1e6cc; } .ds-bar-nav { display: flex; gap: 1.4rem; } .ds-bar-nav a { text-decoration: none; color: #cdc6df; transition: color 160ms ease; } .ds-bar-nav a:hover { color: #ffcf5c; } .ds-bar a:focus-visible, .ds-lang:focus-visible { outline: 4px solid #ffcf5c; outline-offset: 2px; } .ds-lang { display: inline-flex; padding: 0; border: 4px solid #6a5f8c; background: #151229; color: #cdc6df; font: 700 .85rem 'Pixelify Sans', system-ui, sans-serif; cursor: pointer; transition: transform 160ms cubic-bezier(0.23,1,0.32,1); } .ds-lang:active { transform: scale(.97); } .ds-lang-opt { padding: 4px 9px; } .ds-lang-opt.ds-on { background: #ffcf5c; color: #2a1a00; }"
+    },
+    {
+      "name": "Quest Entry",
+      "kind": "custom",
+      "description": "A project as a quest-log entry with leaf-green meta, square bullets and dashed dividers.",
+      "html": "<ol class=\"ds-quests\"><li class=\"ds-quest\"><h3>RevisaTEC</h3><p class=\"ds-who\">Team project · 3 people · Azure</p><p>A peer code-review platform for university team projects.</p><ul class=\"ds-facts\"><li>3 microservices behind Azure API Management</li><li>Spring Boot with hexagonal architecture</li></ul><p class=\"ds-stack\">React · Spring Boot · Azure</p></li><li class=\"ds-quest\"><h3>Space Invaders</h3><p class=\"ds-who\">Solo project · Python</p></li></ol>",
+      "css": ".ds-quests { list-style: none; margin: 0; padding: 16px; background: #151229; color: #cdc6df; font-family: 'Atkinson Hyperlegible', system-ui, sans-serif; line-height: 1.6; } .ds-quest { display: grid; gap: .55rem; padding: 1.6rem 0; border-top: 4px dashed #6a5f8c; } .ds-quest:first-child { border-top: 0; padding-top: .6rem; } .ds-quest h3 { margin: 0; font: 700 clamp(1.45rem, 1.15rem + 1vw, 2rem)/1.05 'Pixelify Sans', system-ui, sans-serif; color: #f1e6cc; } .ds-quest p { margin: 0; } .ds-who { font-family: 'Pixelify Sans', system-ui, sans-serif; color: #a4dc72; font-size: .95rem; } .ds-facts { margin: 0; padding: 0; list-style: none; display: grid; gap: .3rem; } .ds-facts li { display: flex; gap: .65rem; } .ds-facts li::before { content: ''; flex: none; width: 6px; height: 6px; margin-top: .62em; background: #a4dc72; } .ds-stack { font-family: 'Pixelify Sans', system-ui, sans-serif; font-size: .9rem; }"
+    },
+    {
+      "name": "Inventory Rows",
+      "kind": "custom",
+      "description": "The stack as an inventory: leaf-green Pixelify category, Atkinson 700 values, dashed dividers.",
+      "html": "<dl class=\"ds-inv\"><div><dt>Languages</dt><dd>Python, Java, TypeScript, Go, Scala</dd></div><div><dt>Cloud &amp; tools</dt><dd>Azure, Firebase, Docker, Git</dd></div></dl>",
+      "css": ".ds-inv { margin: 0; padding: 16px; background: #151229; display: grid; gap: .8rem; } .ds-inv div { padding-top: .9rem; border-top: 4px dashed #6a5f8c; } .ds-inv dt { font-family: 'Pixelify Sans', system-ui, sans-serif; color: #a4dc72; font-size: .95rem; } .ds-inv dd { margin: .25rem 0 0; font: 700 1.12rem/1.45 'Atkinson Hyperlegible', system-ui, sans-serif; color: #f4efe4; }"
+    },
+    {
+      "name": "Clock HUD",
+      "kind": "custom",
+      "refersTo": "clock-hud",
+      "description": "Scroll-driven time readout; bottom-right on wide screens, centred in the bar and frameless at 760px and below.",
+      "html": "<p class=\"ds-clock\"><span>07:00</span><span class=\"ds-clock-label\">morning</span></p>",
+      "css": ".ds-clock { display: inline-flex; gap: .6em; align-items: baseline; margin: 4px; padding: 6px 12px; background: #151229; color: #f1e6cc; font: 700 .95rem 'Pixelify Sans', system-ui, sans-serif; font-variant-numeric: tabular-nums; box-shadow: 0 0 0 4px #6a5f8c; } .ds-clock-label { color: #cdc6df; font-weight: 400; }"
+    }
+  ],
+  "narrative": {
+    "northStar": "The Day-Long Overworld",
+    "overview": "The page is a single hand-built pixel landscape, drawn in code at low resolution and scaled with nearest-neighbour, that lives one day while the visitor reads. Scroll is the clock: it walks the camera from a cliff-top tower at morning, past the lake and waterfall, through a forest clearing with a sword in a pedestal, across a sunset village, to a hill campfire under the stars, and it carries the time from 07:00 to 22:00. Everything in the world is an indexed palette role; time of day remaps the whole palette, and colour-cycle groups keep water, falls and fire alive.\n\nContent never competes with the world for its own ground. It sits in dark framed windows that read like a game's dialogue box: ink fill, a parchment line between two dark rings, a thin dusk-violet inner rule. Inside them, Pixelify Sans carries names, headings and meta lines, and Atkinson Hyperlegible carries every sentence a visitor must read. Gold appears only on things you can click, so the eye learns the one rule in the first viewport.\n\nThe density is low and deliberate: one panel per section, long open stretches of world between panels, a frame rate held around 14 fps so cycling reads as pixel art rather than video. The rejected first world (a vector Night to Day landscape mirroring the GitHub banner) is the confirmed anti-reference: no smooth vector polygons, no CSS gradient skies.",
+    "keyCharacteristics": [
+      "Indexed-colour canvas world, about 190 logical pixels tall, integer-scaled (min 2x), `image-rendering: pixelated`.",
+      "Five time keys (morning, day, golden, dusk, night) remap every palette role; scroll drives both camera and time.",
+      "Ordered Bayer dithering and hashed stipple stand in for every gradient and haze.",
+      "Framed ink panels with a stepped 4px double ring; square corners everywhere.",
+      "Gold is reserved for clickables; leaf green for meta; parchment for headings and frame lines.",
+      "Pixelify Sans for display and meta, Atkinson Hyperlegible for body."
+    ],
+    "rules": [
+      { "name": "The Gold Means Click Rule", "body": "Gold (and its hover, edge and ink) appears only on elements a visitor can activate, plus the focus ring and selection that serve them. A gold non-interactive element is a bug.", "section": "colors" },
+      { "name": "The Palette Role Rule", "body": "Every world pixel is a palette role index, never a literal colour. Time of day changes the palette, not the pixels.", "section": "colors" },
+      { "name": "The Two Voices Rule", "body": "Pixelify Sans names and labels; Atkinson Hyperlegible explains. If a line is read as a sentence, it is Atkinson.", "section": "typography" },
+      { "name": "The No Tracking Rule", "body": "Pixelify sets at letter-spacing 0; it is a pixel grid and spacing it out breaks the grid.", "section": "typography" },
+      { "name": "The Stepped Depth Rule", "body": "Every UI shadow has zero blur and offsets in whole `--px` steps. A blurred shadow is foreign to this world. (The detector's hard-offset-shadow rule is suppressed for `css/style.css` for exactly this reason.)", "section": "elevation" }
+    ],
+    "dos": [
+      "**Do** reserve gold for clickable things, their focus ring and selection.",
+      "**Do** build every frame, divider, outline and offset from the 4px `--px` step.",
+      "**Do** set headings, labels and meta in Pixelify Sans and every sentence in Atkinson Hyperlegible.",
+      "**Do** add world detail as palette roles with day, golden, dusk and night keys, and animate liquids and fire by cycling roles, not by moving pixels.",
+      "**Do** dither (Bayer or hashed stipple) wherever a gradient or haze is wanted.",
+      "**Do** keep world motion at the low ~14 fps cadence and keep scroll as the only clock.",
+      "**Do** under reduced motion, freeze cycling, birds, twinkle and sprites and remove the fairy, but keep scroll-driven time and camera.",
+      "**Do** keep Zelda allusions small and original: a sword in a pedestal, a three-triangle constellation, a pointer fairy, all drawn pixel by pixel in code."
+    ],
+    "donts": [
+      "**Don't** add entrance animations to panels or content.",
+      "**Don't** use rounded corners or blurred shadows anywhere in the UI.",
+      "**Don't** use CSS gradients or smooth vector shapes for the world; the rejected vector Night to Day landscape is the anti-reference.",
+      "**Don't** use gold for decoration, headings or meta.",
+      "**Don't** set body paragraphs in Pixelify Sans or track it out.",
+      "**Don't** copy game assets, logos, characters or music for the Zelda nods.",
+      "**Don't** let the clock or any fixed HUD cover the left reading column on wide screens."
+    ]
+  }
+}
