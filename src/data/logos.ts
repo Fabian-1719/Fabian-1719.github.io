@@ -10,6 +10,7 @@ const LOGOS: Record<string, Logo> = {
   Express: { file: "express", dark: true }, Fastify: { file: "fastify", dark: true }, Flask: { file: "flask", dark: true },
   Azure: { file: "azure" }, Firebase: { file: "firebase" }, Docker: { file: "docker" },
   Redis: { file: "redis" }, Git: { file: "git" }, "GitHub Actions": { file: "githubactions" },
+  GitHub: { file: "github", dark: true }, LinkedIn: { file: "linkedin" },
   "Node.js": { file: "nodejs" }, Vitest: { file: "vitest" }, asyncio: { file: "python" }
 };
 

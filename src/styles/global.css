@@ -60,7 +60,6 @@ ul, ol, dl { margin: 0; padding: 0; }
 }
 .bar.is-solid { background: var(--bar); box-shadow: 0 4px 0 #0a0818; }
 .sig { display: flex; align-items: center; gap: 12px; margin-right: auto; text-decoration: none; color: #fff; }
-.sig__mark { width: 26px; height: 22px; fill: var(--gold); shape-rendering: crispEdges; }
 .sig span { font: 400 1.3rem/1 var(--serif); letter-spacing: -.01em; }
 .bar__nav { display: flex; gap: clamp(14px, 1.8vw, 26px); }
 .bar__nav a { position: relative; padding: 6px 0; text-decoration: none; color: #d4cee8; font-weight: 400; transition: color 160ms ease; }
@@ -131,6 +130,12 @@ html[lang="en"] .lang__opt[data-lang="en"], html[lang="es"] .lang__opt[data-lang
 @media (hover: hover) and (pointer: fine) { .btn:hover { background: var(--gold-hi); } }
 .link { color: var(--gold); font-weight: 700; text-decoration: underline; text-decoration-thickness: 2px; text-underline-offset: 5px; transition: color 160ms ease; }
 @media (hover: hover) and (pointer: fine) { .link:hover { color: var(--gold-hi); } }
+
+/* social links with their logos (contact) */
+.social { display: inline-flex; align-items: center; gap: .55em; color: var(--gold); font-weight: 700; text-decoration: none; }
+.social span { text-decoration: underline; text-decoration-thickness: 2px; text-underline-offset: 5px; }
+.social__logo { width: 1.4em; height: 1.4em; object-fit: contain; flex: none; }
+@media (hover: hover) and (pointer: fine) { .social:hover { color: var(--gold-hi); } }
 
 /* ---------- About ---------- */
 .facts { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem 2rem; margin-top: .3rem; }
