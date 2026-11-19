@@ -149,6 +149,28 @@ function barState() {
 }
 addEventListener("scroll", barState, { passive: true });
 
+/* ---------------- At the campfire the walker says hello: a pixel speech bubble that types itself ---------------- */
+const hello = $<HTMLElement>("#hello");
+if (hello && !pinned) {
+  let shown = false, typed = 0, nextAt = 0;
+  const foot = document.querySelector<HTMLElement>(".foot");
+  const text = () => (lang === "es" ? hello.dataset.esText : hello.dataset.en) ?? "";
+  const tick = (now: number) => {
+    requestAnimationFrame(tick);
+    // only while he is actually in view: not once the footer has risen over the ground
+    const w = PixelWorld.walker, footTop = foot ? foot.getBoundingClientRect().top : Infinity;
+    const want = w.atFire && footTop > w.y + 30;
+    if (want !== shown) { shown = want; hello.toggleAttribute("data-on", want); typed = reduceMotion ? 99 : 0; nextAt = now + 250; if (!want) hello.textContent = ""; }
+    if (!shown) return;
+    hello.style.transform = `translate(${Math.round(w.x)}px, ${Math.round(w.y)}px) translate(-50%, calc(-100% - 14px))`;
+    const t = text();
+    if (typed < t.length && now >= nextAt) { typed++; nextAt = now + 110; }
+    const v = t.slice(0, typed);
+    if (hello.textContent !== v) hello.textContent = v;
+  };
+  requestAnimationFrame(tick);
+}
+
 applyLang(lang);
 barState();
 anchors();

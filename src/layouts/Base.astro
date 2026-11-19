@@ -88,6 +88,7 @@ const canonical = new URL(Astro.url.pathname, Astro.site).href;
     </div>
   </footer>
 
+  <p class="hello" id="hello" aria-hidden="true" data-en={UI.hello.en} data-es-text={UI.hello.es}></p>
   <canvas class="fairy" id="fairy" width="9" height="8" aria-hidden="true"></canvas>
 
   <script src="../scripts/main.ts"></script>

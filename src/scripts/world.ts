@@ -723,6 +723,8 @@
 
   let anchors: [number, number][] | null = null, focus = 0.62;
   const walker = { x: TOWER_X - 5, dir: 1, dist: 0, still: -1e9 };
+  /** Where the walker's head is on screen (CSS px) and whether he has sat down at the campfire. */
+  const hud = { x: 0, y: 0, atFire: false };
   function camera() {
     if (anchors && anchors.length > 1) {
       let i = 0;
@@ -971,6 +973,7 @@
       const rows = LINK_FRAMES[f], fw = rows[0].length, FH = H * 2;
       const feet = (pathY(walker.x) - off + 18) * 2;
       const sx0 = Math.round((walker.x - camX) * 2) - (fw >> 1), sy0 = feet - 1 - LINK_FEET[f];
+      hud.x = (sx0 + fw / 2) * scale / 2; hud.y = sy0 * scale / 2; hud.atFire = progress >= 0.985 && !walking;
       const overWater = G[Math.round(walker.x)] > WATER;
       const wl = (WATER - off + 18) * 2; // water line on the fine grid
       for (let j = 0; j < rows.length; j++) {
@@ -1036,5 +1039,6 @@
     },
     setAnchors(list: [number, number][], f?: number) { anchors = list; if (f) focus = f; dirty = true; if (reduce) render(0); },
     places: { tower: TOWER_X + 9, falls: 285, sword: SWORD_X, bridge: 680, village: 800, fire: FIRE_X },
-    get scale() { return scale; }
+    get scale() { return scale; },
+    get walker() { return hud; }
   };

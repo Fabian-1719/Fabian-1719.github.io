@@ -194,6 +194,20 @@ html[lang="en"] .lang__opt[data-lang="en"], html[lang="es"] .lang__opt[data-lang
 @media (max-width: 760px) { .foot__cols { grid-template-columns: 1fr 1fr; } .foot__me { grid-column: 1 / -1; } }
 @media (max-width: 440px) { .foot__cols { grid-template-columns: 1fr; } }
 
+/* ---------- The walker's hello at the campfire ---------- */
+.hello {
+  position: fixed; left: 0; top: 0; z-index: 4; margin: 0; pointer-events: none; opacity: 0; transition: opacity 200ms ease;
+  min-width: 2.2em; min-height: 1.9em; padding: 4px 10px 5px; text-align: center;
+  font: 400 1rem/1.2 var(--pixel); color: #241d33; background: #fdf6e3;
+  box-shadow: 0 0 0 3px #241d33, 4px 4px 0 3px rgba(10, 8, 30, .45);
+}
+.hello::after { /* stepped pixel tail pointing down at his head */
+  content: ""; position: absolute; left: 50%; bottom: -12px; width: 12px; height: 12px; margin-left: -6px; background: #241d33;
+  clip-path: polygon(0 0, 100% 0, 100% 25%, 75% 25%, 75% 50%, 50% 50%, 50% 100%, 25% 100%, 25% 50%, 0 50%);
+}
+.hello::before { content: ""; position: absolute; left: 50%; bottom: -6px; width: 6px; height: 6px; margin-left: -3px; z-index: 1; background: #fdf6e3; }
+.hello[data-on] { opacity: 1; }
+
 /* ---------- Fairy ---------- */
 .fairy { position: fixed; left: 0; top: 0; z-index: 30; pointer-events: none; image-rendering: pixelated; opacity: 0; transition: opacity 400ms ease; }
 .fairy[data-on] { opacity: 1; }

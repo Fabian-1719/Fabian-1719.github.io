@@ -52,6 +52,7 @@ export const UI = {
     es: "Si algo de lo que viste te interesa o quieres construir algo juntos, escríbeme."
   },
 
+  hello: { en: "Hi!", es: "¡Hola!" },
   footBlurb: {
     en: "Computer Engineering student at TEC.",
     es: "Estudiante de Ingeniería en Computación en el TEC."
