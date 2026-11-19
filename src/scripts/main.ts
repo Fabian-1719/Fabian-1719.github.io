@@ -47,11 +47,10 @@ const pinnedTime = Number(document.body.dataset.worldTime ?? NaN);
 const clockTime = $("#clockTime")!, clockLabel = $("#clockLabel")!;
 let lastClock = "", ticking = false;
 
-// On phones the footer would cover the ground at the very end, so the day (and the walk to
-// the campfire) finishes just as the footer starts to rise. Wider screens keep the full range.
+// The footer would cover the ground at the very end, so the day (and the walk to the
+// campfire) finishes just as the footer starts to rise.
 function scrollMax(): number {
   const max = document.documentElement.scrollHeight - innerHeight;
-  if (innerWidth >= 560) return max;
   const foot = document.querySelector<HTMLElement>(".foot");
   return Math.max(1, max - (foot?.offsetHeight ?? 0));
 }
