@@ -29,6 +29,7 @@ const canonical = new URL(Astro.url.pathname, Astro.site).href;
   <meta property="og:type" content="website">
   <meta property="og:url" content={canonical}>
   <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <link rel="preload" href="/fonts/young-serif.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="preload" href="/fonts/pixelify.woff2" as="font" type="font/woff2" crossorigin>
 </head>
 <body data-world-place={world?.place} data-world-time={world?.time}>
@@ -37,16 +38,20 @@ const canonical = new URL(Astro.url.pathname, Astro.site).href;
   <!-- The world: one long pixel landscape drawn in code -->
   <canvas class="world" id="world" aria-hidden="true"></canvas>
 
-  <header class="bar">
-    <a class="bar__handle" href="/">Fabian-1719</a>
+  <header class="bar" id="bar">
+    <a class="sig" href="/">
+      <svg class="sig__mark" viewBox="0 0 14 12" aria-hidden="true"><path d="M6 0h2v2H6zM5 2h4v2H5zM4 4h6v2H4zM3 6h2v2H3zM9 6h2v2H9zM2 8h4v2H2zM8 8h4v2H8zM1 10h6v2H1zM7 10h6v2H7z"/></svg>
+      <span>Fabian Aragón</span>
+    </a>
     <nav class="bar__nav" aria-label="Sections">
-      <a href={`${base}#about`} data-es={UI.navAbout.es}>{UI.navAbout.en}</a>
-      <a href={`${base}#projects`} data-es={UI.navProjects.es}>{UI.navProjects.en}</a>
-      <a href={`${base}#stack`} data-es={UI.navStack.es}>{UI.navStack.en}</a>
-      <a href={`${base}#contact`} data-es={UI.navContact.es}>{UI.navContact.en}</a>
+      <a href={`${base}#about`} data-sec="about" data-es={UI.navAbout.es}>{UI.navAbout.en}</a>
+      <a href={`${base}#projects`} data-sec="projects" data-es={UI.navProjects.es}>{UI.navProjects.en}</a>
+      <a href={`${base}#stack`} data-sec="stack" data-es={UI.navStack.es}>{UI.navStack.en}</a>
+      <a href={`${base}#contact`} data-sec="contact" data-es={UI.navContact.es}>{UI.navContact.en}</a>
     </nav>
+    <p class="hour" aria-hidden="true"><i></i><span id="clockTime">07:00</span> <span id="clockLabel">morning</span></p>
     <button class="lang" type="button" id="lang" aria-label="Cambiar a español">
-      <span class="lang__opt" data-lang="en">EN</span><span class="lang__opt" data-lang="es">ES</span>
+      <span class="lang__opt" data-lang="es">ES</span><span class="lang__opt" data-lang="en">EN</span>
     </button>
   </header>
 
@@ -55,11 +60,35 @@ const canonical = new URL(Astro.url.pathname, Astro.site).href;
   </main>
 
   <footer class="foot">
-    <p>© 2026 Fabian Aragón Arce · Santa Clara, Costa Rica</p>
-    <p data-es={UI.footerMade.es}>{UI.footerMade.en}</p>
+    <div class="foot__cols">
+      <div class="foot__me">
+        <p class="foot__name">Fabian Aragón Arce</p>
+        <p data-es={UI.footBlurb.es}>{UI.footBlurb.en}</p>
+      </div>
+      <nav aria-labelledby="foot-sec">
+        <p class="foot__h" id="foot-sec" data-es={UI.footSections.es}>{UI.footSections.en}</p>
+        <ul>
+          <li><a href={`${base}#about`} data-es={UI.navAbout.es}>{UI.navAbout.en}</a></li>
+          <li><a href={`${base}#projects`} data-es={UI.navProjects.es}>{UI.navProjects.en}</a></li>
+          <li><a href={`${base}#stack`} data-es={UI.navStack.es}>{UI.navStack.en}</a></li>
+          <li><a href={`${base}#contact`} data-es={UI.navContact.es}>{UI.navContact.en}</a></li>
+        </ul>
+      </nav>
+      <div>
+        <p class="foot__h" data-es={UI.footElsewhere.es}>{UI.footElsewhere.en}</p>
+        <ul>
+          <li><a href="https://github.com/Fabian-1719" rel="noopener">GitHub</a></li>
+          <li><a href="https://www.linkedin.com/in/fabian-arce-570038402" rel="noopener">LinkedIn</a></li>
+          <li><a href="mailto:fabsarceargon@gmail.com">fabsarceargon@gmail.com</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="foot__base">
+      <p>© 2026 Fabian Aragón Arce<i class="stone"></i>Santa Clara, Costa Rica<i class="stone"></i><span data-es={UI.footerMade.es}>{UI.footerMade.en}</span></p>
+      <a class="foot__up" href="#content"><span aria-hidden="true">↑</span> <span data-es={UI.backTop.es}>{UI.backTop.en}</span></a>
+    </div>
   </footer>
 
-  <p class="clock" aria-hidden="true"><span id="clockTime">07:00</span><span id="clockLabel">morning</span></p>
   <canvas class="fairy" id="fairy" width="9" height="8" aria-hidden="true"></canvas>
 
   <script src="../scripts/main.ts"></script>

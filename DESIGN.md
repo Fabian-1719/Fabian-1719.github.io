@@ -1,6 +1,6 @@
 ---
 name: Fabian Aragón Arce · Portfolio
-description: A hand-built pixel world that lives a full day while you read, behind framed pixel panels.
+description: A hand-built pixel world that lives a full day while you read, behind solid, sprite-notched panels in the colour of its sky.
 colors:
   ink: "#151229"
   parchment-line: "#f1e6cc"
@@ -15,21 +15,21 @@ colors:
   sky-day: "#3a7bd5"
 typography:
   display:
-    fontFamily: "Pixelify Sans, Atkinson Hyperlegible, system-ui, sans-serif"
+    fontFamily: "Young Serif, Georgia, serif"
     fontSize: "clamp(2.8rem, 1.6rem + 4.6vw, 5.2rem)"
-    fontWeight: 700
+    fontWeight: 400
     lineHeight: 0.95
     letterSpacing: "0em"
   headline:
-    fontFamily: "Pixelify Sans, Atkinson Hyperlegible, system-ui, sans-serif"
+    fontFamily: "Young Serif, Georgia, serif"
     fontSize: "clamp(1.7rem, 1.2rem + 1.6vw, 2.5rem)"
-    fontWeight: 700
+    fontWeight: 400
     lineHeight: 1.05
     letterSpacing: "0em"
   title:
-    fontFamily: "Pixelify Sans, Atkinson Hyperlegible, system-ui, sans-serif"
+    fontFamily: "Young Serif, Georgia, serif"
     fontSize: "clamp(1.45rem, 1.15rem + 1vw, 2rem)"
-    fontWeight: 700
+    fontWeight: 400
     lineHeight: 1.05
   body:
     fontFamily: "Atkinson Hyperlegible, system-ui, sans-serif"
@@ -260,3 +260,12 @@ A 9x8 two-frame sprite (pale blue wings, cyan body) that follows the pointer on 
 - **Don't** set body paragraphs in Pixelify Sans or track it out.
 - **Don't** copy game assets, logos, characters or music for the Zelda nods.
 - **Don't** let the clock or any fixed HUD cover the left reading column on wide screens.
+
+
+## 2026-11 revision: panels and type
+
+- Headings use Young Serif (self-hosted, OFL); body stays Atkinson Hyperlegible; Pixelify Sans only for small labels, numbers and the clock.
+- Panels are one solid piece of the sky with 8 px notched corners and a hard 8 px shadow, no outlines or inner frames. Their colour follows the hour of the world (`html[data-hour]`): blue in the morning and afternoon, violet at sunset and dusk, deep night blue at night.
+- The top bar is clear over the opening sky and turns solid after scrolling; it carries the Triforce mark, the nav with a dotted gold underline on the section in view, the world's clock and the ES | EN switch.
+- The footer is the ground under the world: soil colour with a stepped grass edge, three columns (name, sections, elsewhere) and a base line.
+- Copy is professional and direct: no game vocabulary (quests, inventory) in the reading layer.

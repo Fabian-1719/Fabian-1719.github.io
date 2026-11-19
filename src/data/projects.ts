@@ -27,6 +27,8 @@ export type Project = {
   titleParts?: [string, string];
   who: Text;
   summary: Text;
+  /** One short paragraph for the home page list. */
+  blurb: Text;
   /** Longer write-up for the project page, one string per paragraph. */
   details: { en: string[]; es: string[] };
   facts: Text[];
@@ -48,6 +50,10 @@ export const projects: Project[] = [
     summary: {
       en: "A peer code-review platform for university team projects. It connects to each team's repository, requires every change to be reviewed by a teammate before it merges, measures each student's real contribution and drafts feedback for the professor.",
       es: "Una plataforma de revisión de código entre compañeros para proyectos grupales de la universidad. Se conecta al repositorio de cada equipo, exige que cada cambio lo revise un compañero antes de fusionarse, mide el aporte real de cada estudiante y le prepara retroalimentación al profesor."
+    },
+    blurb: {
+      en: "Peer code review for university team projects: every change must be reviewed before it merges, and the history becomes evidence the professor can grade with. Three microservices behind Azure API Management.",
+      es: "Revisión de código entre compañeros para proyectos universitarios: exige que cada cambio se revise antes de fusionarse y convierte el historial en evidencia para calificar. Tres microservicios detrás de Azure API Management."
     },
     details: {
       en: [
@@ -80,6 +86,10 @@ export const projects: Project[] = [
     summary: {
       en: "A multiplayer game console where you play against an AI written in Prolog. Matches run in real time over WebSockets, and every move is streamed to a separate analytics platform: a Go service validates the events and a Scala service turns them into player stats and patterns.",
       es: "Una consola de juegos multijugador donde juegas contra una IA escrita en Prolog. Las partidas corren en tiempo real por WebSockets y cada jugada se envía a una plataforma de analítica aparte: un servicio en Go valida los eventos y uno en Scala los convierte en estadísticas y patrones de los jugadores."
+    },
+    blurb: {
+      en: "Real-time matches against a Prolog AI that plays with minimax, and every move travels to an analytics platform built in Go and Scala.",
+      es: "Partidas en tiempo real contra una IA en Prolog con minimax, y cada jugada viaja a una plataforma de analítica en Go y Scala."
     },
     details: {
       en: [
@@ -114,6 +124,10 @@ export const projects: Project[] = [
       en: "A web platform for a pastry business that combines an online store and a baking academy with courses and enrollments. A monorepo with a React web app and a REST API documented with Swagger.",
       es: "Una plataforma web para una pastelería que combina una tienda en línea y una academia de repostería con cursos y matrículas. Un monorepo con una app web en React y una API REST documentada con Swagger."
     },
+    blurb: {
+      en: "An online store and a baking academy in one platform: a React app and an Express API on Firebase, in a single monorepo.",
+      es: "Tienda en línea y academia de repostería en una sola plataforma: una app en React y una API en Express sobre Firebase, en un monorepo."
+    },
     details: {
       en: [
         "Ciudad Pastel brings the business's two sides into one platform: a store where customers browse products and build a cart, and an academy where they find courses and enroll.",
@@ -141,6 +155,10 @@ export const projects: Project[] = [
     summary: {
       en: "A video game price tracker. It scrapes digital and console stores, collects release dates, genres and covers, and serves everything through a REST API that refreshes itself every 24 hours.",
       es: "Un rastreador de precios de videojuegos. Extrae datos de tiendas digitales y de consolas, reúne fechas de lanzamiento, géneros y portadas, y lo sirve todo con una API REST que se actualiza sola cada 24 horas."
+    },
+    blurb: {
+      en: "Compares video game prices across more than 20 stores with 80 concurrent workers and an API that refreshes itself every 24 hours.",
+      es: "Compara precios de videojuegos en más de 20 tiendas con 80 workers concurrentes y una API que se actualiza cada 24 horas."
     },
     details: {
       en: [
@@ -170,6 +188,10 @@ export const projects: Project[] = [
     summary: {
       en: "An arcade shooter in the style of the classic, written in Python: power-ups, a mystery ship, player profiles, match history and a top-5 leaderboard saved between sessions.",
       es: "Un shooter arcade al estilo del clásico, escrito en Python: power-ups, nave misteriosa, perfiles de jugador, historial de partidas y un top 5 que se guarda entre sesiones."
+    },
+    blurb: {
+      en: "An arcade shooter in Python with power-ups, player profiles and a top-5 leaderboard saved between sessions.",
+      es: "Shooter arcade en Python con power-ups, perfiles de jugador y un top 5 que se guarda entre sesiones."
     },
     details: {
       en: [
