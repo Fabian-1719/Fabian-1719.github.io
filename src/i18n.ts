@@ -29,8 +29,8 @@ export const UI = {
   aboutLabel: { en: "About", es: "Sobre mí" },
   aboutTitle: { en: "I like to understand a system from start to finish.", es: "Me gusta entender un sistema de principio a fin." },
   aboutP: {
-    en: "At university I've worked in teams on a microservices platform on Azure, a game console with a Prolog AI and analytics in Go and Scala, and a price tracker with concurrent scraping. Right now I'm going deeper into distributed systems, software architecture and cybersecurity.",
-    es: "En la carrera he trabajado en equipo en una plataforma de microservicios en Azure, una consola de juegos con IA en Prolog y analítica en Go y Scala, y un rastreador de precios con scraping concurrente. Ahora profundizo en sistemas distribuidos, arquitectura de software y ciberseguridad."
+    en: "At university I've worked in teams on a microservices platform on Azure, a game console with a Prolog AI and analytics in Go and Scala, and a price tracker with concurrent scraping. Right now I'm going deeper into distributed systems, software architecture, project management and cybersecurity.",
+    es: "En la carrera he trabajado en equipo en una plataforma de microservicios en Azure, una consola de juegos con IA en Prolog y analítica en Go y Scala, y un rastreador de precios con scraping concurrente. Ahora profundizo en sistemas distribuidos, arquitectura de software, administración de proyectos y ciberseguridad."
   },
   factStudy: { en: "Studying", es: "Estudio" },
   factStudyV: { en: "Computer Engineering, TEC", es: "Ingeniería en Computación, TEC" },
