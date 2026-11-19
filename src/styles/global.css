@@ -105,6 +105,13 @@ html[lang="en"] .lang__opt[data-lang="en"], html[lang="es"] .lang__opt[data-lang
   .scene { padding-bottom: 50vh; }
   .scene--hero { align-items: flex-end; padding-bottom: 32px; }
 }
+/* Phones: the opening panel sits up in the sky so the ground and the walker stay in view */
+@media (max-width: 559px) {
+  .scene--hero { align-items: flex-start; padding-top: 76px; padding-bottom: 0; }
+  .hero { gap: .8rem; padding: 22px 22px 24px; }
+  .hero__name { font-size: 2.35rem; }
+  .hero .big { font-size: 1.02rem; line-height: 1.55; }
+}
 
 /* ---------- Hero ---------- */
 .hero { gap: 1.25rem; }
