@@ -32,8 +32,6 @@ export const UI = {
   factStudyV: { en: "Computer Engineering, TEC", es: "Ingeniería en Computación, TEC" },
   factFocus: { en: "Focus", es: "Enfoque" },
   factFocusV: { en: "Distributed systems and full-stack", es: "Sistemas distribuidos y full-stack" },
-  factFrom: { en: "Based in", es: "Desde" },
-  factFromV: { en: "Santa Clara, Costa Rica", es: "Santa Clara, Costa Rica" },
   factLang: { en: "Languages", es: "Idiomas" },
   factLangV: { en: "Spanish (native) · English (B1)", es: "Español nativo · Inglés B1" },
 
@@ -55,8 +53,8 @@ export const UI = {
   },
 
   footBlurb: {
-    en: "Computer Engineering student at TEC. This portfolio is my footprint.",
-    es: "Estudiante de Ingeniería en Computación en el TEC. Este portafolio es mi huella."
+    en: "Computer Engineering student at TEC.",
+    es: "Estudiante de Ingeniería en Computación en el TEC."
   },
   footSections: { en: "Sections", es: "Secciones" },
   footElsewhere: { en: "Elsewhere", es: "En otros lados" },
