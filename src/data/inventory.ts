@@ -21,7 +21,7 @@ export const bags: Bag[] = [
     id: "lang", label: { en: "Languages", es: "Lenguajes" }, slots: 12, items: [
       item("Python", "PY", "#8fd18a"), item("Java", "JV", "#ff9b6b"), item("TypeScript", "TS", "#7fb2ff"),
       item("JavaScript", "JS", "#ffe36b"), item("Go", "GO", "#7fe0ff"), item("Scala", "SC", "#ff7a7a"),
-      item("C++", "C++", "#9fb4ff"), item("Prolog", "PL", "#f0b8ff"), item("x86 Assembly", "ASM", "#d7a6ff")
+      item("C++", "C++", "#9fb4ff"), item("Prolog", "PL", "#f0b8ff")
     ]
   },
   {

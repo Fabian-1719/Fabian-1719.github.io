@@ -12,14 +12,14 @@ export const UI = {
   navStack: { en: "Stack", es: "Stack" },
   navContact: { en: "Contact", es: "Contacto" },
   heroLede: {
-    en: "Computer Engineering student at TEC, Costa Rica. I build systems end to end, from x86 assembly to microservices in the cloud.",
-    es: "Estudiante de Ingeniería en Computación en el TEC, Costa Rica. Construyo sistemas de punta a punta, desde ensamblador x86 hasta microservicios en la nube."
+    en: "Computer Engineering student at TEC, Costa Rica. I build systems end to end, from the interface to microservices in the cloud.",
+    es: "Estudiante de Ingeniería en Computación en el TEC, Costa Rica. Construyo sistemas de punta a punta, desde la interfaz hasta microservicios en la nube."
   },
   heroCta: { en: "See the projects", es: "Ver los proyectos" },
   aboutTitle: { en: "I like to understand how a system works, all the way down.", es: "Me gusta entender cómo funciona un sistema, hasta el fondo." },
   aboutP1: {
-    en: "I'm a Computer Engineering student at the Instituto Tecnológico de Costa Rica. I've written games in x86 assembly for a computer organization course, and I've shipped microservices to Azure with my team. Most of what I build starts as a class project and turns into something I keep improving on my own.",
-    es: "Soy estudiante de Ingeniería en Computación en el Instituto Tecnológico de Costa Rica. He escrito juegos en ensamblador x86 para un curso de organización de computadoras y he desplegado microservicios en Azure con mi equipo. Casi todo lo que construyo empieza como un proyecto de curso y termina siendo algo que sigo mejorando por mi cuenta."
+    en: "I'm a Computer Engineering student at the Instituto Tecnológico de Costa Rica. I've shipped microservices to Azure with my team, and I've built a multiplayer game platform whose AI opponent is written in Prolog. Most of what I build starts as a class project and turns into something I keep improving on my own.",
+    es: "Soy estudiante de Ingeniería en Computación en el Instituto Tecnológico de Costa Rica. He desplegado microservicios en Azure con mi equipo y he construido una plataforma de juegos multijugador cuyo oponente con IA está escrito en Prolog. Casi todo lo que construyo empieza como un proyecto de curso y termina siendo algo que sigo mejorando por mi cuenta."
   },
   aboutP2: {
     en: "Lately I've been working on distributed systems: services that talk to each other, stream events and stay up when something fails. Right now I'm going deeper into two things:",

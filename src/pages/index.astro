@@ -1,6 +1,7 @@
 ---
 import Base from "../layouts/Base.astro";
 import Sprite from "../components/Sprite.astro";
+import Logo from "../components/Logo.astro";
 import { UI } from "../i18n";
 import { projects, PLACE_NAMES } from "../data/projects";
 import { bags } from "../data/inventory";
@@ -81,7 +82,7 @@ const pad = (n: number) => String(n).padStart(2, "0");
                 {p.facts.map((f) => <li data-es={f.es}>{f.en}</li>)}
               </ul>
             )}
-            <ul class="chips" aria-label="Stack">{p.stack.map((t) => <li>{t}</li>)}</ul>
+            <ul class="chips" aria-label="Stack">{p.stack.map((t) => <li><Logo class="chip__logo" name={t} tone="ink" />{t}</li>)}</ul>
             <p class="quest__links">
               <a class="btn btn--sm" href={`/projects/${p.slug}/`} data-es={UI.more.es}>{UI.more.en}</a>
               {p.live && <a class="link" href={p.live} rel="noopener" data-es={UI.live.es}>{UI.live.en}</a>}
@@ -122,7 +123,7 @@ const pad = (n: number) => String(n).padStart(2, "0");
           <h3 class="bag__label" data-es={b.label.es}>{b.label.en}</h3>
           <ul class="slots">
             {b.items.map((it) => (
-              <li><button class="slot" type="button" data-item={`${b.id}-${it.glyph}`} aria-label={it.name}><span class="slot__ic" style={`color:${it.color}`}>{it.glyph}</span></button></li>
+              <li><button class="slot" type="button" data-item={`${b.id}-${it.glyph}`} aria-label={it.name}><Logo class="slot__logo" name={it.name} /></button></li>
             ))}
             {Array.from({ length: b.slots - b.items.length }, () => <li class="slot slot--empty" aria-hidden="true"></li>)}
           </ul>
@@ -132,7 +133,7 @@ const pad = (n: number) => String(n).padStart(2, "0");
         <p class="inv__hint" data-es={UI.invHint.es}>{UI.invHint.en}</p>
         {bags.map((b) => b.items.map((it) => (
           <div class="inv__item" data-for={`${b.id}-${it.glyph}`} hidden>
-            <p class="inv__name" style={`--c:${it.color}`}>{it.name}</p>
+            <p class="inv__name"><Logo class="inv__logo" name={it.name} />{it.name}</p>
             {it.seen.length > 0 && (
               <p class="inv__seen">
                 <span data-es={UI.seenIn.es}>{UI.seenIn.en}</span>:{" "}

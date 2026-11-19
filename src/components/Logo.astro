@@ -1,0 +1,20 @@
+---
+/* A technology's logo. "brand" paints it in its own colour (inventory slots);
+   "ink" paints it in the surrounding text colour (chips on parchment). */
+import { logoFor } from "../data/logos";
+import Sprite from "./Sprite.astro";
+interface Props { name: string; tone?: "brand" | "ink"; class?: string }
+const { name, tone = "brand", class: cls } = Astro.props;
+const logo = logoFor(name);
+const inkColors = (ink: string[]) => Object.fromEntries(ink.map((k) => [k, "currentColor"]));
+---
+{logo?.kind === "path" && (
+  <svg class={cls} viewBox="0 0 24 24" aria-hidden="true" style={tone === "brand" ? `color:${logo.color}` : undefined}>
+    <path d={logo.path} fill="currentColor" />
+  </svg>
+)}
+{logo?.kind === "sprite" && (
+  tone === "brand"
+    ? <Sprite class={cls} rows={logo.rows} colors={logo.colors} />
+    : <Sprite class={cls} rows={logo.rows} colors={inkColors(logo.ink)} />
+)}

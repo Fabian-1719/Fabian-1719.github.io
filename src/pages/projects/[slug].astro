@@ -1,5 +1,6 @@
 ---
 import Base from "../../layouts/Base.astro";
+import Logo from "../../components/Logo.astro";
 import { UI } from "../../i18n";
 import { projects, type Project } from "../../data/projects";
 
@@ -61,7 +62,7 @@ const { project: p, prev, next } = Astro.props;
       <section class="project__block">
         <h2 data-es={UI.builtWith.es}>{UI.builtWith.en}</h2>
         <ul class="tags">
-          {p.stack.map((t) => <li>{t}</li>)}
+          {p.stack.map((t) => <li><Logo class="chip__logo" name={t} tone="ink" />{t}</li>)}
         </ul>
       </section>
 
