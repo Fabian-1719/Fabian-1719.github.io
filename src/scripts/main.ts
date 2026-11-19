@@ -17,6 +17,8 @@ const texts = [...document.querySelectorAll<HTMLElement>("[data-es]")];
 texts.forEach((el) => { el.dataset.en = el.textContent ?? ""; });
 const alts = [...document.querySelectorAll<HTMLImageElement>("img[data-es-alt]")];
 alts.forEach((img) => { img.dataset.enAlt = img.alt; });
+const labels = [...document.querySelectorAll<HTMLElement>("[data-es-label]")];
+labels.forEach((el) => { el.dataset.enLabel = el.getAttribute("aria-label") ?? ""; });
 
 const store = {
   get(k: string): string | null { try { return localStorage.getItem(k); } catch { return null; } },
@@ -31,6 +33,8 @@ function applyLang(next: Lang) {
   document.documentElement.lang = lang;
   texts.forEach((el) => { const v = lang === "es" ? el.dataset.es : el.dataset.en; if (v != null) el.textContent = v; });
   alts.forEach((img) => { const v = lang === "es" ? img.dataset.esAlt : img.dataset.enAlt; if (v) img.alt = v; });
+  labels.forEach((el) => { const v = lang === "es" ? el.dataset.esLabel : el.dataset.enLabel; if (v) el.setAttribute("aria-label", v); });
+  typer.finish();
   langBtn.setAttribute("aria-label", lang === "es" ? "Switch to English" : "Cambiar a español");
   lastClock = "";
   update();
@@ -122,4 +126,99 @@ if (fairy && finePointer && !reduceMotion) {
   document.addEventListener("pointerleave", () => fairy.removeAttribute("data-on"));
 }
 
+/* ---------------- Dialogue: the hero line types itself out once ---------------- */
+const typer = (() => {
+  const el = $<HTMLElement>("[data-type]");
+  let timer = 0, done = !el || reduceMotion, running = false;
+  const full = () => (el ? (lang === "es" ? el.dataset.es : el.dataset.en) ?? "" : "");
+  const finish = () => { if (!el || !running) return; running = false; done = true; clearTimeout(timer); el.textContent = full(); };
+  const start = () => {
+    if (!el || done) return;
+    let i = 0; running = true;
+    const tick = () => {
+      if (done) return;
+      const t = full(); i += 1;
+      el.textContent = t.slice(0, i);
+      if (i < t.length) timer = window.setTimeout(tick, t[i - 1] === "," || t[i - 1] === "." ? 160 : 24);
+      else { done = true; running = false; }
+    };
+    el.textContent = "";
+    timer = window.setTimeout(tick, 450);
+    el.closest(".dialog")?.addEventListener("click", finish, { once: true });
+  };
+  return { start, finish };
+})();
+
+/* ---------------- Quest log: one project at a time, ◀ ▶ to page ---------------- */
+const quests = $<HTMLOListElement>(".quests");
+const goQuest = (() => {
+  if (!quests) return (_: number | string) => {};
+  const items = [...quests.querySelectorAll<HTMLLIElement>(".quest")];
+  const pager = $<HTMLElement>(".pager")!, count = pager.querySelector("b")!;
+  let cur = 0;
+  const show = (to: number | string, dir = 1) => {
+    const n = typeof to === "string" ? items.findIndex((q) => q.id === to) : ((to % items.length) + items.length) % items.length;
+    if (n < 0) return;
+    cur = n;
+    quests.style.setProperty("--dir", String(dir));
+    items.forEach((q, i) => { const on = i === n; q.classList.toggle("is-on", on); q.inert = !on; });
+    count.textContent = String(n + 1);
+  };
+  quests.classList.add("is-paged");
+  pager.hidden = false;
+  pager.querySelectorAll<HTMLButtonElement>("[data-step]").forEach((b) => b.addEventListener("click", () => {
+    const d = Number(b.dataset.step); show(cur + d, d);
+  }));
+  quests.closest(".questlog")!.addEventListener("keydown", (e) => {
+    const k = (e as KeyboardEvent).key;
+    if (k === "ArrowRight" || k === "ArrowLeft") { const d = k === "ArrowRight" ? 1 : -1; show(cur + d, d); }
+  });
+  const fromHash = () => { const id = decodeURIComponent(location.hash.slice(1)); if (items.some((q) => q.id === id)) show(id); };
+  show(0); fromHash();
+  addEventListener("hashchange", fromHash);
+  return show;
+})();
+
+/* ---------------- Inventory: tabs per bag, pick a slot to read where it was used ---------------- */
+const inv = $<HTMLElement>(".inv");
+if (inv) {
+  const tabs = [...inv.querySelectorAll<HTMLButtonElement>("[role=tab]")];
+  const bagsEl = [...inv.querySelectorAll<HTMLElement>("[role=tabpanel]")];
+  const hint = inv.querySelector<HTMLElement>(".inv__hint");
+  const descs = [...inv.querySelectorAll<HTMLElement>(".inv__item")];
+  inv.classList.add("is-live");
+  inv.querySelector<HTMLElement>(".tabs")!.hidden = false;
+  const pick = (slot: HTMLButtonElement) => {
+    inv.querySelectorAll(".slot[aria-pressed]").forEach((s) => s.setAttribute("aria-pressed", "false"));
+    slot.setAttribute("aria-pressed", "true");
+    descs.forEach((d) => { d.hidden = d.dataset.for !== slot.dataset.item; });
+    if (hint) hint.hidden = true;
+  };
+  const openBag = (i: number, focus = false) => {
+    tabs.forEach((t, k) => { t.setAttribute("aria-selected", String(k === i)); t.tabIndex = k === i ? 0 : -1; });
+    bagsEl.forEach((b, k) => { b.hidden = k !== i; });
+    if (focus) tabs[i].focus();
+    const first = bagsEl[i].querySelector<HTMLButtonElement>(".slot");
+    if (first) pick(first);
+  };
+  inv.querySelectorAll<HTMLButtonElement>("button.slot").forEach((s) => {
+    s.setAttribute("aria-pressed", "false");
+    s.addEventListener("click", () => pick(s));
+    s.addEventListener("focus", () => pick(s));
+    if (finePointer) s.addEventListener("pointerenter", () => pick(s));
+  });
+  tabs.forEach((t, i) => {
+    t.addEventListener("click", () => openBag(i));
+    t.addEventListener("keydown", (e) => {
+      if (e.key === "ArrowRight") openBag((i + 1) % tabs.length, true);
+      if (e.key === "ArrowLeft") openBag((i - 1 + tabs.length) % tabs.length, true);
+    });
+  });
+  openBag(0);
+  // "Seen in" links open that quest in the log
+  inv.querySelectorAll<HTMLAnchorElement>("[data-quest-link]").forEach((a) => a.addEventListener("click", () => goQuest(a.dataset.questLink!)));
+}
+
 applyLang(lang);
+typer.start();
+anchors();

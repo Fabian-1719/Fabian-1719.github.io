@@ -10,6 +10,16 @@ const meta = (...items: string[]) => items.map((i) => i.replaceAll(" ", NB)).joi
 
 export type Place = "tower" | "falls" | "sword" | "bridge" | "village" | "fire";
 
+/** Names of the world's places, shown on each project's quest card. */
+export const PLACE_NAMES: Record<Place, Text> = {
+  tower: { en: "Old Tower", es: "Torre vieja" },
+  falls: { en: "The Falls", es: "La cascada" },
+  sword: { en: "Sword Grove", es: "Bosque de la Espada" },
+  bridge: { en: "River Bridge", es: "Puente del río" },
+  village: { en: "The Village", es: "La aldea" },
+  fire: { en: "Campfire", es: "La fogata" }
+};
+
 export type Project = {
   slug: string;
   title: string;

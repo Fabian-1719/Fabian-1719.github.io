@@ -1,28 +1,44 @@
 ---
 import Base from "../layouts/Base.astro";
+import Sprite from "../components/Sprite.astro";
 import { UI } from "../i18n";
-import { projects } from "../data/projects";
+import { projects, PLACE_NAMES } from "../data/projects";
+import { bags } from "../data/inventory";
+import { FAIRY, SEAL, PIN } from "../data/sprites";
+const pad = (n: number) => String(n).padStart(2, "0");
 ---
 <Base
   title={{ en: "Fabian Aragón Arce · Computer Engineering student", es: "Fabian Aragón Arce · Estudiante de Ingeniería en Computación" }}
   description="Portfolio of Fabian Aragón Arce, Computer Engineering student at Instituto Tecnológico de Costa Rica. Distributed systems, full-stack projects and a growing interest in cybersecurity."
 >
+  <!-- Hero: an RPG dialogue box along the bottom, the world left open above it -->
   <section class="scene scene--hero" id="top">
-    <div class="panel panel--hero">
-      <h1 class="hero__name">Fabian<br>Aragón Arce</h1>
-      <p class="hero__lede" data-es={UI.heroLede.es}>{UI.heroLede.en}</p>
-      <div class="hero__actions">
-        <a class="btn" href="#projects">
-          <span data-es={UI.heroCta.es}>{UI.heroCta.en}</span>
-          <svg class="i" viewBox="0 0 16 16" aria-hidden="true"><path d="M7 2h2v8h2v2H9v2H7v-2H5v-2h2z"/><path d="M3 8h2v2H3zM11 8h2v2h-2z"/></svg>
-        </a>
-        <a class="link" href="https://github.com/Fabian-1719" rel="noopener">github.com/Fabian-1719</a>
+    <div class="panel dialog dialog--hero">
+      <span class="dialog__tag" data-es={UI.heroTalk.es}>{UI.heroTalk.en}</span>
+      <div class="dialog__portrait"><Sprite class="sprite fairy-portrait" {...FAIRY} /></div>
+      <div class="dialog__body">
+        <h1 class="hero__name">Fabian Aragón Arce</h1>
+        <p class="hero__lede">
+          <span class="sr-only" data-es={UI.heroLede.es}>{UI.heroLede.en}</span>
+          <span aria-hidden="true" data-type data-es={UI.heroLede.es}>{UI.heroLede.en}</span>
+        </p>
+        <div class="dialog__choices">
+          <a class="btn" href="#projects">
+            <span data-es={UI.heroCta.es}>{UI.heroCta.en}</span>
+            <svg class="i" viewBox="0 0 16 16" aria-hidden="true"><path d="M7 2h2v8h2v2H9v2H7v-2H5v-2h2z"/><path d="M3 8h2v2H3zM11 8h2v2h-2z"/></svg>
+          </a>
+          <a class="choice" href="#about" data-es={UI.heroAbout.es}>{UI.heroAbout.en}</a>
+          <a class="choice" href="https://github.com/Fabian-1719" rel="noopener">GitHub</a>
+        </div>
       </div>
+      <span class="dialog__next" aria-hidden="true"></span>
     </div>
   </section>
 
+  <!-- About: the same dialogue box, the speaker named on its tab -->
   <section class="scene" id="about" aria-labelledby="about-title">
-    <div class="panel">
+    <div class="panel dialog">
+      <span class="dialog__tag">Fabian</span>
       <h2 id="about-title" data-es={UI.aboutTitle.es}>{UI.aboutTitle.en}</h2>
       <p class="lead" data-es={UI.aboutP1.es}>{UI.aboutP1.en}</p>
       <p data-es={UI.aboutP2.es}>{UI.aboutP2.en}</p>
@@ -36,30 +52,36 @@ import { projects } from "../data/projects";
           <dd data-es={UI.focusArchD.es}>{UI.focusArchD.en}</dd>
         </div>
       </dl>
+      <span class="dialog__next" aria-hidden="true"></span>
     </div>
   </section>
 
-  <section class="scene scene--long" id="projects" aria-labelledby="projects-title">
-    <div class="panel panel--wide">
-      <h2 id="projects-title" data-es={UI.projectsTitle.es}>{UI.projectsTitle.en}</h2>
-      <p data-es={UI.projectsIntro.es}>{UI.projectsIntro.en}</p>
+  <!-- Projects: a quest log on parchment, one quest at a time -->
+  <section class="scene" id="projects" aria-labelledby="projects-title">
+    <div class="panel panel--parch questlog">
+      <h2 class="ribbon" id="projects-title" data-es={UI.projectsTitle.es}>{UI.projectsTitle.en}</h2>
+      <p class="questlog__intro" data-es={UI.projectsIntro.es}>{UI.projectsIntro.en}</p>
 
       <ol class="quests">
-        {projects.map((p) => (
-          <li class="quest" id={p.slug}>
+        {projects.map((p, i) => (
+          <li class="quest" id={p.slug} data-quest={i}>
+            <p class="quest__place">
+              <Sprite class="sprite pin" {...PIN} />
+              <span><span data-es={UI.quest.es}>{UI.quest.en}</span> {pad(i + 1)} · <span data-es={PLACE_NAMES[p.world.place].es}>{PLACE_NAMES[p.world.place].en}</span></span>
+            </p>
             <h3>
               <a class="quest__title" href={`/projects/${p.slug}/`}>
                 {p.titleParts ? <>{p.titleParts[0]} <span class="amp">+</span> {p.titleParts[1]}</> : p.title}
               </a>
             </h3>
             <p class="quest__who" data-es={p.who.es}>{p.who.en}</p>
-            <p data-es={p.summary.es}>{p.summary.en}</p>
+            <p class="quest__summary" data-es={p.summary.es}>{p.summary.en}</p>
             {p.facts.length > 0 && (
               <ul class="quest__facts">
                 {p.facts.map((f) => <li data-es={f.es}>{f.en}</li>)}
               </ul>
             )}
-            <p class="quest__stack">{p.stack.join(" · ")}</p>
+            <ul class="chips" aria-label="Stack">{p.stack.map((t) => <li>{t}</li>)}</ul>
             <p class="quest__links">
               <a class="btn btn--sm" href={`/projects/${p.slug}/`} data-es={UI.more.es}>{UI.more.en}</a>
               {p.live && <a class="link" href={p.live} rel="noopener" data-es={UI.live.es}>{UI.live.en}</a>}
@@ -71,28 +93,74 @@ import { projects } from "../data/projects";
           </li>
         ))}
       </ol>
+
+      <nav class="pager" aria-label="Projects" hidden>
+        <button class="pager__btn" type="button" data-step="-1" aria-label={UI.prevQuest.en} data-es-label={UI.prevQuest.es}>
+          <svg class="i" viewBox="0 0 16 16" aria-hidden="true"><path d="M10 2h2v12h-2v-2H8v-2H6V6h2V4h2z"/></svg>
+        </button>
+        <span class="pager__count" aria-live="polite"><b>1</b> / {projects.length}</span>
+        <button class="pager__btn" type="button" data-step="1" aria-label={UI.nextQuest.en} data-es-label={UI.nextQuest.es}>
+          <svg class="i" viewBox="0 0 16 16" aria-hidden="true"><path d="M4 2h2v2h2v2h2v4H8v2H6v2H4z"/></svg>
+        </button>
+      </nav>
     </div>
   </section>
 
+  <!-- Stack: the inventory screen -->
   <section class="scene" id="stack" aria-labelledby="stack-title">
-    <div class="panel">
+    <div class="panel panel--stone inv">
       <h2 id="stack-title" data-es={UI.stackTitle.es}>{UI.stackTitle.en}</h2>
-      <dl class="inventory">
-        <div><dt data-es={UI.stackLang.es}>{UI.stackLang.en}</dt><dd>Python, Java, TypeScript, JavaScript, Go, Scala, C++, Prolog, x86&nbsp;Assembly</dd></div>
-        <div><dt data-es={UI.stackFw.es}>{UI.stackFw.en}</dt><dd>React, Spring Boot, FastAPI, Express, Fastify, Flask, Pygame</dd></div>
-        <div><dt data-es={UI.stackTools.es}>{UI.stackTools.en}</dt><dd>Azure, Firebase, Docker, Redis, Git, GitHub&nbsp;Actions</dd></div>
-      </dl>
+      <div class="tabs" role="tablist" aria-labelledby="stack-title" hidden>
+        {bags.map((b, i) => (
+          <button class="tab" type="button" role="tab" id={`tab-${b.id}`} aria-controls={`bag-${b.id}`} aria-selected={i === 0 ? "true" : "false"} tabindex={i === 0 ? 0 : -1}>
+            <span data-es={b.label.es}>{b.label.en}</span>
+          </button>
+        ))}
+      </div>
+      {bags.map((b) => (
+        <div class="bag" role="tabpanel" id={`bag-${b.id}`} aria-labelledby={`tab-${b.id}`}>
+          <h3 class="bag__label" data-es={b.label.es}>{b.label.en}</h3>
+          <ul class="slots">
+            {b.items.map((it) => (
+              <li><button class="slot" type="button" data-item={`${b.id}-${it.glyph}`} aria-label={it.name}><span class="slot__ic" style={`color:${it.color}`}>{it.glyph}</span></button></li>
+            ))}
+            {Array.from({ length: b.slots - b.items.length }, () => <li class="slot slot--empty" aria-hidden="true"></li>)}
+          </ul>
+        </div>
+      ))}
+      <div class="inv__desc" aria-live="polite">
+        <p class="inv__hint" data-es={UI.invHint.es}>{UI.invHint.en}</p>
+        {bags.map((b) => b.items.map((it) => (
+          <div class="inv__item" data-for={`${b.id}-${it.glyph}`} hidden>
+            <p class="inv__name" style={`--c:${it.color}`}>{it.name}</p>
+            {it.seen.length > 0 && (
+              <p class="inv__seen">
+                <span data-es={UI.seenIn.es}>{UI.seenIn.en}</span>:{" "}
+                {it.seen.map((s, k) => <>
+                  {k > 0 && " · "}
+                  {s.slug ? <a href={`#${s.slug}`} data-quest-link={s.slug}>{s.title as string}</a>
+                    : <span data-es={(s.title as { es: string }).es}>{(s.title as { en: string }).en}</span>}
+                </>)}
+              </p>
+            )}
+          </div>
+        )))}
+      </div>
     </div>
   </section>
 
+  <!-- Contact: a sealed letter by the campfire -->
   <section class="scene scene--end" id="contact" aria-labelledby="contact-title">
-    <div class="panel">
+    <div class="panel panel--parch letter">
+      <Sprite class="sprite seal" {...SEAL} />
+      <p class="letter__to" data-es={UI.letterTo.es}>{UI.letterTo.en}</p>
       <h2 class="contact__title" id="contact-title">Pura vida.</h2>
       <p data-es={UI.contactLede.es}>{UI.contactLede.en}</p>
+      <p class="letter__sign">— Fabian</p>
       <p class="contact__links">
         <a class="btn" href="mailto:fabsarceargon@gmail.com">fabsarceargon@gmail.com</a>
-        <a class="link" href="https://www.linkedin.com/in/fabian-arce-570038402" rel="noopener">LinkedIn</a>
-        <a class="link" href="https://github.com/Fabian-1719" rel="noopener">GitHub</a>
+        <a class="btn btn--sm" href="https://www.linkedin.com/in/fabian-arce-570038402" rel="noopener">LinkedIn</a>
+        <a class="btn btn--sm" href="https://github.com/Fabian-1719" rel="noopener">GitHub</a>
       </p>
     </div>
   </section>
