@@ -168,21 +168,21 @@ export const projects: Project[] = [
     title: "Space Invaders",
     who: { en: meta("Solo project", "Python"), es: meta("Proyecto individual", "Python") },
     summary: {
-      en: "An arcade shooter in the style of the classic, built with Pygame: power-ups, a mystery ship, player profiles, match history and a top-5 leaderboard saved between sessions.",
-      es: "Un shooter arcade al estilo del clásico, hecho con Pygame: power-ups, nave misteriosa, perfiles de jugador, historial de partidas y un top 5 que se guarda entre sesiones."
+      en: "An arcade shooter in the style of the classic, written in Python: power-ups, a mystery ship, player profiles, match history and a top-5 leaderboard saved between sessions.",
+      es: "Un shooter arcade al estilo del clásico, escrito en Python: power-ups, nave misteriosa, perfiles de jugador, historial de partidas y un top 5 que se guarda entre sesiones."
     },
     details: {
       en: [
-        "My take on the arcade classic, written in Python with Pygame: waves of aliens, destructible shields, a mystery ship and power-ups for rapid fire, immunity and extra lives.",
+        "My take on the arcade classic, written in Python: waves of aliens, destructible shields, a mystery ship and power-ups for rapid fire, immunity and extra lives.",
         "Players create a profile when they start; every match is saved to that player's history and the best scores make a top-5 leaderboard that persists between sessions in JSON files."
       ],
       es: [
-        "Mi versión del clásico arcade, escrita en Python con Pygame: oleadas de aliens, escudos que se destruyen, una nave misteriosa y power-ups de disparo rápido, inmunidad y vidas extra.",
+        "Mi versión del clásico arcade, escrita en Python: oleadas de aliens, escudos que se destruyen, una nave misteriosa y power-ups de disparo rápido, inmunidad y vidas extra.",
         "Cada jugador crea un perfil al empezar; cada partida se guarda en su historial y los mejores puntajes forman un top 5 que se conserva entre sesiones en archivos JSON."
       ]
     },
     facts: [],
-    stack: ["Python", "Pygame"],
+    stack: ["Python"],
     code: [{ href: "https://github.com/Fabian-1719/Space-Invaders" }],
     images: [],
     world: { place: "fire", time: 1 }

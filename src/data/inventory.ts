@@ -27,7 +27,7 @@ export const bags: Bag[] = [
   {
     id: "fw", label: { en: "Frameworks", es: "Frameworks" }, slots: 12, items: [
       item("React", "RE", "#7fe0ff"), item("Spring Boot", "SB", "#8fd18a"), item("FastAPI", "FA", "#5fd6b4"),
-      item("Express", "EX", "#e6e1d4"), item("Fastify", "FY", "#ffe36b"), item("Flask", "FL", "#cfd6e6"), item("Pygame", "PG", "#ffb86b")
+      item("Express", "EX", "#e6e1d4"), item("Fastify", "FY", "#ffe36b"), item("Flask", "FL", "#cfd6e6")
     ]
   },
   {

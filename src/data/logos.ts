@@ -1,5 +1,5 @@
 /* Official technology logos, served from /public/logos/. Most are Devicon v2.17.0 "original"
-   (full-colour) marks; Pygame's is its own snake mascot, cropped from the logo in the Pygame repo. */
+   (full-colour) marks. */
 
 type Logo = { file: string; /** a black mark that needs lightening on dark backgrounds */ dark?: boolean };
 
@@ -8,7 +8,7 @@ const LOGOS: Record<string, Logo> = {
   Go: { file: "go" }, Scala: { file: "scala" }, "C++": { file: "cplusplus" }, Prolog: { file: "prolog" },
   React: { file: "react" }, "Spring Boot": { file: "spring" }, FastAPI: { file: "fastapi" },
   Express: { file: "express", dark: true }, Fastify: { file: "fastify", dark: true }, Flask: { file: "flask", dark: true },
-  Pygame: { file: "pygame" }, Azure: { file: "azure" }, Firebase: { file: "firebase" }, Docker: { file: "docker" },
+  Azure: { file: "azure" }, Firebase: { file: "firebase" }, Docker: { file: "docker" },
   Redis: { file: "redis" }, Git: { file: "git" }, "GitHub Actions": { file: "githubactions" },
   "Node.js": { file: "nodejs" }, Vitest: { file: "vitest" }, asyncio: { file: "python" }
 };
