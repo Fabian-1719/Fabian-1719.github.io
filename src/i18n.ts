@@ -14,8 +14,8 @@ export const UI = {
 
   heroLabel: { en: "Computer Engineering · TEC", es: "Ingeniería en Computación · TEC" },
   heroLede: {
-    en: "I build web apps and cloud services, focused on distributed systems and full-stack development, with a growing interest in cybersecurity.",
-    es: "Desarrollo aplicaciones web y servicios en la nube, con enfoque en sistemas distribuidos y desarrollo full-stack, y un interés creciente en la ciberseguridad."
+    en: "I build web apps and cloud services, focused on distributed systems and full-stack development, with a growing interest in cybersecurity, project management and software architecture.",
+    es: "Desarrollo aplicaciones web y servicios en la nube, con enfoque en sistemas distribuidos y desarrollo full-stack, y un interés creciente en la ciberseguridad, la administración de proyectos y la arquitectura de software."
   },
   heroLede2: {
     en: "I like taking an idea from the interface all the way to the server; these are the projects I've built along the way.",
