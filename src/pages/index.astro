@@ -14,7 +14,10 @@ const pad = (n: number) => String(n).padStart(2, "0");
     <div class="panel hero">
       <p class="lbl" data-es={UI.heroLabel.es}>{UI.heroLabel.en}</p>
       <h1 class="hero__name">Fabian Aragón Arce</h1>
-      <p class="big" data-es={UI.heroLede.es}>{UI.heroLede.en}</p>
+      <div class="big hero__lede">
+        <p data-es={UI.heroLede.es}>{UI.heroLede.en}</p>
+        <p class="hero__more" data-es={UI.heroLede2.es}>{UI.heroLede2.en}</p>
+      </div>
       <div class="actions">
         <a class="btn" href="#projects"><span data-es={UI.heroCta.es}>{UI.heroCta.en}</span> <span aria-hidden="true">↓</span></a>
         <span class="soon" role="note" aria-label={UI.cvSoon.en} data-es-label={UI.cvSoon.es}>{UI.cv.en}<em data-es={UI.soon.es}>{UI.soon.en}</em></span>

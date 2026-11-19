@@ -111,11 +111,13 @@ html[lang="en"] .lang__opt[data-lang="en"], html[lang="es"] .lang__opt[data-lang
   .hero { gap: .8rem; padding: 22px 22px 24px; }
   .hero__name { font-size: 2.35rem; }
   .hero .big { font-size: 1.02rem; line-height: 1.55; }
+  .hero__more { display: none; }
 }
 
 /* ---------- Hero ---------- */
 .hero { gap: 1.25rem; }
 .hero__name { font-size: clamp(2.7rem, 1.6rem + 3.8vw, 4.2rem); line-height: 1.02; }
+.hero__lede { display: grid; gap: .6rem; }
 .actions { display: flex; flex-wrap: wrap; align-items: center; gap: 1rem 1.6rem; margin-top: .3rem; }
 .soon { display: inline-flex; align-items: center; gap: .5em; font-weight: 700; color: var(--pn-soft); }
 .soon em { font: normal 400 .82rem var(--pixel); color: var(--gold-ink); background: #b9b2d6; padding: 1px 7px; }

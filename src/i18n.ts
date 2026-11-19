@@ -14,8 +14,12 @@ export const UI = {
 
   heroLabel: { en: "Computer Engineering · TEC", es: "Ingeniería en Computación · TEC" },
   heroLede: {
-    en: "I build systems end to end, from the frontend to microservices in the cloud. This is my footprint: what I've built and what I'm learning.",
-    es: "Construyo sistemas de punta a punta, del frontend a microservicios en la nube. Aquí dejo mi huella: lo que he construido y lo que estoy aprendiendo."
+    en: "I build web apps and cloud services, focused on distributed systems and full-stack development, with a growing interest in cybersecurity.",
+    es: "Desarrollo aplicaciones web y servicios en la nube, con enfoque en sistemas distribuidos y desarrollo full-stack, y un interés creciente en la ciberseguridad."
+  },
+  heroLede2: {
+    en: "I like taking an idea from the interface all the way to the server; these are the projects I've built along the way.",
+    es: "Me gusta llevar una idea desde la interfaz hasta el servidor; estos son los proyectos que he construido en el camino."
   },
   heroCta: { en: "See projects", es: "Ver proyectos" },
   cv: { en: "CV", es: "CV" },
