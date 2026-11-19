@@ -82,7 +82,7 @@ const pad = (n: number) => String(n).padStart(2, "0");
                 {p.facts.map((f) => <li data-es={f.es}>{f.en}</li>)}
               </ul>
             )}
-            <ul class="chips" aria-label="Stack">{p.stack.map((t) => <li><Logo class="chip__logo" name={t} tone="ink" />{t}</li>)}</ul>
+            <ul class="chips" aria-label="Stack">{p.stack.map((t) => <li><Logo class="chip__logo" name={t} />{t}</li>)}</ul>
             <p class="quest__links">
               <a class="btn btn--sm" href={`/projects/${p.slug}/`} data-es={UI.more.es}>{UI.more.en}</a>
               {p.live && <a class="link" href={p.live} rel="noopener" data-es={UI.live.es}>{UI.live.en}</a>}

@@ -200,7 +200,7 @@ html[lang="en"] .lang__opt[data-lang="en"], html[lang="es"] .lang__opt[data-lang
 .quest__facts li::before { content: ""; flex: none; width: 7px; height: 7px; margin-top: .6em; background: #8a2e1c; transform: rotate(45deg); }
 .chips { list-style: none; margin: .2rem 0 0; padding: 0; display: flex; flex-wrap: wrap; gap: .45rem; }
 .chips li, .tags li { display: inline-flex; align-items: center; gap: .4em; }
-.chip__logo { width: 1em; height: 1em; flex: none; }
+.chip__logo { width: 1.1em; height: 1.1em; flex: none; object-fit: contain; }
 .chips li { font: .88rem var(--pixel); padding: .15em .6em; background: #e0cfa8; color: #3d2b18; box-shadow: inset 0 0 0 2px #a8875c; }
 .quest__links { display: flex; flex-wrap: wrap; align-items: center; gap: .8rem 1.4rem; margin-top: .3rem; }
 .private { font-family: var(--pixel); color: var(--text-soft); }
@@ -235,7 +235,8 @@ html[lang="en"] .lang__opt[data-lang="en"], html[lang="es"] .lang__opt[data-lang
   border: calc(var(--fp) * 3) solid transparent; border-image: var(--frame-slot) 4 fill / calc(var(--fp) * 3) stretch;
 }
 .slot--empty { cursor: default; opacity: .45; }
-.slot__logo { width: 58%; height: 58%; display: block; }
+.slot__logo { width: 62%; height: 62%; display: block; object-fit: contain; }
+.inv .logo--dark { filter: invert(1) brightness(.92); }
 .slot[aria-pressed="true"] { border-image-source: var(--frame-slot-on); }
 .slot[aria-pressed="true"]::after {
   content: ""; position: absolute; inset: calc(var(--fp) * -5); border: var(--fp) solid var(--gold); pointer-events: none;
@@ -247,7 +248,7 @@ html[lang="en"] .lang__opt[data-lang="en"], html[lang="es"] .lang__opt[data-lang
 .inv__desc { min-height: 5.2rem; padding: .7rem .9rem; background: #0e0c1e; box-shadow: inset 0 0 0 2px #3d3862; display: grid; align-content: start; gap: .2rem; }
 .inv__desc[hidden], .inv__item[hidden], .inv__hint[hidden] { display: none; }
 .inv__name { display: flex; align-items: center; gap: .55rem; font: 700 1.3rem var(--pixel); color: var(--text) !important; }
-.inv__logo { width: 1.2em; height: 1.2em; flex: none; }
+.inv__logo { width: 1.3em; height: 1.3em; flex: none; object-fit: contain; }
 .panel .inv__seen { font: .95rem var(--pixel); color: var(--meta); }
 .inv__seen a { color: var(--gold); text-underline-offset: 3px; }
 @media (max-width: 860px) { .inv { width: 100%; } .slots { gap: 6px; } .slot, .slot--empty { border-width: calc(var(--fp) * 2); border-image-width: calc(var(--fp) * 2); } .slot__logo { width: 62%; height: 62%; } }
