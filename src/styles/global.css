@@ -60,7 +60,7 @@ ul, ol, dl { margin: 0; padding: 0; }
 }
 .bar.is-solid { background: var(--bar); box-shadow: 0 4px 0 #0a0818; }
 .sig { display: flex; align-items: center; gap: 12px; margin-right: auto; text-decoration: none; color: #fff; }
-.sig span { font: 400 1.3rem/1 var(--serif); letter-spacing: -.01em; }
+.sig span { font: 400 1.3rem/1 var(--serif); letter-spacing: -.01em; white-space: nowrap; }
 .bar__nav { display: flex; gap: clamp(14px, 1.8vw, 26px); }
 .bar__nav a { position: relative; padding: 6px 0; text-decoration: none; color: #d4cee8; font-weight: 400; transition: color 160ms ease; }
 .bar__nav a.on { color: #fff; }
@@ -73,7 +73,8 @@ ul, ol, dl { margin: 0; padding: 0; }
 html[lang="en"] .lang__opt[data-lang="en"], html[lang="es"] .lang__opt[data-lang="es"] { background: var(--text); color: var(--bar); }
 .lang:active { transform: scale(.97); }
 @media (max-width: 900px) { .bar__nav { display: none; } }
-@media (max-width: 560px) { .bar { height: 60px; } .sig span { font-size: 1.1rem; } .hour #clockLabel { display: none; } }
+@media (max-width: 560px) { .bar { height: 60px; gap: 12px; } .sig span { font-size: 1rem; } .hour { padding-left: 12px; } .hour #clockLabel { display: none; } .lang__opt { padding: 4px 7px; } }
+@media (max-width: 360px) { .sig span { font-size: .92rem; } .hour i { display: none; } }
 
 /* ---------- Scenes and panels ---------- */
 .scene { min-height: 100svh; padding: 120px var(--gutter) 26vh; display: flex; align-items: flex-start; }
