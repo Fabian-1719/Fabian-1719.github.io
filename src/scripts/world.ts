@@ -358,26 +358,40 @@
     for (let k = 0; k < w; k++) put(main, x, G[x] + k, k === 0 ? R.water2 : R.water0 + ((x + k) & 3));
     put(main, x, G[x] + w, R.rockDk);
   }
-  // Waterfall: widens as it drops, lit streaks, dark edges, curling lip and splash
+  // Waterfall: a curling lip, columns that fall at their own pace, dark solid edges, a foam mound and spray puffs
   for (let y = 112; y < WATER + 1; y++) {
     const t = (y - 112) / (WATER - 112);
     const l = 245 - Math.round(t * 2), r = 255 + Math.round(t * 4);
     for (let x = l; x <= r; x++) {
-      const edge = x === l || x === r;
-      const streak = (x - l) % 4 === 1;
-      let k = ((y >> 1) - x * 3) & 3;
-      if (edge) k = 3; else if (streak) k = 2;
-      if (edge && dith(x, y, 0.5)) continue; // ragged, see-through edge
+      const col = x - l, speed = 1 + Math.floor(hash(x * 1.37) * 3); // each column slides at its own pace
+      let k = ((y * speed) >> 2) + col;
+      if (x === l || x === r) k = 3; // dark edges, solid
+      else if (x === l + 1 || x === r - 1) k = (k & 1) + 2; // shaded sides
+      else if (col % 3 === 1) k = (k & 1) * 2; // bright ribbons down the face
       put(main, x, y, R.fall0 + ((k + (y >> 1)) & 3));
     }
   }
-  for (let x = 244; x < 256; x++) put(main, x, 111, R.foam); // lip
-  for (let i = 0; i < 90; i++) { // splash: a mound of spray where the water lands
-    const a = rnd() * Math.PI, rr = rnd() * 10;
-    const x = Math.round(250 + Math.cos(a) * rr * 1.4), y = Math.round(WATER - Math.sin(a) * rr * 0.7);
-    put(main, x, y, rnd() > 0.5 ? R.foam : R.fall0 + Math.floor(rnd() * 4));
+  for (let x = 243; x < 257; x++) { // the lip curls over the edge: foam, then a bright roll
+    put(main, x, 110, x === 243 || x === 256 ? R.fall3 : R.foam);
+    put(main, x, 111, R.fall2);
   }
-  for (let x = 236; x < 270; x++) if (hash(x * 4.1) > 0.35) put(main, x, WATER + 1 + (Math.abs(x - 252) > 10 ? 1 : 0), R.foam); // foam ring
+  // the foam mound where the water lands: a solid half-dome, its top churning in cycle colours
+  for (let dx = -11; dx <= 11; dx++) for (let dy = 0; dy <= 5; dy++) {
+    const q = (dx * dx) / 121 + (dy * dy) / 25;
+    if (q > 1) continue;
+    const x = 250 + dx, y = WATER - dy;
+    put(main, x, y, q > 0.72 ? R.fall0 + ((dx + dy) & 3) : (dy > 2 ? R.foam : (dx & 1 ? R.fall2 : R.foam)));
+  }
+  for (const [px, py, pr] of [[240, WATER - 4, 3], [261, WATER - 5, 3], [236, WATER - 1, 2], [265, WATER - 1, 2]]) { // spray puffs
+    for (let dx = -pr; dx <= pr; dx++) for (let dy = -pr; dy <= pr; dy++) {
+      if (dx * dx + dy * dy > pr * pr) continue;
+      put(main, px + dx, py + dy, dy > pr / 2 ? R.fall1 : R.foam);
+    }
+  }
+  for (let x = 232; x < 272; x++) { // a ring of foam on the pool, broken in a few places
+    if (hash(x * 4.1) < 0.18) continue;
+    put(main, x, WATER + 1 + (Math.abs(x - 251) > 12 ? 1 : 0), Math.abs(x - 251) > 15 ? R.fall1 : R.foam);
+  }
   // Carved stairs from the tower plateau down toward the falls
   const stairY = (x: number) => Math.min(150, 112 + Math.ceil(Math.ceil((x - 216) / 2) * 3.5));
   for (let x = 216; x < 239; x++) {
@@ -386,21 +400,50 @@
     put(main, x, sy, R.rockHi); put(main, x, sy + 1, R.rock); // tread
     if ((x - 216) % 2 === 1) for (let k = 1; k <= 3; k++) put(main, x, sy + 1 + k, R.rockDk); // riser shadow
   }
-  // Ledge behind the waterfall, then a few steps down to the dock
-  for (let x = 238; x < 262; x++) { // footbridge across the face of the falls
-    const y = x < 256 ? 150 : 150 + Math.ceil((x - 255) * 5 / 6), seam = (x - 238) % 3 === 0;
-    put(main, x, y, seam ? R.woodDk : R.wood); put(main, x, y + 1, R.woodDk);
-    if ((x - 238) % 8 === 0) for (let k = 1; k <= 5; k++) put(main, x, y - k, k === 5 ? R.wood : R.woodDk);
-    put(main, x, y - 5, R.wood);
-  }
-  // Dock across the lake: planks, a dark edge and posts into the lake bed
+  // The first bridge: a footbridge across the face of the falls, steps down, then a pier across the lake.
+  // Thick planks with a lit top, a beam underneath, pilings with cross bracing, posts and a rope rail.
+  const deckAt = (x: number) => (x < 256 ? 150 : x < 262 ? 150 + Math.ceil((x - 255) * 5 / 6) : 155);
+  const plank = (x: number, y: number, i: number) => {
+    const seam = i % 4 === 0;
+    put(main, x, y, seam ? R.woodDk : R.wood); // walking surface
+    put(main, x, y + 1, seam ? R.woodDk : (i % 4 === 2 ? R.trunk : R.wood)); // plank face
+    put(main, x, y + 2, R.trunkDk); // beam underneath
+  };
+  for (let x = 238; x < 262; x++) plank(x, deckAt(x), x - 238);
   let dockEnd = 262;
   for (let x = 262; x < 460; x++) {
     if (G[x] <= 156) { dockEnd = x; break; }
-    const seam = (x - 262) % 4 === 0;
-    put(main, x, 155, seam ? R.woodDk : R.wood); put(main, x, 156, R.woodDk);
-    if ((x - 262) % 14 === 6) for (let y = 157; y < Math.min(G[x], LH); y++) { put(main, x, y, R.woodDk); }
+    plank(x, 155, x - 262);
     dockEnd = x;
+  }
+  // pilings every 12 px, two pixels thick, with an X of bracing between pairs above the bed
+  const piles: number[] = [];
+  for (let x = 244; x <= dockEnd - 2; x += 12) piles.push(x);
+  for (const px of piles) {
+    const top = deckAt(px) + 3;
+    for (let y = top; y < Math.min(G[px], LH); y++) { put(main, px, y, R.wood); put(main, px + 1, y, R.woodDk); }
+  }
+  for (let i = 0; i + 1 < piles.length; i++) {
+    const a = piles[i] + 2, b = piles[i + 1] - 1, top = Math.max(deckAt(a), deckAt(b)) + 3, span = b - a;
+    for (let k = 0; k <= span; k++) {
+      const x = a + k, y1 = top + Math.round((k / span) * 6), y2 = top + 6 - Math.round((k / span) * 6);
+      if (y1 < G[x]) put(main, x, y1, R.trunkDk);
+      if (y2 < G[x]) put(main, x, y2, R.trunkDk);
+    }
+  }
+  // posts on the same rhythm, a top rail and a sagging rope between them
+  for (let i = 0; i < piles.length; i++) {
+    const px = piles[i], y0 = deckAt(px);
+    for (let k = 1; k <= 7; k++) { put(main, px, y0 - k, k === 7 ? R.wood : R.woodDk); }
+    put(main, px + 1, y0 - 7, R.wood);
+    if (i + 1 < piles.length) {
+      const nx = piles[i + 1];
+      for (let x = px + 1; x < nx; x++) {
+        const f = (x - px) / (nx - px);
+        put(main, x, deckAt(x) - 7, R.wood); // top rail
+        put(main, x, deckAt(x) - 4 + Math.round(Math.sin(Math.PI * f) * 1.5), R.pathDk); // rope
+      }
+    }
   }
   // Paths through the village and up the hill
   for (let x = 730; x < 1150; x++) {
@@ -572,26 +615,54 @@
   function house(x0: number, wall: "wood" | "stone") {
     const w = 34, h = 22, base = G[x0 + (w >> 1)];
     for (let y = base - h; y <= base; y++) for (let x = 0; x < w; x++) {
-      let c = wall === "wood" ? ((x % 4 === 0) ? R.woodDk : R.wood) : ((base - y) % 4 === 0 ? R.stoneDk : ((x + (Math.floor((base - y) / 4) % 2) * 3) % 7 === 0 ? R.stoneDk : R.stone));
-      if (x === w - 1 || x === 0) c = wall === "wood" ? R.woodDk : R.stoneDk;
+      const row = base - y;
+      let c: number;
+      if (wall === "wood") { // horizontal boards, each with a lit top edge and a shadow line under it
+        c = row % 3 === 0 ? R.woodDk : row % 3 === 2 ? R.wood : (x > w - 6 ? R.woodDk : R.wood);
+        if (row % 3 === 1 && (x * 7 + Math.floor(row / 3) * 5) % 11 === 0) c = R.woodDk; // board joints
+      } else { // coursed stone, staggered, lit left and shaded right
+        const course = Math.floor(row / 4), off = (course % 2) * 4;
+        c = row % 4 === 0 || (x + off) % 8 === 0 ? R.stoneDk : R.stone;
+        if (c === R.stone && x > w - 6) c = R.stoneDk; // the shaded end
+      }
+      if (x === 0 || x === w - 1) c = wall === "wood" ? R.trunkDk : R.rockDk; // corner posts / quoins
+      if (x === 1 && wall === "wood") c = R.trunk;
       put(main, x0 + x, y, c);
     }
-    for (let x = -1; x <= w; x++) put(main, x0 + x, base - h, R.woodDk); // eave beam
-    for (const wx of [4, 24]) { // windows with a warm glow ring for the evening
+    for (let x = -1; x <= w; x++) for (let y = 0; y < 3; y++) put(main, x0 + x, base - y, y === 2 ? R.rock : (x + y) % 4 === 0 ? R.rockDk : R.rock); // stone footing
+    for (let x = -1; x <= w; x++) put(main, x0 + x, base - h, R.trunkDk); // eave beam
+    // windows: frame, cross bars, open shutters, a flower box underneath, and the warm glow ring for the evening
+    for (const wx of [4, 24]) {
       for (let y = -1; y <= 6; y++) for (let x = -1; x <= 6; x++) put(main, x0 + wx + x, base - 17 + y, R.glowWall);
       for (let y = 0; y < 6; y++) for (let x = 0; x < 6; x++) put(main, x0 + wx + x, base - 17 + y, x === 2 || y === 2 ? R.woodDk : R.glass);
+      for (let y = -1; y <= 6; y++) { put(main, x0 + wx - 2, base - 17 + y, y % 2 ? R.roof : R.roofDk); put(main, x0 + wx + 7, base - 17 + y, y % 2 ? R.roof : R.roofDk); } // shutters
+      for (let x = -1; x <= 6; x++) { put(main, x0 + wx + x, base - 10, R.woodDk); put(main, x0 + wx + x, base - 11, (x & 1) ? R.flowerA : (x % 4 === 0 ? R.flowerB : R.leafMid)); }
     }
-    for (let y = 0; y < 16; y++) for (let x = 14; x < 21; x++) { // door, 16 px tall
+    // door with a frame, planks, a step and a small porch roof on brackets
+    for (let y = 0; y < 16; y++) for (let x = 14; x < 21; x++) {
       const frame = x === 14 || x === 20 || y === 15;
-      put(main, x0 + x, base - y, frame ? R.woodDk : (x === 19 ? R.woodDk : R.wood));
+      put(main, x0 + x, base - y, frame ? R.trunkDk : (x === 17 ? R.woodDk : (y % 5 === 0 ? R.woodDk : R.wood)));
     }
     put(main, x0 + 18, base - 7, R.gem);
-    for (let i = 0; i < 15; i++) { // roof with overhang and shingle rows
-      const y = base - h - 1 - i;
-      for (let x = -3 + i; x < w + 3 - i; x++) put(main, x0 + x, y, (y % 3 === 0) ? R.roofDk : ((x - i) % 4 === 0 ? R.roofDk : R.roof));
+    for (let x = 13; x <= 21; x++) put(main, x0 + x, base + 1, R.rockHi); // step
+    for (let x = 12; x <= 22; x++) { put(main, x0 + x, base - 17, R.roofDk); put(main, x0 + x, base - 18, x % 2 ? R.roof : R.roofDk); } // porch roof
+    put(main, x0 + 13, base - 16, R.trunkDk); put(main, x0 + 21, base - 16, R.trunkDk); // brackets
+    // roof: shingle courses, lit on the left half and shaded on the right, dark bargeboards and a ridge cap
+    const mid = w / 2;
+    for (let i = 0; i < 15; i++) {
+      const y = base - h - 1 - i, xa = -3 + i, xb = w + 2 - i;
+      for (let x = xa; x <= xb; x++) {
+        const lit = x < mid;
+        let c = lit ? R.roof : R.roofDk;
+        if (i % 3 === 0) c = R.roofDk; // shadow under each shingle course
+        else if ((x + (Math.floor(i / 3) % 2) * 2) % 4 === 0) c = lit ? R.roofDk : R.trunkDk; // shingle edges
+        if (x === xa || x === xb) c = R.trunkDk; // bargeboards
+        if (i === 14) c = R.trunkDk; // ridge cap
+        put(main, x0 + x, y, c);
+      }
     }
     for (let y = 0; y < 9; y++) { put(main, x0 + 25, base - h - 6 - y, R.stoneDk); put(main, x0 + 26, base - h - 6 - y, R.stone); put(main, x0 + 27, base - h - 6 - y, R.stoneDk); }
-    for (let x = 24; x <= 28; x++) put(main, x0 + x, base - h - 15, R.stoneDk); // chimney cap
+    for (let x = 24; x <= 28; x++) put(main, x0 + x, base - h - 15, R.rockDk); // chimney cap
     CHIMNEYS.push([x0 + 26, base - h - 16]);
   }
   function lampPost(x0: number) { // 22 px: taller than the walker
