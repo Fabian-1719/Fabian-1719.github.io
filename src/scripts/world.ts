@@ -8,6 +8,9 @@
     farMid:   ["#86a2c4", "#bf9088", "#76598a", "#242c50"],
     farHaze:  ["#c3d8ea", "#efc8a6", "#b28296", "#323d68"],
     farSnow:  ["#eef6fc", "#ffe6c8", "#e2b4c0", "#55628e"],
+    farRim:   ["#d4e4f2", "#f4caa8", "#c497b6", "#3d4874"],
+    farDeep:  ["#6b87ab", "#9a6f74", "#5c4474", "#1a2140"],
+    snowSh:   ["#c4d6ea", "#eec4b2", "#bf92ae", "#424e7c"],
     hillLit:  ["#6aa66c", "#9aa456", "#626076", "#1f2f40"],
     hillMid:  ["#4a8a5a", "#768448", "#4a4a62", "#182636"],
     hillDark: ["#336a4a", "#55603c", "#373750", "#111c2a"],
@@ -184,30 +187,47 @@
   const farTop = (x: number): number => {
     let h = 0;
     for (const [c, a, w] of PK) { const d = Math.abs(x - c) / w; if (d < 1) h = Math.max(h, a * Math.pow(1 - d, 1.25)); }
-    return Math.round(122 - h - fbm(x * 0.05) * 6);
+    // crags: sharp little notches along the ridge, stronger the higher the mountain
+    const crag = Math.abs(noise(x * 0.33 + 7) - 0.5) * 7 * clamp(h / 70);
+    return Math.round(122 - h - fbm(x * 0.05) * 6 - crag);
   };
   const FT = new Int16Array(WW);
   for (let x = 0; x < WW; x++) FT[x] = farTop(x);
-  const peaks = [];
+  const peaks: [number, number][] = [];
   for (let x = 0; x < WW; x++) {
     let isPeak = true;
     for (let k = -14; k <= 14 && isPeak; k++) if (k && FT[Math.min(WW - 1, Math.max(0, x + k))] < FT[x]) isPeak = false;
     if (isPeak && (!peaks.length || x - peaks[peaks.length - 1][0] > 6)) peaks.push([x, FT[x]]);
   }
+  // ridged noise: thin bright lines (spurs) and thin dark lines (couloirs) running down each face
+  const ridged = (u: number, v: number) => 1 - Math.abs(2 * noise(u + noise(v) * 1.6) - 1);
   for (let x = 0; x < WW; x++) {
     const t = FT[x];
     let pk = peaks[0];
     for (const q of peaks) if (Math.abs(q[0] - x) < Math.abs(pk[0] - x)) pk = q;
+    const snowLine = 70 + noise(x * 0.21) * 8;
     for (let y = t; y < LH; y++) {
       const d = y - t, k = d / (LH - t);
-      // the ridge line between the sunlit and shaded face slants down and away from the peak
+      // the main ridge between the sunlit and shaded face slants down and away from the peak
       const split = pk[0] + (y - pk[1]) * 0.42 + (noise(y * 0.15 + pk[0]) - 0.5) * 6;
       const litFace = x < split;
-      let c = litFace ? R.farLit : R.farMid;
-      const gully = noise(x * 0.45 + y * 0.09) > 0.74 && d > 3;
-      if (gully) c = litFace ? R.farMid : (dith(x, y, 0.3) ? R.farLit : R.farMid);
-      if (y < 72 + noise(x * 0.21) * 7 + (litFace ? 0 : -3)) c = litFace ? R.farSnow : (hash(x * 3.1 + y * 7.7) > 0.12 ? R.farLit : R.farSnow);
-      else if (dith(x, y, k * 1.7 - 0.35)) c = R.farHaze;
+      // streaks follow the fall line of each face: down-left on the lit side, down-right in shade
+      const u = x * 0.19 + (litFace ? -y : y) * 0.085, r = ridged(u + pk[0] * 0.01, y * 0.05);
+      const spur = r > 0.965, couloir = r < 0.26;
+      const snowHere = y < snowLine + (couloir ? 9 : 0) + (litFace ? 0 : -3);
+      let c: number;
+      if (snowHere) {
+        c = litFace ? R.farSnow : R.snowSh;
+        if (spur && litFace) c = R.farRim;
+        if (couloir && !litFace) c = R.farMid;
+      } else {
+        c = litFace ? R.farLit : R.farMid;
+        // below the snow only the dark couloirs read as lines; bright spurs would break into specks
+        if (couloir) c = litFace ? R.farMid : R.farDeep;
+        if (!litFace && x - split < 2.2) c = R.farDeep; // a crisp shadow just under the main ridge
+      }
+      if (d === 0) c = litFace ? (snowHere ? R.farRim : R.farRim) : (snowHere ? R.snowSh : R.farMid); // sunlit rim on the skyline
+      if (!snowHere && k > 0.5 + (noise(x * 0.06 + 3) - 0.5) * 0.16) c = R.farHaze; // haze settles in the valley, clean edge
       put(far, x, y, c);
     }
   }
@@ -219,7 +239,7 @@
       const d = y - t;
       let c = R.hillMid;
       if (d < 2) c = midTop(x - 2) > t ? R.hillLit : R.hillMid;
-      else if (dith(x, y, (d - 4) / 30)) c = R.hillDark;
+      else if (d > 9 + Math.round(noise(x * 0.05 + 11) * 8)) c = R.hillDark; // a clean step into shade, no dot pattern
       put(mid, x, y, c);
     }
   }
@@ -452,33 +472,86 @@
   }
   function tower(x0: number) {
     const base = G[x0 + 9], w = 18, h = 54;
-    for (let y = base - h; y <= base; y++) for (let x = 0; x < w; x++) {
-      const row = base - y;
-      let c = R.stone;
-      if (row % 5 === 0) c = R.stoneDk;
-      else if ((x + (Math.floor(row / 5) % 2) * 3) % 7 === 0) c = R.stoneDk;
-      if (x === 0 || x === w - 1) c = R.stoneDk;
-      if (x > w - 5 && dith(x, y, 0.5)) c = R.stoneDk;
-      put(main, x0 + x, y, c);
+    const top = base - h;
+    // coursed stone: 4-px courses, blocks of varied width, lit on the left, shaded on the right
+    for (let y = top; y <= base; y++) {
+      const row = base - y, course = Math.floor(row / 4);
+      let joint = Math.floor(hash(course * 3.7) * 6);
+      const joints = new Set<number>();
+      while (joint < w) { joints.add(joint); joint += 4 + Math.floor(hash(course * 7.3 + joint) * 4); }
+      for (let x = 0; x < w; x++) {
+        let c = R.stone;
+        if (row % 4 === 0 || joints.has(x)) c = R.stoneDk; // mortar
+        if (x === 1 && row % 4 !== 0) c = R.rockHi; // sunlit edge
+        if (x > w - 6 && dith(x, y, (x - (w - 6)) / 6)) c = R.stoneDk; // the far side turns away from the light
+        if (x === 0 || x === w - 1) c = R.rockDk; // outline
+        put(main, x0 + x, y, c);
+      }
     }
-    // windows with a warm glow ring that only shows at night
-    for (const [wx, wy] of [[7, 8], [7, 22]]) {
-      for (let y = -1; y <= 4; y++) for (let x = -1; x <= 3; x++) put(main, x0 + wx + x, base - h + wy + y, R.glowWall);
-      for (let y = 0; y < 4; y++) for (let x = 0; x < 2; x++) put(main, x0 + wx + x, base - h + wy + y, R.glass);
+    // plinth: a wider, darker base course
+    for (let y = 0; y < 5; y++) for (let x = -2; x < w + 2; x++) {
+      const c = y === 4 ? R.stone : (x === -2 || x === w + 1 ? R.rockDk : (y + x) % 5 === 0 ? R.stoneDk : (x > w - 4 ? R.stoneDk : R.stone));
+      put(main, x0 + x, base - y, c);
     }
-    for (let y = 0; y < 15; y++) for (let x = 6; x <= 11; x++) { // arched door, 15 px: the walker fits
+    // ivy climbing the lit side
+    for (let i = 0; i < 70; i++) {
+      const vy = base - 4 - Math.floor(hash(i * 1.9) * 26), vx = Math.floor(Math.pow(hash(i * 5.3), 1.8) * 6);
+      if (vy < base - 4 - (6 - vx) * 4) continue; // thins out toward the top
+      put(main, x0 + vx, vy, hash(i * 2.7) > 0.55 ? R.leafLo : R.leafMid);
+      if (hash(i * 4.1) > 0.7) put(main, x0 + vx, vy - 1, R.leafHi);
+    }
+    // arched windows with a stone frame, a sill, and a glow ring for the night
+    for (const wy of [8, 24]) {
+      const wx = 7;
+      for (let y = -2; y <= 6; y++) for (let x = -2; x <= 5; x++) put(main, x0 + wx + x, top + wy + y, R.glowWall);
+      for (let y = -1; y <= 5; y++) for (let x = -1; x <= 4; x++) {
+        const arch = y === -1 && (x === -1 || x === 4);
+        if (!arch) put(main, x0 + wx + x, top + wy + y, R.stoneDk);
+      }
+      for (let y = 0; y < 5; y++) for (let x = 0; x < 4; x++) {
+        if (y === 0 && (x === 0 || x === 3)) continue; // rounded head
+        put(main, x0 + wx + x, top + wy + y, x === 1 || x === 2 ? R.glass : (y > 1 ? R.glass : R.stoneDk));
+      }
+      for (let y = 1; y < 5; y++) put(main, x0 + wx + 1, top + wy + y, R.woodDk); // mullion
+      for (let x = -2; x <= 5; x++) put(main, x0 + wx + x, top + wy + 6, R.rockHi); // sill
+    }
+    // arrow slits
+    for (const [sx, sy] of [[4, 38], [13, 16]]) for (let y = 0; y < 4; y++) put(main, x0 + sx, top + sy + y, R.rockDk);
+    // arched door, 15 px so the walker fits, with voussoirs around it
+    for (let y = 0; y < 17; y++) for (let x = 4; x <= 13; x++) {
+      if (y >= 15 && (x <= 5 || x >= 12)) continue;
+      if (y >= 16 && (x <= 6 || x >= 11)) continue;
+      put(main, x0 + x, base - y, (x + y) % 2 ? R.stoneDk : R.rockHi);
+    }
+    for (let y = 0; y < 15; y++) for (let x = 6; x <= 11; x++) {
       if (y === 14 && (x === 6 || x === 11)) continue;
       const frame = x === 6 || x === 11 || y === 14;
-      put(main, x0 + x, base - y, frame ? R.stoneDk : x === 10 ? R.woodDk : (y % 4 === 0 ? R.woodDk : R.wood));
+      put(main, x0 + x, base - y, frame ? R.woodDk : x === 10 ? R.woodDk : (y % 4 === 0 ? R.woodDk : R.wood));
     }
+    for (const sy of [4, 10]) for (let x = 7; x <= 10; x++) put(main, x0 + x, base - sy, R.rockDk); // iron straps
     put(main, x0 + 9, base - 7, R.gem); // handle
-    // conical roof with a small spire
-    for (let i = 0; i < 16; i++) {
-      const y = base - h - 1 - i, half = Math.round(11 - i * 0.68);
-      for (let x = -half; x <= half; x++) put(main, x0 + 9 + x, y, x < 0 ? R.roof : R.roofDk);
+    // corbelled cornice under the roof
+    for (let x = -2; x < w + 2; x++) {
+      put(main, x0 + x, top - 1, x > w - 3 ? R.stoneDk : R.stone);
+      put(main, x0 + x, top, R.rockDk);
+      if ((x + 2) % 3 === 0) { put(main, x0 + x, top + 1, R.stoneDk); put(main, x0 + x, top + 2, R.rockDk); }
     }
-    for (let y = 0; y < 5; y++) put(main, x0 + 9, base - h - 17 - y, R.woodDk);
-    put(main, x0 + 10, base - h - 21, R.gem);
+    // conical roof: shingle rows, lit left, shaded right, a dark eave line
+    for (let i = 0; i < 20; i++) {
+      const y = top - 2 - i, half = Math.round(12 - i * 0.62);
+      for (let x = -half; x <= half; x++) {
+        let c = x < 0 ? R.roof : R.roofDk;
+        if (i % 3 === 0 && (x + i) % 2 === 0) c = R.roofDk; // shingle edges
+        if (i === 0) c = R.roofDk; // eave
+        if (x === half) c = R.trunkDk;
+        put(main, x0 + 9 + x, y, c);
+      }
+    }
+    // finial and a banner in the wind
+    for (let y = 0; y < 7; y++) put(main, x0 + 9, top - 22 - y, R.woodDk);
+    put(main, x0 + 9, top - 29, R.gem);
+    for (const [fx, fy] of [[1, 0], [2, 0], [3, 0], [4, 1], [1, 1], [2, 1], [3, 1], [1, 2], [2, 2], [5, 1]])
+      put(main, x0 + 9 + fx, top - 28 + fy, fx > 3 ? R.roofDk : R.stripe);
   }
   const CHIMNEYS: [number, number][] = [];
   function house(x0: number, wall: "wood" | "stone") {
@@ -794,25 +867,6 @@
         if (X >= 0 && X < W && Y >= 0 && Y < H) px32[Y * W + X] = pal[sh === 0 ? R.cloud : sh === 1 ? R.cloudMid : R.cloudSh];
       }
     }
-    // Constellation drawn over the clouds so it is never hidden
-    if (progress > 0.82) {
-      const cx = W < 160 ? Math.floor(W * 0.55) - 12 : Math.floor(W * 0.74), cy = W < 160 ? Math.floor(H * 0.2) : Math.max(Math.floor(H * 0.07), Math.ceil(66 / scale));
-      const pts = [[12, 0], [0, 20], [24, 20], [6, 10], [18, 10], [12, 20]];
-      const lines = [[0, 1], [1, 2], [2, 0], [3, 4], [4, 5], [5, 3]];
-      const dim = pack(92, 84, 64);
-      for (const [a, b] of lines) {
-        const [x0, y0] = pts[a], [x1, y1] = pts[b];
-        const steps = Math.max(Math.abs(x1 - x0), Math.abs(y1 - y0));
-        for (let s2 = 0; s2 <= steps; s2++) {
-          const x = cx + Math.round(x0 + (x1 - x0) * s2 / steps), y = cy + Math.round(y0 + (y1 - y0) * s2 / steps);
-          if (x >= 0 && x < W && y >= 0 && y < H && dith(x, y, night * 0.95)) px32[y * W + x] = dim;
-        }
-      }
-      if (night > 0.5) for (const [x, y] of pts) for (const [dx, dy] of [[0, 0], [1, 0], [0, 1], [1, 1]]) {
-        const X = cx + x + dx - 1, Y = cy + y + dy - 1;
-        if (X >= 0 && X < W && Y >= 0 && Y < H) px32[Y * W + X] = pack(255, 236, 160);
-      }
-    }
     // Birds by day
     if (day > 0.4 && !reduce) {
       for (const b of birds) {
@@ -825,12 +879,13 @@
     // Layers with parallax
     const layers: [Uint8Array, number, number][] = [[far, 0.25, 0], [mid, 0.55, 6], [main, 1, 18]];
     for (const [li, [buf, k, drop]] of layers.entries()) {
-      if (li === 1) { // a band of valley mist in front of the far range
-        const mTop = 96 - off, mBot = 126 - off, haze = pal[R.farHaze];
-        for (let y = Math.max(0, mTop); y < Math.min(H, mBot); y++) {
-          const a = Math.sin(Math.PI * (y - mTop) / (mBot - mTop)) * 0.32;
-          const shift = reduce ? 0 : Math.floor(clock * 2);
-          for (let x = 0; x < W; x++) if (hash((x + Math.round(camX * 0.3)) * 12.9898 + y * 78.233 + shift * 0.37) < a * (0.6 + 0.4 * noise((x + camX * 0.3) * 0.04 + y * 0.2))) px32[y * W + x] = haze;
+      if (li === 1) { // a solid bank of valley fog in front of the far range, its top edge rolling slowly
+        const haze = pal[R.farHaze], rim = pal[R.farLit], drift = reduce ? 0 : clock * 1.2;
+        const mBot = 132 - off;
+        for (let x = 0; x < W; x++) {
+          const wx = x + camX * 0.3 + drift;
+          const top = Math.round(104 - off + noise(wx * 0.03) * 7 + noise(wx * 0.09 + 5) * 2.5);
+          for (let y = Math.max(0, top); y < Math.min(H, mBot); y++) px32[y * W + x] = y === top ? rim : haze;
         }
       }
       const ox = Math.round(camX * k);
@@ -937,6 +992,42 @@
           fine32[y * FW + x] = pal[R["sw_" + ch]];
         }
       }
+    }
+    // The Triforce constellation, on the fine grid: hairline gold lines and four-point stars that twinkle
+    if (progress > 0.82 && night > 0.05) {
+      const FH = H * 2, u = W < 160 ? 1 : 1.25; // a touch larger on wide screens
+      const cx = (W < 160 ? Math.floor(W * 0.55) - 12 : Math.floor(W * 0.74)) * 2;
+      const cy = (W < 160 ? Math.floor(H * 0.2) : Math.max(Math.floor(H * 0.07), Math.ceil(66 / scale))) * 2;
+      const P = [[24, 0], [0, 40], [48, 40], [12, 20], [36, 20], [24, 40]].map(([x, y]) => [cx + Math.round(x * u), cy + Math.round(y * u)]);
+      const blend = (x: number, y: number, rgb: number[], a: number) => {
+        if (x < 0 || y < 0 || x >= FW || y >= FH) return;
+        const k = y * FW + x, s0 = fine32[k];
+        fine32[k] = pack(Math.round((s0 & 255) * (1 - a) + rgb[0] * a), Math.round(((s0 >> 8) & 255) * (1 - a) + rgb[1] * a), Math.round(((s0 >> 16) & 255) * (1 - a) + rgb[2] * a));
+      };
+      const gold = [212, 178, 92], spark = [255, 244, 196], vis = clamp((night - 0.05) / 0.6);
+      for (const [i, j] of [[0, 1], [1, 2], [2, 0], [3, 4], [4, 5], [5, 3]]) { // Bresenham, one fine pixel wide
+        let [x0, y0] = P[i]; const [x1, y1] = P[j];
+        const dx = Math.abs(x1 - x0), dy = -Math.abs(y1 - y0), sx = x0 < x1 ? 1 : -1, sy = y0 < y1 ? 1 : -1;
+        let err = dx + dy;
+        for (;;) {
+          blend(x0, y0, gold, 0.42 * vis);
+          if (x0 === x1 && y0 === y1) break;
+          const e2 = 2 * err;
+          if (e2 >= dy) { err += dy; x0 += sx; }
+          if (e2 <= dx) { err += dx; y0 += sy; }
+        }
+      }
+      const t = reduce ? 0 : clock;
+      P.forEach(([x, y], i) => {
+        const outer = i < 3, tw = 0.5 + 0.5 * Math.sin(t * 2.2 + i * 1.7);
+        const arm = (outer ? 3 : 2) + (tw > 0.6 ? 1 : 0);
+        for (let k = 1; k <= arm; k++) {
+          const a = vis * (1 - k / (arm + 1)) * 0.95;
+          blend(x + k, y, spark, a); blend(x - k, y, spark, a); blend(x, y + k, spark, a); blend(x, y - k, spark, a);
+        }
+        for (const [dx, dy] of [[1, 1], [-1, 1], [1, -1], [-1, -1]]) blend(x + dx, y + dy, gold, 0.45 * vis);
+        blend(x, y, [255, 255, 240], vis);
+      });
     }
     // The campfire flame: three flickering tongues on the fine grid, growing as the evening comes
     {
