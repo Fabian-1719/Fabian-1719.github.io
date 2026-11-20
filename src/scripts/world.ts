@@ -47,6 +47,9 @@
     flowerB:  ["#ffe066", "#ffd25a", "#c0a060", "#3a3a2c"],
     foam:     ["#eaf6ff", "#fff1dc", "#f0c4c4", "#6c7ca8"],
     tent:     ["#ece3c8", "#f2d2a2", "#b49ea8", "#a07a5c"],
+    ivyHi:    ["#9ad86a", "#cfc85c", "#868060", "#2e5040"],
+    ivy:      ["#58a850", "#89a040", "#58604c", "#21402f"],
+    ivyLo:    ["#367e40", "#5e7232", "#3c463c", "#172f25"],
     catFur:   ["#f6f4f0", "#ffe9d2", "#d4c4d4", "#8a92b0"],
     catLine:  ["#9a9cab", "#a48c84", "#6e5e7a", "#3c405e"],
     catEye:   ["#3a8ee0", "#3c8ad8", "#4a9ae8", "#7cc8ff"],
@@ -566,8 +569,8 @@
     for (let i = 0; i < 70; i++) {
       const vy = base - 4 - Math.floor(hash(i * 1.9) * 26), vx = Math.floor(Math.pow(hash(i * 5.3), 1.8) * 6);
       if (vy < base - 4 - (6 - vx) * 4) continue; // thins out toward the top
-      put(main, x0 + vx, vy, hash(i * 2.7) > 0.55 ? R.leafLo : R.leafMid);
-      if (hash(i * 4.1) > 0.7) put(main, x0 + vx, vy - 1, R.leafHi);
+      put(main, x0 + vx, vy, hash(i * 2.7) > 0.55 ? R.ivyLo : R.ivy); // ivy is fixed to the wall: it doesn't sway
+      if (hash(i * 4.1) > 0.7) put(main, x0 + vx, vy - 1, R.ivyHi);
     }
     // arched windows with a stone frame, a sill, and a glow ring for the night
     for (const wy of [8, 24]) {
@@ -648,7 +651,7 @@
       for (let y = 0; y < 6; y++) for (let x = 0; x < 6; x++) put(main, x0 + wx + x, base - 17 + y, x === 2 || y === 2 ? R.woodDk : R.glass);
       WINDOWS.push({ x: x0 + wx, y: base - 17, w: 6, h: 6, ring: wall === "wood" ? R.wood : R.stone, thr: 0.6 + hash(x0 * 0.37 + wx) * 0.12 });
       for (let y = -1; y <= 6; y++) { put(main, x0 + wx - 2, base - 17 + y, y % 2 ? R.roof : R.roofDk); put(main, x0 + wx + 7, base - 17 + y, y % 2 ? R.roof : R.roofDk); } // shutters
-      for (let x = -1; x <= 6; x++) { put(main, x0 + wx + x, base - 10, R.woodDk); put(main, x0 + wx + x, base - 11, (x & 1) ? R.flowerA : (x % 4 === 0 ? R.flowerB : R.leafMid)); }
+      for (let x = -1; x <= 6; x++) { put(main, x0 + wx + x, base - 10, R.woodDk); put(main, x0 + wx + x, base - 11, (x & 1) ? R.flowerA : (x % 4 === 0 ? R.flowerB : R.ivy)); }
     }
     // door with a frame, planks, a step and a small porch roof on brackets
     for (let y = 0; y < 16; y++) for (let x = 14; x < 21; x++) {
@@ -994,7 +997,7 @@
         for (let x = 0; x < W; x++) {
           const wx = x + camX * 0.3 + drift;
           const top = Math.round(104 - off + noise(wx * 0.03) * 7 + noise(wx * 0.09 + 5) * 2.5);
-          for (let y = Math.max(0, top); y < Math.min(H, mBot); y++) px32[y * W + x] = y === top ? rim : haze;
+          for (let y = Math.max(0, top); y < Math.min(H, mBot); y++) { px32[y * W + x] = y === top ? rim : haze; cloudMask[y * W + x] = 1; }
         }
       }
       const ox = Math.round(camX * k);
@@ -1014,7 +1017,7 @@
               else if (LEAF[c]) c = 0; // the canopy edge moved away: background shows through
             }
           }
-          if (c) px32[out + x] = pal[c];
+          if (c) { px32[out + x] = pal[c]; cloudMask[out + x] = 1; } // the sky's things stay behind whatever stands in front
         }
       }
     }
@@ -1049,13 +1052,21 @@
         const bend = Math.round(Math.sin(t * 2.3 + wx * 0.37) * 0.9);
         set(x + bend, sy(G[wx] - 2), pal[R.grassHi]);
       }
-      // leaves drifting down through the forest
-      if (!reduce) for (let i = 0; i < 16; i++) {
-        const age = (clock * 5 + i * 9.7) % 70, wx0 = 432 + hash(i * 3.3 + Math.floor((clock * 5 + i * 9.7) / 70)) * 200;
-        const wy = 104 + age * 0.62, x = Math.round(wx0 + Math.sin(age * 0.18 + i) * 4) - ox, y = Math.round(sy(wy));
-        if (wy > forestG(Math.round(wx0)) - 1) continue;
-        const c = pal[i % 3 ? R.leafHi : R.leafMid];
-        set(x, y, c); if (Math.floor(age / 3) % 2) set(x + 1, y, c); else set(x, y + 1, c); // flutter
+      // a few leaves letting go of the canopy: slow, swinging like a pendulum, turning as they fall
+      if (!reduce) for (let i = 0; i < 6; i++) {
+        const T = 13, tt = clock + i * (T / 6), cyc = Math.floor(tt / T), age = tt % T;
+        if (hash(cyc * 9.1 + i) < 0.35) continue; // not every cycle: the forest is calm, not snowing
+        const wx0 = Math.round(440 + hash(cyc * 4.7 + i * 1.3) * 190);
+        let y0 = 92; while (y0 < 140 && !LEAF[main[y0 * WW + wx0]]) y0++;
+        if (y0 >= 140) continue; // only from where a canopy actually is
+        const ground = forestG(wx0) - 1, fall = age * 4.2;
+        if (y0 + fall >= ground) continue;
+        const swing = Math.sin(age * 2.6 + i), x = Math.round(wx0 + swing * 4) - ox;
+        const y = Math.round(sy(y0 + fall + Math.cos(age * 5.2 + i * 2) * 0.8)); // lifts a little at each end of its swing
+        const flat = Math.abs(swing) > 0.6, under = Math.cos(age * 2.6 + i) < 0;
+        const c = pal[under ? R.leafLo : R.leafHi];
+        set(x, y, c);
+        if (flat) set(x + 1, y, c); else set(x + (swing > 0 ? -1 : 1), y + 1, c); // flat at the ends, tilted mid-swing
       }
       // ripples circling the bridge pilings
       for (const px of PILES) {
@@ -1252,7 +1263,7 @@
         tailUp ? ".owo.owo..." : ".owo.owo.ow"
       ];
       const col: Record<string, number> = { o: pal[R.catLine], w: pal[R.catFur], p: pal[R.catPink], n: pal[R.catPink], e: pal[R.catEye] };
-      const x0 = Math.round((CAT[0] - camX) * 2), y0 = (CAT[1] - off + 18) * 2 + 1 - rows.length;
+      const x0 = Math.round((CAT[0] - camX) * 2), y0 = (CAT[1] - off + 18) * 2 + 2 - rows.length; // paws on the ridge
       rows.forEach((row, j) => [...row].forEach((ch, i) => {
         if (ch === ".") return;
         const x = x0 + i, y = y0 + j;
