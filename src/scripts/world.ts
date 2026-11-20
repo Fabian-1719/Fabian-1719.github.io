@@ -47,6 +47,13 @@
     flowerB:  ["#ffe066", "#ffd25a", "#c0a060", "#3a3a2c"],
     foam:     ["#eaf6ff", "#fff1dc", "#f0c4c4", "#6c7ca8"],
     tent:     ["#ece3c8", "#f2d2a2", "#b49ea8", "#a07a5c"],
+    catFur:   ["#f6f4f0", "#ffe9d2", "#d4c4d4", "#8a92b0"],
+    catLine:  ["#9a9cab", "#a48c84", "#6e5e7a", "#3c405e"],
+    catEye:   ["#3a8ee0", "#3c8ad8", "#4a9ae8", "#7cc8ff"],
+    catPink:  ["#f2a2aa", "#f6a294", "#c48296", "#7c5c70"],
+    duckBody: ["#f0ebe0", "#f6dcc4", "#c4aab8", "#4a5070"],
+    duckHead: ["#2e7a3a", "#4c6e2c", "#2c4c40", "#142a2a"],
+    duckBill: ["#e8902a", "#f08a2a", "#b06a3a", "#5a3a2a"],
     tentDk:   ["#c4b892", "#d0a878", "#8c7888", "#6e5040"],
     stripe:   ["#c0392b", "#c84a26", "#8c3040", "#6a2a26"],
     blade:    ["#eaf2ff", "#ffeccc", "#c8bedc", "#b4c0ec"],
@@ -315,11 +322,16 @@
     let x = 430 + Math.floor(rnd() * 470), y = G[x] + 4;
     for (let k = 0; k < 6 + rnd() * 8; k++) { put(main, x, y, R.trunkDk); x += rnd() > 0.5 ? 1 : 0; y += 1; }
   }
+  const TUFTS: number[] = [];
+  const PILES: number[] = [];
+  type Light = { x: number; y: number; w: number; h: number; ring: number; thr: number };
+  const WINDOWS: Light[] = [], LAMPS: Light[] = [];
+  let CAT: [number, number] = [0, 0];
   for (let x = 0; x < WW; x++) { // grass tufts break the top line
     if (G[x] >= WATER - 3 || (x > 240 && x < 264)) continue;
     const h = hash(x * 3.7);
     if (h > 0.7) put(main, x, G[x] - 1, h > 0.9 ? R.grassHi : R.grass);
-    if (h > 0.94) put(main, x, G[x] - 2, R.grassHi);
+    if (h > 0.88) TUFTS.push(x); // their tips are drawn live so they bend in the wind
   }
   // Cliff face below the tower plateau: stepped ledges, darker toward the falls
   for (let x = 232; x < 262; x++) {
@@ -416,7 +428,7 @@
     dockEnd = x;
   }
   // pilings every 12 px, two pixels thick, with an X of bracing between pairs above the bed
-  const piles: number[] = [];
+  const piles: number[] = PILES;
   for (let x = 244; x <= dockEnd - 2; x += 12) piles.push(x);
   for (const px of piles) {
     const top = deckAt(px) + 3;
@@ -634,6 +646,7 @@
     for (const wx of [4, 24]) {
       for (let y = -1; y <= 6; y++) for (let x = -1; x <= 6; x++) put(main, x0 + wx + x, base - 17 + y, R.glowWall);
       for (let y = 0; y < 6; y++) for (let x = 0; x < 6; x++) put(main, x0 + wx + x, base - 17 + y, x === 2 || y === 2 ? R.woodDk : R.glass);
+      WINDOWS.push({ x: x0 + wx, y: base - 17, w: 6, h: 6, ring: wall === "wood" ? R.wood : R.stone, thr: 0.6 + hash(x0 * 0.37 + wx) * 0.12 });
       for (let y = -1; y <= 6; y++) { put(main, x0 + wx - 2, base - 17 + y, y % 2 ? R.roof : R.roofDk); put(main, x0 + wx + 7, base - 17 + y, y % 2 ? R.roof : R.roofDk); } // shutters
       for (let x = -1; x <= 6; x++) { put(main, x0 + wx + x, base - 10, R.woodDk); put(main, x0 + wx + x, base - 11, (x & 1) ? R.flowerA : (x % 4 === 0 ? R.flowerB : R.leafMid)); }
     }
@@ -663,12 +676,14 @@
     for (let y = 0; y < 9; y++) { put(main, x0 + 25, base - h - 6 - y, R.stoneDk); put(main, x0 + 26, base - h - 6 - y, R.stone); put(main, x0 + 27, base - h - 6 - y, R.stoneDk); }
     for (let x = 24; x <= 28; x++) put(main, x0 + x, base - h - 15, R.rockDk); // chimney cap
     CHIMNEYS.push([x0 + 26, base - h - 16]);
+    if (wall === "stone") CAT = [x0 + 13, base - h - 16]; // a cat keeps watch on the stone roof
   }
   function lampPost(x0: number) { // 22 px: taller than the walker
     const base = G[x0];
     for (let y = 1; y < 19; y++) { put(main, x0, base - y, R.woodDk); put(main, x0 + 1, base - y, y % 5 === 0 ? R.woodDk : R.wood); }
     for (let x = -1; x <= 2; x++) put(main, x0 + x, base, R.stoneDk);
     for (let y = -2; y <= 1; y++) for (let x = -1; x <= 2; x++) put(main, x0 + x, base - 20 + y, (x === -1 || x === 2) ? R.woodDk : R.lamp);
+    LAMPS.push({ x: x0, y: base - 22, w: 2, h: 4, ring: 0, thr: 0.62 + LAMPS.length * 0.035 });
     for (let x = -2; x <= 3; x++) put(main, x0 + x, base - 23, R.roofDk);
   }
   const BRIDGE_X0 = 634, BRIDGE_X1 = 730;
@@ -843,6 +858,7 @@
     clouds.push({ m, w, x: i * 120 + rnd() * 60, y: 4 + rnd() * 34, v: 0.5 + rnd() * 0.7 });
   }
   let cloudMask = new Uint8Array(0);
+  const LEAF = new Uint8Array(N); for (const r of [R.leafHi, R.leafMid, R.leafLo, R.leafOut, R.pineHi, R.pine]) LEAF[r] = 1;
   const stars: [number, number, number, number][] = [];
   for (let i = 0; i < 160; i++) stars.push([rnd(), rnd() * 0.7, rnd(), rnd() * 6.28]);
   const birds: { x: number; y: number; v: number; ph: number }[] = [];
@@ -982,12 +998,22 @@
         }
       }
       const ox = Math.round(camX * k);
+      const sway = li === 2 && !reduce; // leaves lean with the wind; trunks stay put
       for (let y = 0; y < H; y++) {
         const ly = y + off - drop;
         if (ly < 0 || ly >= LH) continue;
         const row = ly * WW, out = y * W;
         for (let x = 0; x < W; x++) {
-          const c = buf[row + ((x + ox) % WW)];
+          const wx = (x + ox) % WW;
+          let c = buf[row + wx];
+          if (sway) {
+            const sh = Math.round(Math.sin(clock * 1.5 + wx * 0.045 - ly * 0.02) * 0.8);
+            if (sh) {
+              const src = buf[row + Math.min(WW - 1, Math.max(0, wx - sh))];
+              if (LEAF[src]) c = src;
+              else if (LEAF[c]) c = 0; // the canopy edge moved away: background shows through
+            }
+          }
           if (c) px32[out + x] = pal[c];
         }
       }
@@ -1007,6 +1033,92 @@
           if (!dith(x, y, 0.82 - d * 0.03)) continue;
           const sx = Math.min(W - 1, Math.max(0, x + wobble));
           px32[y * W + x] = avg(px32[y * W + x], px32[my * W + sx]);
+        }
+      }
+    }
+    // ---- Life in the world (drawn live) ----
+    {
+      const ox = Math.round(camX), sy = (wy: number) => wy - off + 18;
+      const set = (x: number, y: number, c: number) => { if (x >= 0 && x < W && y >= 0 && y < H) px32[y * W + x] = c; };
+      const t = reduce ? 0 : clock;
+      // grass tips bending in the wind
+      for (const wx of TUFTS) {
+        const x = wx - ox; if (x < -2 || x > W + 2) continue;
+        if (main[(G[wx] - 1) * WW + wx] !== R.grass && main[(G[wx] - 1) * WW + wx] !== R.grassHi) continue;
+        if (main[(G[wx] - 2) * WW + wx]) continue;
+        const bend = Math.round(Math.sin(t * 2.3 + wx * 0.37) * 0.9);
+        set(x + bend, sy(G[wx] - 2), pal[R.grassHi]);
+      }
+      // leaves drifting down through the forest
+      if (!reduce) for (let i = 0; i < 16; i++) {
+        const age = (clock * 5 + i * 9.7) % 70, wx0 = 432 + hash(i * 3.3 + Math.floor((clock * 5 + i * 9.7) / 70)) * 200;
+        const wy = 104 + age * 0.62, x = Math.round(wx0 + Math.sin(age * 0.18 + i) * 4) - ox, y = Math.round(sy(wy));
+        if (wy > forestG(Math.round(wx0)) - 1) continue;
+        const c = pal[i % 3 ? R.leafHi : R.leafMid];
+        set(x, y, c); if (Math.floor(age / 3) % 2) set(x + 1, y, c); else set(x, y + 1, c); // flutter
+      }
+      // ripples circling the bridge pilings
+      for (const px of PILES) {
+        if (G[px] <= WATER + 1) continue;
+        const r = Math.floor(((t * 2.4 + px * 0.7) % 7));
+        if (r > 4) continue;
+        const c = pal[r < 2 ? R.foam : R.lakeHi];
+        set(px - 1 - r - ox, sy(WATER) + 1, c); set(px + 2 + r - ox, sy(WATER) + 1, c);
+      }
+      // two ducks paddling on the lake, with a little wake
+      for (let i = 0; i < 2; i++) {
+        const phase = t * 0.05 + i * 2.6, wx = Math.round(300 + i * 60 + Math.sin(phase) * 46), dir = Math.cos(phase) >= 0 ? 1 : -1;
+        const x0 = wx - ox, yb = sy(WATER) + 7 + i * 3 + (Math.floor(t * 1.4 + i) % 2 ? 0 : 1); // in front of the pier, nearer the viewer
+        if (x0 < -8 || x0 > W + 8) continue;
+        const rows = ["....h.", "bbbbhk", ".bbb.."];
+        rows.forEach((row, j) => [...row].forEach((ch, k) => {
+          if (ch === ".") return;
+          const xx = dir > 0 ? x0 + k : x0 + 5 - k;
+          set(xx, yb - 2 + j, pal[ch === "b" ? R.duckBody : ch === "h" ? R.duckHead : R.duckBill]);
+        }));
+        set(dir > 0 ? x0 - 1 : x0 + 6, yb + 1, pal[R.lakeHi]); set(dir > 0 ? x0 - 3 : x0 + 8, yb + 1, pal[R.lakeHi]);
+      }
+      // now and then a fish leaps out of the lake
+      if (!reduce) {
+        const cyc = Math.floor(clock / 6), ph = (clock % 6) / 1.1;
+        const fx = 290 + hash(cyc * 7.7) * 120, fy0 = sy(WATER) + 9; // in front of the pier
+        if (ph < 1.25) {
+          const f = Math.min(1, ph), x = Math.round(fx + f * 10) - ox, y = Math.round(fy0 - Math.sin(Math.PI * f) * 7);
+          if (ph < 1) { set(x, y, pal[R.foam]); set(x - 1, y, pal[R.lakeHi]); set(x - 2, y + (f < 0.5 ? 1 : -1), pal[R.lakeHi]); }
+          for (const [sx, s2] of [[fx, ph], [fx + 10, ph - 1]]) if (s2 >= 0 && s2 < 0.25) { // splash rings where it leaves and lands
+            const rr = 1 + Math.round(s2 * 8);
+            set(Math.round(sx) - rr - ox, fy0, pal[R.foam]); set(Math.round(sx) + rr - ox, fy0, pal[R.foam]); set(Math.round(sx) - ox, fy0 - 1, pal[R.foam]);
+          }
+        }
+      }
+      // village lights come on one by one as evening falls
+      const unlit = pack(...mix([hex("#3a4658"), hex("#3a4050"), hex("#2c3040"), hex("#20242e"), hex("#181c26")], ...timeWeights(progress)));
+      for (const L of WINDOWS) {
+        if (progress >= L.thr) continue;
+        const x0 = L.x - ox, y0 = sy(L.y);
+        if (x0 < -8 || x0 > W + 8) continue;
+        for (let y = -1; y <= L.h; y++) for (let x = -1; x <= L.w; x++) {
+          const inner = x >= 0 && y >= 0 && x < L.w && y < L.h;
+          if (!inner) set(x0 + x, y0 + y, pal[L.ring]);
+          else if (x !== 2 && y !== 2) set(x0 + x, y0 + y, unlit);
+        }
+      }
+      for (const L of LAMPS) {
+        if (progress >= L.thr) continue;
+        const x0 = L.x - ox, y0 = sy(L.y);
+        for (let y = 0; y < L.h; y++) for (let x = 0; x < L.w; x++) set(x0 + x, y0 + y, unlit);
+      }
+      // the moon laid on the water as a trembling column of short dashes
+      if (progress > 0.7) {
+        const mx = Math.round(W * 0.22), a = clamp((progress - 0.7) / 0.15);
+        for (let d = 1; d < 12; d += 2) {
+          const wob = reduce ? 0 : Math.round(Math.sin(clock * 2 + d) * 1);
+          const half = Math.max(0, 2 - (d >> 2));
+          for (let dx = -half; dx <= half; dx++) {
+            const x = mx + dx + wob, wx = x + ox;
+            if (wx < 0 || wx >= WW || G[wx] <= WATER + d || a < 0.3) continue;
+            set(x, sy(WATER) + d, pack(214, 206, 180));
+          }
         }
       }
     }
@@ -1121,6 +1233,45 @@
         for (const [dx, dy] of [[1, 1], [-1, 1], [1, -1], [-1, -1]]) blend(x + dx, y + dy, gold, 0.45 * vis);
         blend(x, y, [255, 255, 240], vis);
       });
+    }
+    // The cat on the stone roof, drawn at the walker's resolution: white, front-facing, two blue eyes that blink, tail swishing
+    {
+      const FH = H * 2, t = reduce ? 0 : clock;
+      const tailUp = Math.floor(t * 1.2) % 2 === 0, blink = (t % 4.2) < 0.18 || ((t + 1.3) % 7.5) < 0.14;
+      const rows = [
+        ".o.....o...",
+        "opo...opo..",
+        "owwwwwwwo..",
+        blink ? "owowwwowo.." : "owewwwewo..", // closed eyes: one line-coloured pixel each
+        "owwwnwwwo..",
+        ".owwwwwo...",
+        tailUp ? "..owwwo..o." : "..owwwo....",
+        tailUp ? ".owwwwwo.ow" : ".owwwwwo...",
+        tailUp ? "owwwwwwwoow" : "owwwwwwwo..",
+        tailUp ? "owwwwwwwwo." : "owwwwwwwwoo",
+        tailUp ? ".owo.owo..." : ".owo.owo.ow"
+      ];
+      const col: Record<string, number> = { o: pal[R.catLine], w: pal[R.catFur], p: pal[R.catPink], n: pal[R.catPink], e: pal[R.catEye] };
+      const x0 = Math.round((CAT[0] - camX) * 2), y0 = (CAT[1] - off + 18) * 2 + 1 - rows.length;
+      rows.forEach((row, j) => [...row].forEach((ch, i) => {
+        if (ch === ".") return;
+        const x = x0 + i, y = y0 + j;
+        if (x >= 0 && x < FW && y >= 0 && y < FH) fine32[y * FW + x] = col[ch];
+      }));
+    }
+    // A shooting star now and then at night, on the fine grid and behind the clouds
+    if (!reduce && night > 0.55) {
+      const FH = H * 2, cyc = Math.floor(clock / 5.5), ph = (clock % 5.5) / 0.75;
+      if (ph < 1) {
+        const x0 = (0.2 + hash(cyc * 3.1) * 0.6) * FW, y0 = (0.04 + hash(cyc * 5.7) * 0.22) * FH, len = 60 + hash(cyc) * 40;
+        const hx = x0 - ph * len, hy = y0 + ph * len * 0.45;
+        for (let k = 0; k < 18; k++) {
+          const x = Math.round(hx + k * 1.6), y = Math.round(hy - k * 0.72);
+          if (x < 0 || y < 0 || x >= FW || y >= FH || cloudMask[(y >> 1) * W + (x >> 1)]) continue;
+          const a = (1 - k / 18) * night * (ph < 0.15 ? ph / 0.15 : 1), i = y * FW + x, s0 = fine32[i];
+          fine32[i] = pack(Math.round((s0 & 255) * (1 - a) + 255 * a), Math.round(((s0 >> 8) & 255) * (1 - a) + 246 * a), Math.round(((s0 >> 16) & 255) * (1 - a) + 214 * a));
+        }
+      }
     }
     // The campfire flame: three flickering tongues on the fine grid, growing as the evening comes
     {
