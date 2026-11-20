@@ -68,6 +68,9 @@ ul, ol, dl { margin: 0; padding: 0; }
 @media (hover: hover) and (pointer: fine) { .bar__nav a:hover { color: var(--gold); } }
 .hour { display: flex; align-items: center; gap: 8px; margin: 0; padding-left: clamp(14px, 1.8vw, 26px); box-shadow: inset 2px 0 0 rgba(255, 255, 255, .14); font: 400 .95rem var(--pixel); color: var(--gold); font-variant-numeric: tabular-nums; white-space: nowrap; }
 .hour i { width: 10px; height: 10px; background: var(--gold); box-shadow: 0 0 0 2px var(--bar), 0 0 0 4px rgba(255, 207, 92, .35); }
+.rupees { display: flex; align-items: center; gap: 6px; margin: 0; font: 400 .95rem var(--pixel); color: #b6f59a; }
+.rupees[hidden] { display: none; }
+.rupees svg { width: 10px; height: 14px; shape-rendering: crispEdges; }
 .lang { display: inline-flex; padding: 0; border: 0; background: none; cursor: pointer; font: 700 .85rem var(--body); }
 .lang__opt { padding: 4px 9px; color: #9d97bd; transition: color 160ms ease, background-color 160ms ease; }
 html[lang="en"] .lang__opt[data-lang="en"], html[lang="es"] .lang__opt[data-lang="es"] { background: var(--text); color: var(--bar); }

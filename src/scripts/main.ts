@@ -170,6 +170,28 @@ if (hello && !pinned) {
   requestAnimationFrame(tick);
 }
 
+/* ---------------- Play: click Link to make him jump; find the hidden rupees ---------------- */
+{
+  const RKEY = "rupees";
+  try { const got = JSON.parse(store.get(RKEY) || "[]"); if (Array.isArray(got)) PixelWorld.setCollected(got.filter((n) => typeof n === "number")); } catch { /* ignore a broken entry */ }
+  const counter = $<HTMLElement>("#rupees");
+  const showCount = () => {
+    const n = PixelWorld.collected.length;
+    if (counter) { counter.hidden = n === 0; counter.querySelector("b")!.textContent = `${n}/${PixelWorld.rupeeTotal}`; }
+  };
+  showCount();
+  const blocked = (el: EventTarget | null) => el instanceof Element && !!el.closest(".panel, a, button, input, label, .bar, .foot");
+  document.addEventListener("click", (e) => {
+    if (blocked(e.target)) return;
+    const hit = PixelWorld.hit(e.clientX, e.clientY);
+    if (hit === "walker") PixelWorld.jump();
+    else if (typeof hit === "number") { PixelWorld.collect(hit); store.set(RKEY, JSON.stringify(PixelWorld.collected)); showCount(); }
+  });
+  if (finePointer) document.addEventListener("pointermove", (e) => {
+    document.body.style.cursor = !blocked(e.target) && PixelWorld.hit(e.clientX, e.clientY) !== null ? "pointer" : "";
+  }, { passive: true });
+}
+
 applyLang(lang);
 barState();
 anchors();

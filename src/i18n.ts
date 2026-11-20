@@ -57,6 +57,7 @@ export const UI = {
   },
 
   hello: { en: "Hi!", es: "¡Hola!" },
+  rupees: { en: "Rupees found", es: "Rupias encontradas" },
   footBlurb: {
     en: "Computer Engineering student at TEC.",
     es: "Estudiante de Ingeniería en Computación en el TEC."

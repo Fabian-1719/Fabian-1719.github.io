@@ -330,6 +330,8 @@
   type Light = { x: number; y: number; w: number; h: number; ring: number; thr: number };
   const WINDOWS: Light[] = [], LAMPS: Light[] = [];
   let CAT: [number, number] = [0, 0];
+  let FLAG: [number, number] = [0, 0];
+  let OWL: [number, number] = [0, 0];
   for (let x = 0; x < WW; x++) { // grass tufts break the top line
     if (G[x] >= WATER - 3 || (x > 240 && x < 264)) continue;
     const h = hash(x * 3.7);
@@ -622,8 +624,7 @@
     // finial and a banner in the wind
     for (let y = 0; y < 7; y++) put(main, x0 + 9, top - 22 - y, R.woodDk);
     put(main, x0 + 9, top - 29, R.gem);
-    for (const [fx, fy] of [[1, 0], [2, 0], [3, 0], [4, 1], [1, 1], [2, 1], [3, 1], [1, 2], [2, 2], [5, 1]])
-      put(main, x0 + 9 + fx, top - 28 + fy, fx > 3 ? R.roofDk : R.stripe);
+    FLAG = [x0 + 10, top - 28]; // the banner itself is drawn live so it can wave
   }
   const CHIMNEYS: [number, number][] = [];
   function house(x0: number, wall: "wood" | "stone") {
@@ -808,6 +809,7 @@
   house(732, "wood"); house(780, "stone"); house(834, "wood");
   lampPost(771); lampPost(821); lampPost(876);
   broadleaf(893, G[893], 8, 9);
+  { let y = 40; while (y < 150 && !main[y * WW + 893]) y++; OWL = [893, y]; } // the owl sits on its crown
   flowers(720, 900, 26);
   pine(960, G[960], 24); pine(1000, G[1000], 30); pine(1150, G[1150], 22);
   tentAndFire(1032, 1088);
@@ -868,6 +870,8 @@
   for (let i = 0; i < 5; i++) birds.push({ x: rnd() * 300, y: 30 + rnd() * 40, v: 6 + rnd() * 6, ph: rnd() * 6 });
   const flies: { x: number; y: number; ph: number; r: number }[] = [];
   for (let i = 0; i < 34; i++) { const x = 430 + rnd() * 700; flies.push({ x, y: G[Math.floor(x)] - 4 - rnd() * 18, ph: rnd() * 6.28, r: 3 + rnd() * 5 }); }
+  for (let i = 0; i < 12; i++) { const x = 1050 + rnd() * 70; flies.push({ x, y: G[Math.floor(x)] - 3 - rnd() * 12, ph: rnd() * 6.28, r: 2 + rnd() * 4 }); } // around the fire
+  for (let i = 0; i < 10; i++) { const x = 645 + rnd() * 75; flies.push({ x, y: WATER - 2 - rnd() * 10, ph: rnd() * 6.28, r: 2 + rnd() * 4 }); } // over the river
 
   /* ---------------- Renderer ---------------- */
   let canvas: HTMLCanvasElement, ctx: CanvasRenderingContext2D, img: ImageData, px32: Uint32Array, fineImg: ImageData, fine32: Uint32Array, W = 0, H = 0, scale = 1;
@@ -909,6 +913,17 @@
   const walker = { x: TOWER_X - 5, dir: 1, dist: 0, still: -1e9 };
   /** Where the walker's head is on screen (CSS px) and whether he has sat down at the campfire. */
   const hud = { x: 0, y: 0, atFire: false };
+  const walkerBox = { x0: 0, y0: 0, x1: 0, y1: 0 };
+  let jumpAt = -1e9;
+  type Rupee = { id: number; x: number; kind: 0 | 1 | 2 };
+  const RUPEES: Rupee[] = [
+    { id: 0, x: 96, kind: 0 }, { id: 1, x: 508, kind: 1 }, { id: 2, x: 612, kind: 0 },
+    { id: 3, x: 760, kind: 2 }, { id: 4, x: 960, kind: 1 }, { id: 5, x: 1150, kind: 0 }
+  ];
+  const RUPEE_COL = [["#b6f59a", "#3cc24e", "#16703a"], ["#bfe4ff", "#3f86e6", "#1d3c9a"], ["#ffc4c4", "#e2403a", "#8a1a1a"]].map((k) => k.map((h) => { const c = hex(h); return pack(c[0], c[1], c[2]); }));
+  const collected = new Set<number>();
+  const rupeeBoxes: { id: number; x0: number; y0: number; x1: number; y1: number }[] = [];
+  const pickups: { x: number; y: number; at: number }[] = [];
   function camera() {
     if (anchors && anchors.length > 1) {
       let i = 0;
@@ -1001,7 +1016,7 @@
         }
       }
       const ox = Math.round(camX * k);
-      const sway = li === 2 && !reduce; // leaves lean with the wind; trunks stay put
+      const sway = li === 2 && !reduce; // canopies rustle in pixel clusters; nothing else moves
       for (let y = 0; y < H; y++) {
         const ly = y + off - drop;
         if (ly < 0 || ly >= LH) continue;
@@ -1010,11 +1025,17 @@
           const wx = (x + ox) % WW;
           let c = buf[row + wx];
           if (sway) {
-            const sh = Math.round(Math.sin(clock * 1.5 + wx * 0.045 - ly * 0.02) * 0.8);
-            if (sh) {
-              const src = buf[row + Math.min(WW - 1, Math.max(0, wx - sh))];
-              if (LEAF[src]) c = src;
-              else if (LEAF[c]) c = 0; // the canopy edge moved away: background shows through
+            // rustle: in small staggered clumps the sunlit leaves slide a pixel left and right (frames 0/1/0/2),
+            // and a few edge leaves lift or poke out, driven by gusts that roll across the forest
+            const cy2 = Math.floor(ly / 2), cl = hash(Math.floor((wx + (cy2 % 3) * 2) / 4) * 3.17 + cy2 * 7.91);
+            const gust = Math.sin(clock * 0.9 - wx * 0.03) > 0.1 ? 1 : 0;
+            const fr = [0, 1, 0, 2][Math.floor(clock * (1.5 + gust * 3.5) + cl * 4) % 4];
+            if (LEAF[c] && c !== R.leafOut && fr) {
+              const from = buf[row + wx + (fr === 1 ? 1 : -1)]; // the light comes from the neighbour on that side
+              if (from === R.leafHi && c !== R.leafHi) c = R.leafHi;
+              else if (c === R.leafHi && from !== R.leafHi) c = R.leafMid;
+            } else if (!c && fr === 2 && cl < 0.3 && buf[row + WW + wx] === R.leafHi && ((wx * 7 + ly) % 4 === 0)) {
+              c = R.leafHi; // a leaf tip pokes above the edge
             }
           }
           if (c) { px32[out + x] = pal[c]; cloudMask[out + x] = 1; } // the sky's things stay behind whatever stands in front
@@ -1053,15 +1074,15 @@
         set(x + bend, sy(G[wx] - 2), pal[R.grassHi]);
       }
       // a few leaves letting go of the canopy: slow, swinging like a pendulum, turning as they fall
-      if (!reduce) for (let i = 0; i < 6; i++) {
-        const T = 13, tt = clock + i * (T / 6), cyc = Math.floor(tt / T), age = tt % T;
-        if (hash(cyc * 9.1 + i) < 0.35) continue; // not every cycle: the forest is calm, not snowing
+      if (!reduce) for (let i = 0; i < 22; i++) {
+        const T = 11, tt = clock + i * (T / 22), cyc = Math.floor(tt / T), age = tt % T;
+        if (hash(cyc * 9.1 + i) < 0.15) continue; // a steady drift of leaves, like the Kokiri woods
         const wx0 = Math.round(440 + hash(cyc * 4.7 + i * 1.3) * 190);
         let y0 = 92; while (y0 < 140 && !LEAF[main[y0 * WW + wx0]]) y0++;
         if (y0 >= 140) continue; // only from where a canopy actually is
         const ground = forestG(wx0) - 1, fall = age * 4.2;
         if (y0 + fall >= ground) continue;
-        const swing = Math.sin(age * 2.6 + i), x = Math.round(wx0 + swing * 4) - ox;
+        const swing = Math.sin(age * 2.6 + i), x = Math.round(wx0 + swing * 4 + age * 0.9) - ox; // the breeze carries them a little
         const y = Math.round(sy(y0 + fall + Math.cos(age * 5.2 + i * 2) * 0.8)); // lifts a little at each end of its swing
         const flat = Math.abs(swing) > 0.6, under = Math.cos(age * 2.6 + i) < 0;
         const c = pal[under ? R.leafLo : R.leafHi];
@@ -1199,7 +1220,7 @@
     // The sword in its pedestal, on the fine grid so it stands half again the walker's height
     {
       const sw = SWORD_ROWS[0].length, sh = SWORD_ROWS.length, FH = H * 2;
-      const cx = Math.round((SWORD_X - camX) * 2), bottom = (G[SWORD_X] + 1 - off + 18) * 2 + 1;
+      const cx = (SWORD_X - Math.round(camX)) * 2, bottom = (G[SWORD_X] + 1 - off + 18) * 2 + 1;
       for (let j = 0; j < sh; j++) {
         const y = bottom - sh + 1 + j; if (y < 0 || y >= FH) continue;
         for (let i = 0; i < sw; i++) {
@@ -1263,7 +1284,7 @@
         tailUp ? ".owo.owo..." : ".owo.owo.ow"
       ];
       const col: Record<string, number> = { o: pal[R.catLine], w: pal[R.catFur], p: pal[R.catPink], n: pal[R.catPink], e: pal[R.catEye] };
-      const x0 = Math.round((CAT[0] - camX) * 2), y0 = (CAT[1] - off + 18) * 2 + 2 - rows.length; // paws on the ridge
+      const x0 = (CAT[0] - Math.round(camX)) * 2, y0 = (CAT[1] - off + 18) * 2 + 2 - rows.length; // paws on the ridge
       rows.forEach((row, j) => [...row].forEach((ch, i) => {
         if (ch === ".") return;
         const x = x0 + i, y = y0 + j;
@@ -1286,7 +1307,7 @@
     }
     // The campfire flame: three flickering tongues on the fine grid, growing as the evening comes
     {
-      const FH = H * 2, fx2 = Math.round((FIRE_X - camX) * 2), fb2 = (G[FIRE_X] - 2 - off + 18) * 2;
+      const FH = H * 2, fx2 = (FIRE_X - Math.round(camX)) * 2, fb2 = (G[FIRE_X] - 2 - off + 18) * 2;
       const lit = 0.35 + 0.65 * clamp((progress - 0.5) / 0.3);
       const t = reduce ? 0 : clock;
       const tongues = [[-3, 0.7, 1.7], [0, 1, 0], [3, 0.75, 3.1]];
@@ -1307,6 +1328,105 @@
         }
       }
     }
+    // ---- Fine-grid life: sword glint, the waving flag, forest fairies, light shafts, butterflies, dew, the owl, rupees ----
+    {
+      const FH = H * 2, t = reduce ? 0 : clock, ocx = Math.round(camX);
+      const fx = (wx: number) => (wx - ocx) * 2, fy = (wy: number) => (wy - off + 18) * 2;
+      const setF = (x: number, y: number, c: number) => { if (x >= 0 && y >= 0 && x < FW && y < FH) fine32[y * FW + x] = c; };
+      const blendF = (x: number, y: number, rgb: number[], a: number) => {
+        if (x < 0 || y < 0 || x >= FW || y >= FH || a <= 0) return;
+        const k = y * FW + x, s0 = fine32[k];
+        fine32[k] = pack(Math.round((s0 & 255) * (1 - a) + rgb[0] * a), Math.round(((s0 >> 8) & 255) * (1 - a) + rgb[1] * a), Math.round(((s0 >> 16) & 255) * (1 - a) + rgb[2] * a));
+      };
+      // 5) a glint runs up the Master Sword's blade every few seconds, then the tip sparkles
+      if (!reduce) {
+        const ph = (clock % 4.5) / 0.6, scx = fx(SWORD_X), sbot = (G[SWORD_X] + 1 - off + 18) * 2 + 1 - 9; // top of the pedestal
+        if (ph < 1) { const y = Math.round(sbot - ph * 26); for (let dx = -1; dx <= 1; dx++) blendF(scx + dx, y, [255, 255, 255], 0.9); blendF(scx, y - 1, [255, 255, 255], 0.6); }
+        else if (ph < 1.6) { const k = 1 - (ph - 1) / 0.6, ty = sbot - 29; for (let d = 1; d <= 3; d++) { const a = k * (1 - d / 4); blendF(scx + d, ty, [255, 255, 240], a); blendF(scx - d, ty, [255, 255, 240], a); blendF(scx, ty + d, [255, 255, 240], a); blendF(scx, ty - d, [255, 255, 240], a); } blendF(scx, ty, [255, 255, 255], k); }
+      }
+      // 4) the tower banner waves: each column lifts and drops on a travelling wave, light and shade along the folds
+      {
+        const bx = fx(FLAG[0]), by = fy(FLAG[1]);
+        for (let c = 0; c < 10; c++) {
+          const wave = Math.sin(t * 6 - c * 0.75), dy = Math.round(wave * (c / 9) * 1.6), len = c < 8 ? 6 : c < 9 ? 4 : 2;
+          for (let r = 0; r < len; r++) {
+            const yy = by + dy + r + (6 - len) / 2;
+            setF(bx + c, Math.round(yy), pal[wave > 0.35 ? R.stripe : wave < -0.35 ? R.roofDk : (c > 7 ? R.roofDk : R.stripe)]);
+          }
+        }
+      }
+      // 2) shafts of light slant down through gaps in the canopy, with motes drifting in them (morning to golden hour)
+      const sun = clamp(1 - night * 1.6) * clamp(1.3 - progress);
+      if (sun > 0.05) for (const [i, sx] of [[0, 474], [1, 528], [2, 584], [3, 622]] as const) {
+        const top = 114, bot = forestG(sx) - 1, a0 = 0.17 * sun * (0.75 + 0.25 * Math.sin(t * 0.4 + i * 1.7));
+        for (let wy = top; wy < bot; wy++) for (let k = 0; k < 5; k++) {
+          const wx = sx + (wy - top) * 0.32 + k, x = fx(Math.round(wx)) + ((wy * 2) & 1), edge = k === 0 || k === 4 ? 0.5 : 1;
+          blendF(x, fy(wy), [255, 236, 170], a0 * edge); blendF(x + 1, fy(wy), [255, 236, 170], a0 * edge);
+          blendF(x, fy(wy) + 1, [255, 236, 170], a0 * edge); blendF(x + 1, fy(wy) + 1, [255, 236, 170], a0 * edge);
+        }
+        for (let m = 0; m < 4; m++) { // motes
+          const age = (t * 3 + m * 9 + i * 5) % 34, wy = top + 2 + age, wx = sx + (wy - top) * 0.32 + 1 + ((m * 3 + i) % 3) + Math.sin(t + m) * 0.8;
+          if (wy < bot) blendF(Math.round(fx(wx)), fy(wy), [255, 248, 210], 0.75 * sun);
+        }
+      }
+      // 1) fairies drifting among the forest trees: a bright core, a soft halo, flickering wings
+      for (let i = 0; i < 3; i++) {
+        const wx = 470 + i * 62 + Math.sin(t * 0.45 + i * 2.1) * 20 + Math.sin(t * 1.3 + i) * 5;
+        const wy = 126 + Math.sin(t * 0.7 + i * 1.7) * 9 + Math.cos(t * 1.9 + i) * 3;
+        const x = Math.round(fx(wx)), y = Math.round(fy(wy)), glow = 0.42 + night * 0.3, pulse = 0.8 + 0.2 * Math.sin(t * 5 + i);
+        const tint = i === 1 ? [255, 214, 236] : [210, 240, 255];
+        for (let dy = -7; dy <= 7; dy++) for (let dx = -7; dx <= 7; dx++) { const d = Math.hypot(dx - 0.5, dy - 0.5); if (d <= 7) blendF(x + dx, y + dy, tint, glow * pulse * (1 - d / 7.5)); }
+        const ring = pack(tint[0] - 40, tint[1] - 20, 255);
+        for (const [dx, dy] of [[-1, 0], [-1, 1], [2, 0], [2, 1], [0, -1], [1, -1], [0, 2], [1, 2]]) setF(x + dx, y + dy, ring);
+        const up = Math.floor(t * 14 + i) % 2;
+        setF(x - 2, y - 1 + up, pack(232, 246, 255)); setF(x + 2, y - 1 + up, pack(232, 246, 255));
+        setF(x - 3, y - 2 + up * 2, pack(190, 226, 255)); setF(x + 3, y - 2 + up * 2, pack(190, 226, 255));
+        for (const [dx, dy] of [[0, 0], [1, 0], [0, 1], [1, 1]]) setF(x + dx - 0, y + dy - 0, pack(255, 255, 255));
+      }
+      // 3) butterflies over the flower patches by day
+      if (day > 0.3) for (let i = 0; i < 4; i++) {
+        const c0 = [130, 548, 790, 852][i];
+        const wx = c0 + Math.sin(t * 0.6 + i * 1.9) * 14 + Math.sin(t * 2.2 + i) * 3, wy = G[c0] - 6 + Math.sin(t * 1.7 + i * 2) * 3;
+        const x = Math.round(fx(wx)), y = Math.round(fy(wy)), open = Math.floor(t * 9 + i * 1.3) % 2 === 0;
+        const wing = pal[i % 2 ? R.flowerB : R.flowerA], body = pack(50, 40, 40);
+        setF(x, y, body); setF(x, y + 1, body);
+        if (open) { setF(x - 1, y - 1, wing); setF(x - 2, y - 1, wing); setF(x - 1, y, wing); setF(x + 1, y - 1, wing); setF(x + 2, y - 1, wing); setF(x + 1, y, wing); }
+        else { setF(x, y - 1, wing); setF(x, y - 2, wing); setF(x + 1, y - 2, wing); } // wings folded up together
+      }
+      // 7) morning dew: grass tips catch the light and twinkle, fading as the day goes on
+      const dew = clamp((0.3 - progress) / 0.3);
+      if (dew > 0) for (const wx of TUFTS) {
+        const ph = hash(wx * 1.73) * 6.28, tw = Math.sin(t * 2.6 + ph);
+        if (tw < 0.86) continue;
+        const x = fx(wx) + 1, y = fy(G[wx] - 2), a = dew * (tw - 0.86) / 0.14;
+        blendF(x, y, [255, 255, 255], a); blendF(x - 1, y, [255, 255, 255], a * 0.5); blendF(x + 1, y, [255, 255, 255], a * 0.5); blendF(x, y - 1, [255, 255, 255], a * 0.5);
+      }
+      // 8) at night an owl keeps watch from the big tree by the village: blinks, and looks left and right
+      if (night > 0.45) {
+        const x0 = fx(OWL[0]) - 4, y0 = fy(OWL[1]) - 10, look = Math.floor(t / 2.4) % 3, blink = (t % 3.7) < 0.16;
+        const eyes = blink ? "bwwbkbwwb".replace("k", "b") : look === 0 ? "bywbbbywb" : look === 1 ? "bwybbbwyb" : "bwybbbywb";
+        const rows = [".b.....b.", ".bbbbbbb.", "bwwbbbwwb", blink ? "bwwbbbwwb" : eyes, "bwwbkbwwb", ".bbbkbbb.", ".blbbblb.", ".bblllbb.", "..blllb..", "..f...f.."];
+        const col: Record<string, number> = { b: pack(...mix([hex("#6a4a32"), hex("#6a4a32"), hex("#5a4038"), hex("#4a3a40"), hex("#3a3040")], ...timeWeights(progress))), w: pack(214, 196, 160), y: pack(255, 210, 70), k: pack(232, 150, 50), l: pack(178, 150, 110), f: pack(232, 150, 50) };
+        rows.forEach((row, j) => [...row].forEach((ch, i) => { if (ch !== ".") setF(x0 + i, y0 + j, col[ch]); }));
+      }
+      // 12) hidden rupees in the grass: they glint, and a click picks them up
+      rupeeBoxes.length = 0;
+      const RS = ["..a..", ".aab.", "abbbc", "abbbc", "abbbc", ".bbc.", "..c.."];
+      for (const r of RUPEES) {
+        if (collected.has(r.id)) continue;
+        const x0 = fx(r.x) - 2, y0 = fy(G[r.x]) - RS.length + 1;
+        if (x0 < -6 || x0 > FW + 6) continue;
+        const [hi, mid, dk] = RUPEE_COL[r.kind], shine = !reduce && ((clock + r.id * 1.3) % 3) < 0.25;
+        RS.forEach((row, j) => [...row].forEach((ch, i) => { if (ch !== ".") setF(x0 + i, y0 + j, ch === "a" ? (shine ? pack(255, 255, 255) : hi) : ch === "b" ? mid : dk); }));
+        const k = scale / 2; rupeeBoxes.push({ id: r.id, x0: (x0 - 3) * k, y0: (y0 - 3) * k, x1: (x0 + 8) * k, y1: (y0 + 10) * k });
+      }
+      for (let i = pickups.length - 1; i >= 0; i--) { // a little sparkle where one was picked up
+        const pk = pickups[i], a = 1 - (now - pk.at) / 600;
+        if (a <= 0) { pickups.splice(i, 1); continue; }
+        const x = fx(pk.x), y = fy(pk.y) - 4 - Math.round((1 - a) * 10);
+        for (let d = 1; d <= 3; d++) { blendF(x + d, y, [255, 255, 220], a); blendF(x - d, y, [255, 255, 220], a); blendF(x, y + d, [255, 255, 220], a); blendF(x, y - d, [255, 255, 220], a); }
+      }
+    }
     // The walker follows the camera along the path, stepping with the scroll, at full resolution
     {
       const lead = Math.min(24, W * focus - 30) * (1 - clamp(progress / 0.05)); // starts a little before the tower
@@ -1321,13 +1441,18 @@
       let gy = pathY(walker.x);
       for (const dx of [-2, -1, 1, 2]) gy = Math.max(gy, pathY(walker.x + dx));
       const feet = (gy - off + 18) * 2;
-      const sx0 = Math.round((walker.x - camX) * 2) - (fw >> 1), sy0 = feet - 1 - LINK_FEET[f];
-      hud.x = (sx0 + fw / 2) * scale / 2; hud.y = sy0 * scale / 2; hud.atFire = progress >= 0.985 && !walking;
+      const jt = (now - jumpAt) / 520, hop = jt >= 0 && jt < 1 ? Math.round(Math.sin(Math.PI * jt) * 16) : 0; // a little jump when clicked
+      const sx0 = Math.round((walker.x - camX) * 2) - (fw >> 1), sy0 = feet - 1 - LINK_FEET[f] - hop;
+      const idle = !walking && !hud.atFire && now - walker.still > 3000;
+      const faceDir = idle && Math.floor((now - walker.still - 3000) / 2600) % 2 === 1 ? -walker.dir : walker.dir; // looks around while waiting
+      walkerBox.x0 = sx0 * scale / 2; walkerBox.x1 = (sx0 + fw) * scale / 2; walkerBox.y0 = sy0 * scale / 2; walkerBox.y1 = (sy0 + rows.length) * scale / 2;
+      hud.x = (sx0 + fw / 2) * scale / 2; hud.y = (sy0 + hop) * scale / 2; hud.atFire = progress >= 0.985 && !walking;
       const overWater = G[Math.round(walker.x)] > WATER;
       const wl = (WATER - off + 18) * 2; // water line on the fine grid
       { // a soft contact shadow on the ground under him
         const cx = sx0 + (fw >> 1);
-        for (let dy = 0; dy < 2; dy++) for (let dx = -8 + dy * 2; dx <= 8 - dy * 2; dx++) {
+        const sw = 8 - Math.round(hop / 4);
+        for (let dy = 0; dy < 2; dy++) for (let dx = -sw + dy * 2; dx <= sw - dy * 2; dx++) {
           const x = cx + dx, y = feet + dy - 1;
           if (x < 0 || x >= FW || y < 0 || y >= FH) continue;
           const k = y * FW + x, s0 = fine32[k], m = Math.abs(dx) > 5 ? 0.82 : 0.66;
@@ -1337,7 +1462,7 @@
       for (let j = 0; j < rows.length; j++) {
         const y = sy0 + j, row = rows[j];
         for (let i = 0; i < fw; i++) {
-          const ch = row[walker.dir > 0 ? i : fw - 1 - i];
+          const ch = row[faceDir > 0 ? i : fw - 1 - i];
           if (ch === ".") continue;
           const x = sx0 + i; if (x < 0 || x >= FW) continue;
           const c = pal[R["lk_" + ch]];
@@ -1398,5 +1523,19 @@
     setAnchors(list: [number, number][], f?: number) { anchors = list; if (f) focus = f; dirty = true; if (reduce) render(0); },
     places: { tower: TOWER_X + 9, falls: 285, sword: SWORD_X, bridge: 680, village: 800, fire: FIRE_X },
     get scale() { return scale; },
-    get walker() { return hud; }
+    get walker() { return hud; },
+    /** What is under a screen point: "walker", a rupee id, or null. */
+    hit(x: number, y: number): "walker" | number | null {
+      for (const b of rupeeBoxes) if (x >= b.x0 && x <= b.x1 && y >= b.y0 && y <= b.y1) return b.id;
+      if (x >= walkerBox.x0 && x <= walkerBox.x1 && y >= walkerBox.y0 && y <= walkerBox.y1) return "walker";
+      return null;
+    },
+    jump() { if (performance.now() - jumpAt > 560) { jumpAt = performance.now(); dirty = true; } },
+    collect(id: number) {
+      const r = RUPEES.find((q) => q.id === id); if (!r || collected.has(id)) return;
+      collected.add(id); pickups.push({ x: r.x, y: G[r.x], at: performance.now() }); dirty = true; if (reduce) render(0);
+    },
+    setCollected(ids: number[]) { ids.forEach((i) => collected.add(i)); },
+    get collected() { return [...collected]; },
+    rupeeTotal: 6
   };

@@ -48,6 +48,10 @@ const canonical = new URL(Astro.url.pathname, Astro.site).href;
       <a href={`${base}#stack`} data-sec="stack" data-es={UI.navStack.es}>{UI.navStack.en}</a>
       <a href={`${base}#contact`} data-sec="contact" data-es={UI.navContact.es}>{UI.navContact.en}</a>
     </nav>
+    <p class="rupees" id="rupees" hidden aria-label={UI.rupees.en} data-es-label={UI.rupees.es}>
+      <svg viewBox="0 0 5 7" aria-hidden="true"><path d="M2 0h1v1h1v5H3v1H2V6H1V1h1z" fill="#3cc24e"/><path d="M2 1h1v1H2zM1 2h1v3H1z" fill="#b6f59a"/><path d="M3 2h1v4H3z" fill="#16703a"/></svg>
+      <b>0/6</b>
+    </p>
     <p class="hour" aria-hidden="true"><i></i><span id="clockTime">07:00</span> <span id="clockLabel">morning</span></p>
     <button class="lang" type="button" id="lang" aria-label="Cambiar a español">
       <span class="lang__opt" data-lang="es">ES</span><span class="lang__opt" data-lang="en">EN</span>
