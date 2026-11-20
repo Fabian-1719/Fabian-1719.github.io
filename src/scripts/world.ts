@@ -226,7 +226,22 @@
         if (couloir) c = litFace ? R.farMid : R.farDeep;
         if (!litFace && x - split < 2.2) c = R.farDeep; // a crisp shadow just under the main ridge
       }
-      if (d === 0) c = litFace ? (snowHere ? R.farRim : R.farRim) : (snowHere ? R.snowSh : R.farMid); // sunlit rim on the skyline
+      // texture: small rocks scattered at jittered spots (no grid), each a lit top over a shadow that follows
+      // the slope; in the snow, short wind ridges. Clusters only, never lone pixels.
+      const gx = Math.floor(x / 5), gy = Math.floor(y / 4);
+      for (let oy = -1; oy <= 0; oy++) for (let ox = -1; ox <= 0; ox++) {
+        const cx = gx + ox, cy = gy + oy, hk = cx * 7.13 + cy * 13.37;
+        if (hash(hk) < 0.62) continue;
+        const sx = cx * 5 + Math.floor(hash(hk + 1.1) * 5), sy = cy * 4 + Math.floor(hash(hk + 2.3) * 4);
+        const dir = litFace ? -1 : 1, lx = x - sx, ly = y - sy;
+        if (!snowHere && d > 2 && !couloir) {
+          const big = hash(hk + 3.7) > 0.5;
+          if (ly === 0 && (lx === 0 || (big && lx === 1)) && litFace) c = R.farRim;
+          else if (ly === 1 && (lx === 0 || lx === 1 || (big && lx === 2))) c = litFace ? R.farMid : R.farDeep;
+          else if (ly === 2 && lx === (dir < 0 ? 0 : 1) + (big ? dir : 0)) c = litFace ? R.farMid : R.farDeep;
+        } else if (snowHere && d > 1 && ly === 0 && lx >= 0 && lx < 3 && hash(hk + 5.9) > 0.45) c = litFace ? R.snowSh : R.farMid;
+      }
+      if (d === 0) c = litFace ? R.farRim : (snowHere ? R.snowSh : R.farMid); // sunlit rim on the skyline
       if (!snowHere && k > 0.5 + (noise(x * 0.06 + 3) - 0.5) * 0.16) c = R.farHaze; // haze settles in the valley, clean edge
       put(far, x, y, c);
     }
@@ -728,29 +743,36 @@
   type Cloud = { m: [number, number, number][]; w: number; x: number; y: number; v: number };
   const clouds: Cloud[] = [];
   for (let i = 0; i < 6; i++) {
-    const w = 34 + Math.floor(rnd() * 34), base = 16;
-    const n = 3 + Math.floor(rnd() * 3), puffs: [number, number, number][] = [];
-    for (let j = 0; j < n; j++) {
-      const mid = 1 - Math.abs(j - (n - 1) / 2) / n;
-      const r = Math.round(3 + rnd() * 3 + mid * 5);
-      puffs.push([6 + j * (w - 12) / (n - 1) + rnd() * 3, base - r * 0.55, r]);
+    const w = 40 + Math.floor(rnd() * 40), base = 20;
+    const n = 4 + Math.floor(rnd() * 3), puffs: [number, number, number][] = [];
+    for (let j = 0; j < n; j++) { // a row of bumps, biggest in the middle, so the top makes a dome
+      const t = j / (n - 1), mid = Math.sin(Math.PI * t);
+      const r = Math.round(4 + mid * 6 + rnd() * 2.5);
+      puffs.push([5 + t * (w - 10) + (rnd() - 0.5) * 3, base - r * 0.6 - mid * 2, r]);
+    }
+    for (let j = 0; j < 2; j++) { // a second tier on top of the dome
+      const r = Math.round(4 + rnd() * 3);
+      puffs.push([w * (0.35 + rnd() * 0.3), base - 10 - rnd() * 4 - r * 0.4, r]);
     }
     const m: [number, number, number][] = [];
-    for (let y = 0; y <= base; y++) for (let x = 0; x < w + 4; x++) {
-      let best = -1, nx = 0, ny = 0;
+    for (let y = 0; y <= base; y++) for (let x = -2; x < w + 4; x++) {
+      let best = -1, second = -1, nx = 0, ny = 0, by = 0;
       for (const [cx, cy, r] of puffs) {
-        const d = Math.hypot(x - cx, (y - cy) * 1.15) / r;
-        if (d <= 1 && 1 - d > best) { best = 1 - d; nx = (x - cx) / r; ny = (y - cy) / r; }
+        const q = 1 - Math.hypot(x - cx, (y - cy) * 1.1) / r;
+        if (q > best) { second = best; best = q; nx = (x - cx) / r; ny = (y - cy) / r; by = cy; }
+        else if (q > second) second = q;
       }
       if (best < 0) continue;
-      const light = -nx * 0.45 - ny * 0.85;
-      let tone = light > 0.32 ? 0 : light > -0.2 ? 1 : 2;
-      if (tone === 0 && light < 0.44 && !dith(x, y, (light - 0.32) / 0.12)) tone = 1;
-      if (y >= base - 1) tone = 2;
+      const light = -nx * 0.5 - ny * 0.85;
+      let tone = light > 0.3 ? 0 : light > -0.25 ? 1 : 2;
+      if (second > -0.02 && best - second < 0.09 && y > by - 1) tone = Math.min(2, tone + 1); // crease where two bumps meet
+      if (best < 0.12 && light > 0.1) tone = 0; // bright rim on the sunny side
+      if (y >= base - 2 + (hash(x * 0.71 + i) > 0.6 ? 1 : 0)) tone = 2; // flat, shaded underside
       m.push([x, y, tone]);
     }
-    clouds.push({ m, w, x: i * 120 + rnd() * 60, y: 6 + rnd() * 34, v: 0.5 + rnd() * 0.7 });
+    clouds.push({ m, w, x: i * 120 + rnd() * 60, y: 4 + rnd() * 34, v: 0.5 + rnd() * 0.7 });
   }
+  let cloudMask = new Uint8Array(0);
   const stars: [number, number, number, number][] = [];
   for (let i = 0; i < 160; i++) stars.push([rnd(), rnd() * 0.7, rnd(), rnd() * 6.28]);
   const birds: { x: number; y: number; v: number; ph: number }[] = [];
@@ -859,12 +881,13 @@
         if (dith(x, y, a)) px32[y * W + x] = pack(244, 233, 200);
       });
     }
-    // Clouds
+    // Clouds (remembered in a mask so the stars and the constellation stay behind them)
+    if (cloudMask.length !== W * H) cloudMask = new Uint8Array(W * H); else cloudMask.fill(0);
     for (const c of clouds) {
       const cx = Math.round(((c.x + clock * c.v - camX * 0.12) % (W + 90) + W + 90) % (W + 90)) - 75;
       for (const [x, y, sh] of c.m) {
         const X = cx + x, Y = Math.round(c.y + y);
-        if (X >= 0 && X < W && Y >= 0 && Y < H) px32[Y * W + X] = pal[sh === 0 ? R.cloud : sh === 1 ? R.cloudMid : R.cloudSh];
+        if (X >= 0 && X < W && Y >= 0 && Y < H) { px32[Y * W + X] = pal[sh === 0 ? R.cloud : sh === 1 ? R.cloudMid : R.cloudSh]; cloudMask[Y * W + X] = 1; }
       }
     }
     // Birds by day
@@ -1000,7 +1023,7 @@
       const cy = (W < 160 ? Math.floor(H * 0.2) : Math.max(Math.floor(H * 0.07), Math.ceil(66 / scale))) * 2;
       const P = [[24, 0], [0, 40], [48, 40], [12, 20], [36, 20], [24, 40]].map(([x, y]) => [cx + Math.round(x * u), cy + Math.round(y * u)]);
       const blend = (x: number, y: number, rgb: number[], a: number) => {
-        if (x < 0 || y < 0 || x >= FW || y >= FH) return;
+        if (x < 0 || y < 0 || x >= FW || y >= FH || cloudMask[(y >> 1) * W + (x >> 1)]) return; // behind the clouds
         const k = y * FW + x, s0 = fine32[k];
         fine32[k] = pack(Math.round((s0 & 255) * (1 - a) + rgb[0] * a), Math.round(((s0 >> 8) & 255) * (1 - a) + rgb[1] * a), Math.round(((s0 >> 16) & 255) * (1 - a) + rgb[2] * a));
       };
