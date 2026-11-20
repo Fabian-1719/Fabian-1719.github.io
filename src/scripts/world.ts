@@ -359,7 +359,7 @@
     put(main, x, G[x] + w, R.rockDk);
   }
   // Waterfall: a curling lip, columns that fall at their own pace, dark solid edges, a foam mound and spray puffs
-  for (let y = 112; y < WATER + 1; y++) {
+  for (let y = 113; y < WATER + 1; y++) {
     const t = (y - 112) / (WATER - 112);
     const l = 245 - Math.round(t * 2), r = 255 + Math.round(t * 4);
     for (let x = l; x <= r; x++) {
@@ -371,9 +371,8 @@
       put(main, x, y, R.fall0 + ((k + (y >> 1)) & 3));
     }
   }
-  for (let x = 243; x < 257; x++) { // the lip curls over the edge: foam, then a bright roll
-    put(main, x, 110, x === 243 || x === 256 ? R.fall3 : R.foam);
-    put(main, x, 111, R.fall2);
+  for (let x = 244; x < 256; x++) { // the lip curls over the edge, level with the rock
+    put(main, x, 112, x === 243 || x === 256 ? R.fall3 : (x & 1 ? R.foam : R.fall2)); // level with the cliff top
   }
   // the foam mound where the water lands: a solid half-dome, its top churning in cycle colours
   for (let dx = -11; dx <= 11; dx++) for (let dy = 0; dy <= 5; dy++) {
@@ -1156,11 +1155,23 @@
       const walking = now - walker.still < 220;
       const f = walking ? Math.floor(walker.dist / 2) % LINK_FRAMES.length : 3;
       const rows = LINK_FRAMES[f], fw = rows[0].length, FH = H * 2;
-      const feet = (pathY(walker.x) - off + 18) * 2;
+      // stand on the lowest ground under both feet, so a downhill foot never hangs in the air
+      let gy = pathY(walker.x);
+      for (const dx of [-2, -1, 1, 2]) gy = Math.max(gy, pathY(walker.x + dx));
+      const feet = (gy - off + 18) * 2;
       const sx0 = Math.round((walker.x - camX) * 2) - (fw >> 1), sy0 = feet - 1 - LINK_FEET[f];
       hud.x = (sx0 + fw / 2) * scale / 2; hud.y = sy0 * scale / 2; hud.atFire = progress >= 0.985 && !walking;
       const overWater = G[Math.round(walker.x)] > WATER;
       const wl = (WATER - off + 18) * 2; // water line on the fine grid
+      { // a soft contact shadow on the ground under him
+        const cx = sx0 + (fw >> 1);
+        for (let dy = 0; dy < 2; dy++) for (let dx = -8 + dy * 2; dx <= 8 - dy * 2; dx++) {
+          const x = cx + dx, y = feet + dy - 1;
+          if (x < 0 || x >= FW || y < 0 || y >= FH) continue;
+          const k = y * FW + x, s0 = fine32[k], m = Math.abs(dx) > 5 ? 0.82 : 0.66;
+          fine32[k] = pack(Math.round((s0 & 255) * m), Math.round(((s0 >> 8) & 255) * m), Math.round(((s0 >> 16) & 255) * m));
+        }
+      }
       for (let j = 0; j < rows.length; j++) {
         const y = sy0 + j, row = rows[j];
         for (let i = 0; i < fw; i++) {
