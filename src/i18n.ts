@@ -18,8 +18,8 @@ export const UI = {
     es: "Desarrollo aplicaciones web y servicios en la nube, con enfoque en sistemas distribuidos y desarrollo full-stack, y un interés creciente en la ciberseguridad, la administración de proyectos y la arquitectura de software."
   },
   heroLede2: {
-    en: "I like taking an idea from the interface all the way to the server; these are the projects I've built along the way.",
-    es: "Me gusta llevar una idea desde la interfaz hasta el servidor; estos son los proyectos que he construido en el camino."
+    en: "I take each idea from the interface to the server; these are the projects I've built.",
+    es: "Trabajo cada idea desde la interfaz hasta el servidor; estos son los proyectos que he construido."
   },
   heroCta: { en: "See projects", es: "Ver proyectos" },
   cv: { en: "CV", es: "CV" },
@@ -27,7 +27,7 @@ export const UI = {
   cvSoon: { en: "CV coming soon", es: "CV disponible pronto" },
 
   aboutLabel: { en: "About", es: "Sobre mí" },
-  aboutTitle: { en: "I like to understand a system from start to finish.", es: "Me gusta entender un sistema de principio a fin." },
+  aboutTitle: { en: "I design systems with the whole flow in mind, end to end.", es: "Diseño sistemas pensando en todo su recorrido, de principio a fin." },
   aboutP: {
     en: "At university I've worked in teams on a microservices platform on Azure, a game console with a Prolog AI and analytics in Go and Scala, and a price tracker with concurrent scraping. Right now I'm going deeper into distributed systems, software architecture, project management and cybersecurity.",
     es: "En la carrera he trabajado en equipo en una plataforma de microservicios en Azure, una consola de juegos con IA en Prolog y analítica en Go y Scala, y un rastreador de precios con scraping concurrente. Ahora profundizo en sistemas distribuidos, arquitectura de software, administración de proyectos y ciberseguridad."
