@@ -31,9 +31,9 @@ export const bags: Bag[] = [
     ]
   },
   {
-    id: "tools", label: { en: "Cloud & tools", es: "Nube y herramientas" }, slots: 6, items: [
+    id: "tools", label: { en: "Cloud & tools", es: "Nube y herramientas" }, slots: 7, items: [
       item("Azure", "AZ", "#7fb2ff"), item("Firebase", "FB", "#ffb86b"), item("Docker", "DK", "#7fe0ff"),
-      item("Redis", "RD", "#ff7a7a"), item("Git", "GIT", "#ff9b6b"), item("GitHub Actions", "GA", "#c9cfdf")
+      item("Redis", "RD", "#ff7a7a"), item("Git", "GIT", "#ff9b6b"), item("GitHub Actions", "GA", "#c9cfdf"), item("Postman", "PM", "#ff8a4a")
     ]
   }
 ];
