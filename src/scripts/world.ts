@@ -11,9 +11,9 @@
     farRim:   ["#d4e4f2", "#f4caa8", "#c497b6", "#3d4874"],
     farDeep:  ["#6b87ab", "#9a6f74", "#5c4474", "#1a2140"],
     snowSh:   ["#c4d6ea", "#eec4b2", "#bf92ae", "#424e7c"],
-    hillLit:  ["#6aa66c", "#9aa456", "#626076", "#1f2f40"],
-    hillMid:  ["#4a8a5a", "#768448", "#4a4a62", "#182636"],
-    hillDark: ["#336a4a", "#55603c", "#373750", "#111c2a"],
+    hillLit:  ["#6aa66c", "#8ea258", "#5a7864", "#23384a"],
+    hillMid:  ["#4a8a5a", "#6a7e4a", "#3e5a52", "#1a2c3c"],
+    hillDark: ["#336a4a", "#4c5c3c", "#2c4244", "#121e2c"],
     leafHi:   ["#9ad86a", "#cfc85c", "#868060", "#2e5040"],
     leafMid:  ["#58a850", "#89a040", "#58604c", "#21402f"],
     leafLo:   ["#367e40", "#5e7232", "#3c463c", "#172f25"],
@@ -256,7 +256,7 @@
       put(far, x, y, c);
     }
   }
-  // Mid hills: rolling, with tree-top bumps and dithered shading
+  // Mid hills: a rolling, forested ridge drawn as rows of tree crowns
   const midTop = (x: number): number => Math.round(138 - fbm(x * 0.011 + 50) * 38 - Math.abs(Math.sin(x * 0.55)) * 2.5 * noise(x * 0.2));
   for (let x = 0; x < WW; x++) {
     const t = midTop(x);
@@ -265,6 +265,24 @@
       let c = R.hillMid;
       if (d < 2) c = midTop(x - 2) > t ? R.hillLit : R.hillMid;
       else if (d > 9 + Math.round(noise(x * 0.05 + 11) * 8)) c = R.hillDark; // a clean step into shade, no dot pattern
+      // a distant forest: rows of round tree crowns, each lit on its upper left and shaded on its lower right
+      if (d >= 2) {
+        const shade = c === R.hillDark, gx = Math.floor(x / 6), gy = Math.floor(y / 5);
+        let best = 99, bdx = 0, bdy = 0, br = 3;
+        for (let oy = -1; oy <= 1; oy++) for (let ox = -1; ox <= 1; ox++) {
+          const cx0 = gx + ox, cy0 = gy + oy, hk = cx0 * 5.31 + cy0 * 9.17 + 3;
+          const cx = cx0 * 6 + 1 + hash(hk) * 4, cy = cy0 * 5 + 1 + hash(hk + 1.7) * 3, r = 2.4 + hash(hk + 2.9) * 1.4;
+          if (cy < t + 1) continue;
+          const dd = Math.hypot(x - cx, (y - cy) * 1.15) / r;
+          if (dd < best) { best = dd; bdx = x - cx; bdy = y - cy; br = r; }
+        }
+        if (best <= 1) {
+          const rim = best > 1 - 1.15 / br;
+          if (rim && bdx + bdy > 0.4) c = R.hillDark; // shaded lower right
+          else if (rim && bdx + bdy < -0.4) c = shade ? R.hillMid : R.hillLit; // lit upper left
+          else if (!shade && bdx < 0 && bdy < 0 && best < 0.55) c = R.hillLit; // a sunny patch on the crown
+        }
+      }
       put(mid, x, y, c);
     }
   }
